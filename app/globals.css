@@ -2,134 +2,207 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+/* Theme tokens. Values are RGB channels so Tailwind opacity modifiers work.
+   Light = "Site Plan" (drafting paper), dark = "Blueprint" (night linework). */
+@layer base {
+  :root {
+    --bg: 250 249 246;
+    --surface: 255 255 255;
+    --surface-2: 243 241 236;
+    --ink: 22 25 29;
+    --ink-muted: 88 96 106;
+    --line: 228 224 216;
+    --line-strong: 205 199 188;
+    --accent: 4 120 87;
+    --accent-hover: 6 95 70;
+    --accent-ink: 4 120 87;
+    --on-accent: 255 255 255;
+    --accent-soft: 230 243 237;
+    --danger: 185 28 28;
+    --scrim: 10 13 16;
+    --shadow: 22 25 29;
+    --backdrop-ink: 22 25 29;
+    --backdrop-opacity: 0.06;
+    --survey: 4 120 87;
+
+    --dur-fast: 150ms;
+    --dur-base: 240ms;
+    --dur-slow: 400ms;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    color-scheme: light;
+  }
+
+  .dark {
+    --bg: 14 20 25;
+    --surface: 21 29 36;
+    --surface-2: 27 37 46;
+    --ink: 232 236 239;
+    --ink-muted: 156 168 179;
+    --line: 36 48 58;
+    --line-strong: 56 72 86;
+    --accent: 16 185 129;
+    --accent-hover: 52 211 153;
+    --accent-ink: 52 211 153;
+    --on-accent: 3 44 32;
+    --accent-soft: 17 49 41;
+    --danger: 248 113 113;
+    --scrim: 4 8 11;
+    --shadow: 0 0 0;
+    --backdrop-ink: 52 211 153;
+    --backdrop-opacity: 0.09;
+    --survey: 103 232 249;
+    color-scheme: dark;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-bg font-sans text-base text-ink antialiased;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4 {
+    @apply text-ink;
+    text-wrap: balance;
+  }
+
+  ::selection {
+    @apply bg-accent-soft text-accent-ink;
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--accent-ink));
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
 }
 
-body {
-  background-color: #030712;
-  color: #f1f5f9;
-  font-family: var(--font-inter);
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer components {
+  /* Drawing-set sheet label, e.g. "A-02 · Corridors" */
+  .sheet-label {
+    @apply font-mono text-2xs uppercase tracking-[0.14em] text-ink-muted;
+  }
+
+  .btn, .btn-primary, .btn-secondary, .btn-ghost {
+    @apply inline-flex min-h-[48px] select-none items-center justify-center gap-2 whitespace-nowrap rounded-xl px-5 text-sm font-medium transition-colors duration-fast ease-out;
+    touch-action: manipulation;
+  }
+  .btn:active, .btn-primary:active, .btn-secondary:active, .btn-ghost:active { transform: scale(0.98); }
+  .btn-primary { @apply bg-accent text-accent-on hover:bg-accent-hover; }
+  .btn-secondary { @apply border border-line bg-surface text-ink hover:border-line-strong hover:bg-surface-2; }
+  .btn-ghost { @apply text-ink-muted hover:bg-surface-2 hover:text-ink; }
+  .icon-btn {
+    @apply inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-line bg-surface text-ink transition-colors duration-fast ease-out hover:border-line-strong hover:bg-surface-2;
+  }
+
+  .field {
+    @apply min-h-[48px] w-full rounded-xl border border-line bg-surface px-4 text-base text-ink transition-colors duration-fast placeholder:text-ink-muted/80 hover:border-line-strong;
+  }
+  .field:focus-visible { @apply border-accent-ink; outline-offset: 0; }
+  .field[aria-invalid='true'] { @apply border-danger; }
+
+  .chip {
+    @apply inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-line bg-surface px-3.5 text-sm text-ink transition-colors duration-fast hover:border-line-strong;
+  }
+  .chip[aria-pressed='true'], .chip[aria-checked='true'], .chip[data-active='true'] {
+    @apply border-accent-ink bg-accent-soft text-accent-ink;
+  }
+
+  .panel { @apply rounded-card border border-line bg-surface; }
+
+  /* Hover lift: transform on the card, shadow on a pseudo-element that only fades in. */
+  .lift {
+    position: relative;
+    transition: transform var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease);
+  }
+  .lift::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: 0 18px 40px -18px rgb(var(--shadow) / 0.35), 0 4px 12px -6px rgb(var(--shadow) / 0.12);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-base) var(--ease);
+  }
+  @media (hover: hover) {
+    .lift:hover { transform: translateY(-4px); border-color: rgb(var(--accent-ink) / 0.3); }
+    .lift:hover::after { opacity: 1; }
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden bg-surface-2;
+  }
+  .skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgb(var(--surface) / 0.6), transparent);
+    @apply animate-shimmer;
+  }
+
+  .hairline { @apply border-line; }
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .tabular { font-variant-numeric: tabular-nums; }
 }
 
-/* Custom refined scrollbar */
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+/* Scroll reveal: 12px rise and fade, once. */
+.reveal { transition: opacity var(--dur-slow) var(--ease) var(--reveal-delay, 0ms), transform var(--dur-slow) var(--ease) var(--reveal-delay, 0ms); }
+.reveal[data-reveal='waiting'] { opacity: 0; transform: translateY(12px); }
+
+/* Blueprint backdrop: the building outline draws once, then stays. */
+.bp-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw-in 1.6s var(--ease) 0.15s forwards; }
+@keyframes draw-in { to { stroke-dashoffset: 0; } }
+
+.bp-floor {
+  opacity: clamp(0, calc((var(--bp-p, 0) - var(--k)) * 10), 1);
+  transform: translateY(calc((1 - clamp(0, calc((var(--bp-p, 0) - var(--k)) * 10), 1)) * 10px));
+}
+.bp-survey { opacity: clamp(0, calc((var(--bp-p, 0) - 0.1) * 2.2), 1); }
+
+/* The header compacts with transforms only: it slides up 12px and the content re-centres. */
+.site-header { transition: transform var(--dur-base) var(--ease); }
+.site-header[data-compact='true'] { transform: translateY(-12px); }
+.site-header__inner { transition: transform var(--dur-base) var(--ease); }
+.site-header[data-compact='true'] .site-header__inner { transform: translateY(6px); }
+.site-header__chrome { opacity: 0; transition: opacity var(--dur-base) var(--ease); }
+.site-header[data-compact='true'] .site-header__chrome { opacity: 1; }
+
+.safe-bottom { padding-bottom: max(0.5rem, env(safe-area-inset-bottom)); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal[data-reveal='waiting'] { opacity: 1; transform: none; }
+  .bp-draw { stroke-dashoffset: 0; animation: none; }
+  .skeleton::after { display: none; }
 }
 
-::-webkit-scrollbar-track {
-  background: #030712;
+/* Dual-thumb range: two native range inputs share one track; only the thumbs take pointer input. */
+.dual-range { position: relative; height: 48px; }
+.dual-range input[type='range'] {
+  position: absolute; inset: 0; width: 100%; height: 48px; margin: 0;
+  appearance: none; -webkit-appearance: none; background: transparent; pointer-events: none;
 }
+.dual-range input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; pointer-events: auto; cursor: grab;
+  width: 24px; height: 24px; border-radius: 9999px;
+  background: rgb(var(--surface)); border: 2px solid rgb(var(--accent)); box-shadow: 0 1px 4px rgb(var(--shadow) / 0.25);
+}
+.dual-range input[type='range']::-moz-range-thumb {
+  pointer-events: auto; cursor: grab; width: 20px; height: 20px; border-radius: 9999px;
+  background: rgb(var(--surface)); border: 2px solid rgb(var(--accent));
+}
+.dual-range input[type='range']:focus-visible::-webkit-slider-thumb { outline: 2px solid rgb(var(--accent-ink)); outline-offset: 2px; }
 
-::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 2px;
-}
+@keyframes progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #334155;
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* Sharp Architectural Custom Styles */
-.btn-primary {
-  @apply relative inline-flex items-center justify-center font-bold text-xs sm:text-sm text-canvas-950 bg-brand-500 hover:bg-brand-400 active:bg-brand-600 transition-all duration-150 rounded-[6px] shadow-[0_1px_2px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.25)] border border-brand-400/40;
-}
-
-.btn-secondary {
-  @apply relative inline-flex items-center justify-center font-semibold text-xs sm:text-sm text-slate-200 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] active:bg-white/[0.12] transition-all duration-150 rounded-[6px] border border-white/[0.1] hover:border-white/[0.2];
-}
-
-.btn-ghost {
-  @apply relative inline-flex items-center justify-center font-medium text-xs text-slate-300 hover:text-white transition-colors duration-150 rounded-[6px] hover:bg-white/[0.05];
-}
-
-/* Crisp Input / Select styling */
-.field-input {
-  @apply w-full bg-[#070b13] border border-white/[0.1] hover:border-white/[0.18] focus:border-brand-500 focus:bg-[#080d18] rounded-[6px] text-xs text-white placeholder-slate-500 transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-brand-500/30;
-}
-
-/* Styled Native Select Fallback */
-select.field-input {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  padding-right: 32px;
-}
-
-select.field-input option {
-  background-color: #080d16;
-  color: #f1f5f9;
-  padding: 8px 12px;
-}
-
-/* Precision Range Slider */
-input[type=range] {
-  -webkit-appearance: none;
-  background: transparent;
-}
-
-input[type=range]:focus {
-  outline: none;
-}
-
-input[type=range]::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 4px;
-  cursor: pointer;
-  background: #111827;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 2px;
-}
-
-input[type=range]::-webkit-slider-thumb {
-  height: 16px;
-  width: 16px;
-  border-radius: 3px;
-  background: #10b981;
-  border: 2px solid #030712;
-  cursor: pointer;
-  -webkit-appearance: none;
-  margin-top: -6px;
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
-  transition: transform 0.1s ease, background-color 0.1s ease;
-}
-
-input[type=range]::-webkit-slider-thumb:hover {
-  background: #34d399;
-  transform: scale(1.1);
-}
-
-/* Architectural Card & Panel styling */
-.arch-card {
-  background: #080c15;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-}
-
-.arch-card-elevated {
-  background: #0a0f1a;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-}
-
-/* Subtle Technical Grid Overlay */
-.bg-tech-grid {
-  background-size: 48px 48px;
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-}
+html[data-listing-pending] #listing-results { visibility: hidden; }

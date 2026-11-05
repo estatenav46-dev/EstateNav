@@ -8,6 +8,9 @@
 
 # next.js
 /.next/
+/.next_build/
+/.next-estatenav/
+/build-output/
 /out/
 
 # production

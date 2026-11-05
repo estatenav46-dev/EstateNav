@@ -1,57 +1,64 @@
 import type { Config } from 'tailwindcss';
 
+// Every colour is a CSS variable (see app/globals.css) so the light "Site Plan" and
+// dark "Blueprint" themes swap without touching components.
+const token = (name: string) => `rgb(var(--${name}) / <alpha-value>)`;
+
 const config: Config = {
-  content: [
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
-  ],
+  darkMode: 'class',
+  content: ['./app/**/*.{ts,tsx,mdx}', './components/**/*.{ts,tsx,mdx}', './lib/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
-        brand: {
-          50: '#ecfdf5',
-          100: '#d1fae5',
-          200: '#a7f3d0',
-          300: '#6ee7b7',
-          400: '#34d399',
-          500: '#10b981',
-          600: '#059669',
-          700: '#047857',
-          800: '#065f46',
-          900: '#064e3b',
-          950: '#022c22',
+        bg: token('bg'),
+        surface: { DEFAULT: token('surface'), 2: token('surface-2') },
+        ink: { DEFAULT: token('ink'), muted: token('ink-muted') },
+        line: { DEFAULT: token('line'), strong: token('line-strong') },
+        accent: {
+          DEFAULT: token('accent'),
+          hover: token('accent-hover'),
+          ink: token('accent-ink'),
+          soft: token('accent-soft'),
+          on: token('on-accent'),
         },
-        canvas: {
-          950: '#030712',
-          900: '#090d16',
-          850: '#0e1422',
-          800: '#141c2e',
-          700: '#1e293b',
-        },
+        danger: token('danger'),
+        scrim: token('scrim'),
       },
       fontFamily: {
-        logo: ['var(--font-logo)', 'Montserrat', 'system-ui', 'sans-serif'],
-        sans: ['var(--font-inter)', 'system-ui', '-apple-system', 'sans-serif'],
-        mono: ['var(--font-mono)', 'monospace'],
+        sans: ['var(--font-geist-sans)', 'Manrope', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-serif)', 'Georgia', 'serif'],
+        mono: ['var(--font-geist-mono)', 'ui-monospace', 'monospace'],
+      },
+      fontSize: {
+        '2xs': ['0.75rem', { lineHeight: '1.4' }],
+        sm: ['0.875rem', { lineHeight: '1.5' }],
+        base: ['1rem', { lineHeight: '1.6' }],
+        lg: ['1.125rem', { lineHeight: '1.55' }],
+        xl: ['1.375rem', { lineHeight: '1.35' }],
+        '2xl': ['1.75rem', { lineHeight: '1.2' }],
+        '3xl': ['2.5rem', { lineHeight: '1.08' }],
+        '4xl': ['3.5rem', { lineHeight: '1.04' }],
+      },
+      maxWidth: { container: '1360px' },
+      borderRadius: { card: '16px', slide: '20px' },
+      transitionDuration: { fast: '150ms', base: '240ms', slow: '400ms' },
+      transitionTimingFunction: { out: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+      spacing: { header: '72px' },
+      keyframes: {
+        shimmer: { '100%': { transform: 'translateX(100%)' } },
+        progress: { from: { transform: 'scaleX(0)' }, to: { transform: 'scaleX(1)' } },
+        'draw-in': { to: { strokeDashoffset: '0' } },
+        'pin-drop': {
+          '0%': { opacity: '0', transform: 'translateY(-10px) scale(0.6)' },
+          '60%': { opacity: '1', transform: 'translateY(1px) scale(1.06)' },
+          '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
+        'fade-up': { from: { opacity: '0', transform: 'translateY(8px)' }, to: { opacity: '1', transform: 'none' } },
       },
       animation: {
-        'ticker': 'ticker 35s linear infinite',
-        'pulse-subtle': 'pulseSubtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-      },
-      keyframes: {
-        ticker: {
-          '0%': { transform: 'translateX(0%)' },
-          '100%': { transform: 'translateX(-50%)' },
-        },
-        pulseSubtle: {
-          '0%, 100%': { opacity: '1' },
-          '50%': { opacity: '0.4' },
-        },
-      },
-      boxShadow: {
-        'glow-emerald': '0 0 25px -5px rgba(16, 185, 129, 0.25)',
-        'glow-subtle': '0 0 40px -10px rgba(16, 185, 129, 0.12)',
+        shimmer: 'shimmer 1.4s cubic-bezier(0.22, 1, 0.36, 1) infinite',
+        'pin-drop': 'pin-drop 420ms cubic-bezier(0.22, 1, 0.36, 1) both',
+        'fade-up': 'fade-up 240ms cubic-bezier(0.22, 1, 0.36, 1) both',
       },
     },
   },
@@ -59,4 +66,3 @@ const config: Config = {
 };
 
 export default config;
-

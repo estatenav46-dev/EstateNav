@@ -1,118 +1,80 @@
 import type { Metadata, Viewport } from 'next';
-import { Montserrat } from 'next/font/google';
+import localFont from 'next/font/local';
+import { Instrument_Serif } from 'next/font/google';
 import './globals.css';
+import { Providers } from '@/components/theme/ThemeProvider';
+import { BlueprintBackdrop } from '@/components/layout/BlueprintBackdrop';
+import { SiteHeader } from '@/components/layout/SiteHeader';
+import { SiteFooter } from '@/components/layout/SiteFooter';
+import { HideOnAdmin } from '@/components/layout/HideOnAdmin';
+import { MobileDock } from '@/components/layout/MobileDock';
+import { CompareTray } from '@/components/listings/CompareTray';
+import { getCorridors, getSettings } from '@/lib/data/cached';
+import { SITE_URL } from '@/lib/site';
 
-const montserrat = Montserrat({
-  subsets: ['latin'],
-  weight: ['600', '700', '800', '900'],
-  variable: '--font-logo',
-  display: 'swap',
-});
+// Geist (SIL OFL, see app/fonts/LICENSE-Geist.txt), subset to Latin plus ₹ to keep the preload small.
+const sans = localFont({ src: './fonts/Geist-Latin.woff2', variable: '--font-geist-sans', weight: '100 900', display: 'swap' });
+// Mono only sets RERA numbers and areas, so it loads after the critical content.
+const mono = localFont({ src: './fonts/GeistMono-Latin.woff2', variable: '--font-geist-mono', weight: '100 900', display: 'swap', preload: false });
+const serif = Instrument_Serif({ weight: '400', subsets: ['latin'], variable: '--font-serif', display: 'swap' });
 
 export const metadata: Metadata = {
-  title: 'EstateNav — Smart Investments, Better Living, Great Possibilities',
-  description: 'EstateNav: Smart Investments, Better Living, Great Possibilities. Institutional-grade research, Kaveri 2.0 title audits, and direct verified allocations across Bengaluru corridors.',
-  keywords: [
-    'Bengaluru Real Estate',
-    'Codename New Dimension',
-    'Sarjapur Road Apartments',
-    'Whitefield Flats',
-    'Kaveri 2.0 audited properties',
-    'Direct developer pricing',
-    'K-RERA registered projects',
-  ],
-  authors: [{ name: 'EstateNav Advisory' }],
+  metadataBase: new URL(SITE_URL),
+  title: { default: 'EstateNav | Verified Bengaluru homes, plots & workspaces', template: '%s | EstateNav' },
+  description: 'A curated catalogue of verified Bengaluru homes, plots and workspaces — direct-developer pricing, zero buyer brokerage and RERA details you can check.',
   openGraph: {
-    title: 'EstateNav — Navigate Bengaluru Real Estate with Data-Backed Certainty',
-    description: 'Data-backed property discovery, transit radius matching, and direct developer allocations for high-income tech leads and NRI investors.',
-    url: 'https://estatenav.vercel.app',
+    title: 'EstateNav | Verified Bengaluru homes, plots & workspaces',
+    description: 'Direct-developer pricing, zero buyer brokerage and RERA details you can check.',
+    url: SITE_URL,
     siteName: 'EstateNav',
-    images: [
-      {
-        url: 'https://estatenav.vercel.app/logo-card.jpg',
-        width: 1422,
-        height: 1422,
-        alt: 'EstateNav Institutional Real Estate Advisory Logo',
-      },
-    ],
+    images: [{ url: '/logo-card.jpg', width: 1422, height: 1422, alt: 'EstateNav' }],
     locale: 'en_IN',
     type: 'website',
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
-  icons: {
-    icon: '/logo.png',
-    apple: '/logo.png',
-  },
+  robots: { index: true, follow: true },
+  icons: { icon: '/logo.png', apple: '/logo.png' },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#030712',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#FAF9F6' },
+    { media: '(prefers-color-scheme: dark)', color: '#0E1419' },
+  ],
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'RealEstateAgent',
-    name: 'EstateNav',
-    description: 'Institutional-grade real estate advisory and direct developer allocations in Bengaluru.',
-    url: 'https://estatenav.vercel.app',
-    logo: 'https://estatenav.vercel.app/logo.png',
-    image: 'https://estatenav.vercel.app/logo-card.jpg',
-    areaServed: ['Sarjapur Road', 'Whitefield', 'Outer Ring Road', 'Hebbal', 'Electronic City'],
-    knowsAbout: [
-      'K-RERA Compliance',
-      'Kaveri 2.0 Title Clearances',
-      'Direct Developer Allocations',
-    ],
-    contactPoint: {
-      '@type': 'ContactPoint',
-      telephone: '+91 97406 09562',
-      contactType: 'Sales & Advisory Support',
-      areaServed: 'IN',
-      availableLanguage: ['English', 'Kannada', 'Hindi'],
-    },
-  };
+export default async function RootLayout({ children, modal }: { children: React.ReactNode; modal: React.ReactNode }) {
+  const [settings, corridors] = await Promise.all([getSettings(), getCorridors()]);
+  const consent = { text: settings.consentText, version: settings.consentVersion, privacyNote: settings.privacyNote };
 
   return (
-    <html lang="en" className={`dark scroll-smooth ${montserrat.variable}`}>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if (typeof window !== 'undefined') {
-                const _log = console.log;
-                const _info = console.info;
-                console.log = function(...args) {
-                  if (typeof args[0] === 'string' && args[0].includes('[Fast Refresh]')) return;
-                  _log.apply(console, args);
-                };
-                console.info = function(...args) {
-                  if (typeof args[0] === 'string' && args[0].includes('[Fast Refresh]')) return;
-                  _info.apply(console, args);
-                };
-              }
-            `,
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-      </head>
-      <body className="bg-canvas-950 text-slate-100 antialiased selection:bg-brand-500/20 selection:text-brand-300 min-h-screen flex flex-col justify-between">
-        {children}
+    <html lang="en-IN" suppressHydrationWarning className={`${sans.variable} ${mono.variable} ${serif.variable}`}>
+      <body className="flex min-h-screen flex-col">
+        <Providers>
+          <a href="#content" className="sr-only z-[100] rounded-lg bg-surface px-4 py-3 text-ink focus:not-sr-only focus:fixed focus:left-4 focus:top-4">
+            Skip to content
+          </a>
+          <BlueprintBackdrop />
+          <SiteHeader
+            phone={settings.contact.phone}
+            phoneDisplay={settings.contact.phoneDisplay}
+            whatsapp={settings.contact.whatsapp}
+            agentName={settings.agent.name}
+            agentRera={settings.agent.reraNumber}
+          />
+          <div id="content" className="flex-1">
+            {children}
+          </div>
+          {modal}
+          <HideOnAdmin>
+            <SiteFooter settings={settings} corridors={corridors} />
+          </HideOnAdmin>
+          <CompareTray />
+          <MobileDock settings={settings} consent={consent} />
+        </Providers>
       </body>
     </html>
   );
 }
-

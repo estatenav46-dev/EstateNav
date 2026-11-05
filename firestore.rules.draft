@@ -1,0 +1,42 @@
+rules_version = '2';
+// DRAFT — not deployed. Review before `firebase deploy --only firestore:rules`.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function role() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role; }
+    function isStaff() { return signedIn() && role() in ['admin', 'editor']; }
+    function isAdmin() { return signedIn() && role() == 'admin'; }
+
+    // Listings: the public reads published ones only; staff manage everything.
+    match /properties/{propertyId} {
+      allow read: if resource.data.status == 'published' || isStaff();
+      allow create, update, delete: if isStaff();
+    }
+
+    match /developers/{id}       { allow read: if true; allow write: if isStaff(); }
+    match /corridors/{id}        { allow read: if true; allow write: if isStaff(); }
+    match /marketSnapshots/{id}  { allow read: if true; allow write: if isStaff(); }
+    match /officeHubs/{id}       { allow read: if true; allow write: if isStaff(); }
+    match /settings/{id}         { allow read: if true; allow write: if isStaff(); }
+
+    // Enquiries are written only by Server Actions through the Admin SDK (which bypasses
+    // these rules). Browsers can never read or create them.
+    match /enquiries/{id} {
+      allow create: if false;
+      allow read, update: if isStaff();
+      allow delete: if isAdmin();
+    }
+
+    // A visitor can read and change only their own shortlist; roles are admin-only.
+    match /users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow create: if signedIn() && request.auth.uid == uid && !('role' in request.resource.data);
+      allow update: if signedIn() && (
+        (request.auth.uid == uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['shortlist', 'displayName']))
+        || isAdmin()
+      );
+      allow delete: if isAdmin();
+    }
+  }
+}

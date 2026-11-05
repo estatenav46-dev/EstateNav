@@ -1,44 +1,90 @@
-export type Segment = 'residential' | 'commercial' | 'plotted';
-
+export type PropertyCategory = 'residential' | 'commercial' | 'plotted';
+// Kept for the untouched legacy Firebase adapter.
+export type Segment = PropertyCategory;
 export type MilestoneLens = 'all' | 'first' | 'upgrade' | 'nri' | 'senior';
-
 export type TechCampus = 'all' | 'wipro' | 'ecospace' | 'manyata';
 
-export interface CommuteInfo {
-  campus: TechCampus;
-  driveMinutes: number;
-  distanceKm: number;
-  routeHighlight: string;
-}
-
-export interface InvestmentMetrics {
-  expectedYield: string;
-  historicalAppreciation: string;
-  kaveriGuidelineRate: string;
-  absorptionVelocity: string;
-}
-
 export interface Property {
+  // Identity
   id: string;
-  name: string;
+  title: string;
+  projectName: string;
   developer: string;
-  segment: Segment;
-  microMarket: string;
+  listingFor: 'buy' | 'rent';
+  propertyType: 'apartment' | 'villa' | 'plot' | 'floor' | 'office';
+  category: PropertyCategory;
+  status: 'new-launch' | 'under-construction' | 'ready' | 'pre-launch';
+  featured: boolean;
+  availability: 'available' | 'sold-out';
+
+  // Location
+  city: 'Bengaluru';
+  locality: string;
+  corridor: 'Sarjapur Road' | 'Whitefield' | 'Electronic City' | 'North Bengaluru' | 'Other';
   address: string;
-  configurations: string;
-  carpetArea?: string;
-  startingPrice: number; // in Lakhs for unified filtering
-  priceDisplay: string;
-  possession: string;
-  status: 'Pre-Launch' | 'Under Construction' | 'Ready to Move In' | 'Ready to Register';
-  isAnchorSpotlight?: boolean;
-  reraNumber: string;
-  reraValidationUrl: string;
-  heroImage: string;
-  keyFeatures: string[];
-  commute: CommuteInfo;
-  lenses: MilestoneLens[];
-  metrics: InvestmentMetrics;
+  pincode?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+
+  // Specifications
+  bhkLabel: string;
+  bhkOptions?: number[];
+  bathrooms?: number | null;
+  furnishing?: 'unfurnished' | 'semi-furnished' | 'furnished' | null;
+  facing?: string | null;
+  floor?: number | null;
+  totalFloors?: number | null;
+  carpetAreaMin?: number | null;
+  carpetAreaMax?: number | null;
+  builtUpAreaMin?: number | null;
+  builtUpAreaMax?: number | null;
+  superAreaMin?: number | null;
+  superAreaMax?: number | null;
+  plotAreaMin?: number | null;
+  plotAreaMax?: number | null;
+  areaUnit: 'sqft';
+
+  // Pricing
+  priceMin: number;
+  priceLabel: string;
+  priceType: 'onwards' | 'fixed' | 'per-sqft-month';
+  pricePerSqft?: number;
+  maintenancePerMonth?: number | null;
+  isGuidePrice: true;
+
+  // Possession
+  possessionLabel: string;
+  possessionStatus: 'ready' | 'under-construction' | 'new-launch';
+
+  // Media
+  images: string[];
+  coverImage: string;
+  videoUrl?: string | null;
+  brochureUrl?: string | null;
+
+  // Amenities
+  amenities: string[];
+
+  // Compliance and trust
+  reraNumber?: string;
+  reraUrl?: string;
+  agentName: 'SV Praveen';
+  agentRera: 'PRM/KA/RERA/1251/310/AG/260916/007810';
+  verified: boolean;
+  titleStatus?: string;
+  approvals?: string[];
+
+  // Investment
+  grossYieldPercent?: number;
+  capRatePercent?: number;
+
+  // Presentation and SEO
+  shortDescription: string;
+  highlights: string[];
+  postedOn: string | null;
+  updatedAt: string | null;
+  metaTitle: string;
+  metaDescription: string;
 }
 
 export interface LeadPayload {
@@ -52,15 +98,5 @@ export interface LeadPayload {
   actionContext: string;
   channelPartnerDisclosureAccepted: boolean;
   createdAt: string;
-}
-
-export interface TelemetryTickerItem {
-  id: string;
-  corridor: string;
-  subRegistrarBenchmark: string;
-  yoyDelta: string;
-  isPositive: boolean;
-  grossYield: string;
-  absorptionTime: string;
 }
 
