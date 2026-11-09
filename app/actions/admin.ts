@@ -6,6 +6,23 @@ import { getRepos } from '@/lib/data';
 import { corridorSchema, developerSchema, enquiryStatusSchema, propertySchema, publishStatusSchema, siteSettingsSchema } from '@/lib/data/schemas';
 import type { Corridor, Developer, Enquiry, Property, PublishStatus, SiteSettings } from '@/lib/data/types';
 import { ADMIN_ACTOR, isAdminPreview } from '@/lib/admin';
+import { getAdminFirestore } from '@/lib/data/adapters/firestore/admin';
+import {
+  corridorConverter,
+  developerConverter,
+  enquiryConverter,
+  officeHubConverter,
+  propertyConverter,
+  settingsConverter,
+} from '@/lib/data/adapters/firestore/converters';
+import {
+  seedCorridors,
+  seedDevelopers,
+  seedEnquiries,
+  seedOfficeHubs,
+  seedProperties,
+  seedSettings,
+} from '@/lib/data/adapters/mock/seed';
 
 type Result<T> = { ok: true; data: T } | { ok: false; message: string; issues?: string[] };
 
@@ -74,4 +91,53 @@ export async function saveCorridor(input: unknown): Promise<Result<Corridor>> {
 
 export async function saveSettings(input: unknown): Promise<Result<SiteSettings>> {
   return run(() => getRepos().settings.save(siteSettingsSchema.parse(input)), ['settings']);
+}
+
+export async function seedFirestoreDatabase(): Promise<Result<{ properties: number; developers: number; corridors: number }>> {
+  return run(async () => {
+    const db = getAdminFirestore();
+    const batch = db.batch();
+
+    // 1. Settings
+    const settingsRef = db.collection('settings').doc('site').withConverter(settingsConverter);
+    batch.set(settingsRef, { ...seedSettings, id: 'site' });
+
+    // 2. Corridors
+    for (const c of seedCorridors) {
+      const ref = db.collection('corridors').doc(c.id).withConverter(corridorConverter);
+      batch.set(ref, c);
+    }
+
+    // 3. Office hubs
+    for (const h of seedOfficeHubs) {
+      const ref = db.collection('officeHubs').doc(h.id).withConverter(officeHubConverter);
+      batch.set(ref, h);
+    }
+
+    // 4. Developers
+    for (const d of seedDevelopers) {
+      const ref = db.collection('developers').doc(d.id).withConverter(developerConverter);
+      batch.set(ref, d);
+    }
+
+    // 5. Properties
+    for (const p of seedProperties) {
+      const ref = db.collection('properties').doc(p.id).withConverter(propertyConverter);
+      batch.set(ref, p);
+    }
+
+    // 6. Enquiries
+    for (const e of seedEnquiries) {
+      const ref = db.collection('enquiries').doc(e.id).withConverter(enquiryConverter);
+      batch.set(ref, e);
+    }
+
+    await batch.commit();
+
+    return {
+      properties: seedProperties.length,
+      developers: seedDevelopers.length,
+      corridors: seedCorridors.length,
+    };
+  }, ['properties', 'catalogue', 'settings']);
 }

@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { getRepos } from '@/lib/data';
+import { getRepos, dataSource } from '@/lib/data';
 import { INTENT_LABEL } from '@/lib/property';
+import { SeedDatabaseButton } from '@/components/admin/SeedDatabaseButton';
 
 export const metadata = { title: 'Overview' };
 
@@ -15,7 +16,12 @@ export default async function AdminOverview() {
   ];
   return (
     <div className="space-y-8">
-      <h1 className="font-serif text-2xl">Overview</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="font-serif text-2xl">Overview</h1>
+      </div>
+
+      <SeedDatabaseButton dataSource={dataSource} />
+
       <ul className="grid gap-3 sm:grid-cols-3">
         {tiles.map((t) => (
           <li key={t.label}>

@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, Menu, MessageCircle, Phone, Search } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { LazySheet as Sheet } from '@/components/ui/LazySheet';
+import { UserMenu } from '@/components/auth/UserMenu';
 import { heroSearchStore, shortlistStore } from '@/lib/ui/stores';
 import { whatsAppLink } from '@/lib/contact';
 
@@ -164,6 +165,9 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, agentName, agentRera
           <Link href="/contact?intent=site-visit" className="btn-primary ml-1 hidden lg:inline-flex">
             Schedule site visit
           </Link>
+          <div className="ml-1 hidden sm:inline-flex">
+            <UserMenu />
+          </div>
           <button type="button" onClick={() => setDrawer(true)} className="icon-btn border-transparent lg:hidden" aria-label="Open menu" aria-expanded={drawer}>
             <Menu className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -180,6 +184,9 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, agentName, agentRera
           ))}
         </nav>
         <div className="mt-4 space-y-2 border-t border-line pt-4">
+          <div className="pb-1 sm:hidden">
+            <UserMenu />
+          </div>
           <Link href="/contact?intent=site-visit" className="btn-primary w-full">Schedule site visit</Link>
           <div className="grid grid-cols-2 gap-2">
             <a href={whatsAppLink(`Hi ${agentName}, I'm browsing EstateNav and would like some advice.`, whatsapp)} target="_blank" rel="noopener noreferrer" className="btn-secondary">

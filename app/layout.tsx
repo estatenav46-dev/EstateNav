@@ -3,6 +3,8 @@ import localFont from 'next/font/local';
 import { Instrument_Serif } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/theme/ThemeProvider';
+import { AuthProvider } from '@/lib/auth/context';
+import { AuthModal } from '@/components/auth/AuthModal';
 import { BlueprintBackdrop } from '@/components/layout/BlueprintBackdrop';
 import { SiteHeader } from '@/components/layout/SiteHeader';
 import { SiteFooter } from '@/components/layout/SiteFooter';
@@ -53,26 +55,29 @@ export default async function RootLayout({ children, modal }: { children: React.
     <html lang="en-IN" suppressHydrationWarning className={`${sans.variable} ${mono.variable} ${serif.variable}`}>
       <body className="flex min-h-screen flex-col">
         <Providers>
-          <a href="#content" className="sr-only z-[100] rounded-lg bg-surface px-4 py-3 text-ink focus:not-sr-only focus:fixed focus:left-4 focus:top-4">
-            Skip to content
-          </a>
-          <BlueprintBackdrop />
-          <SiteHeader
-            phone={settings.contact.phone}
-            phoneDisplay={settings.contact.phoneDisplay}
-            whatsapp={settings.contact.whatsapp}
-            agentName={settings.agent.name}
-            agentRera={settings.agent.reraNumber}
-          />
-          <div id="content" className="flex-1">
-            {children}
-          </div>
-          {modal}
-          <HideOnAdmin>
-            <SiteFooter settings={settings} corridors={corridors} />
-          </HideOnAdmin>
-          <CompareTray />
-          <MobileDock settings={settings} consent={consent} />
+          <AuthProvider>
+            <a href="#content" className="sr-only z-[100] rounded-lg bg-surface px-4 py-3 text-ink focus:not-sr-only focus:fixed focus:left-4 focus:top-4">
+              Skip to content
+            </a>
+            <BlueprintBackdrop />
+            <SiteHeader
+              phone={settings.contact.phone}
+              phoneDisplay={settings.contact.phoneDisplay}
+              whatsapp={settings.contact.whatsapp}
+              agentName={settings.agent.name}
+              agentRera={settings.agent.reraNumber}
+            />
+            <div id="content" className="flex-1">
+              {children}
+            </div>
+            {modal}
+            <HideOnAdmin>
+              <SiteFooter settings={settings} corridors={corridors} />
+            </HideOnAdmin>
+            <CompareTray />
+            <MobileDock settings={settings} consent={consent} />
+            <AuthModal />
+          </AuthProvider>
         </Providers>
       </body>
     </html>

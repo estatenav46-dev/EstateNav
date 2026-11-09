@@ -3,7 +3,7 @@ import { getRepos } from '.';
 
 // Cached reads for public pages (ISR on Vercel). Admin publish actions call
 // revalidateTag('properties' | 'catalogue' | 'settings') to refresh them immediately.
-const REVALIDATE = 300;
+const REVALIDATE = process.env.NODE_ENV === 'development' ? 1 : 60;
 
 export const getPublishedProperties = unstable_cache(
   () => getRepos().properties.list({ status: 'published' }),
