@@ -52,6 +52,8 @@ export async function sendEnquiryEmailNotification(enquiry: Enquiry): Promise<bo
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Origin': siteUrl,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) EstateNav/1.0',
       },
       body: JSON.stringify(payload),
     });
