@@ -2,6 +2,7 @@
 
 import { enquiryInputSchema } from '@/lib/data/schemas';
 import { getRepos } from '@/lib/data';
+import { sendEnquiryEmailNotification } from '@/lib/email/emailjs';
 import type { Property } from '@/lib/data/types';
 
 export type EnquiryResult =
@@ -41,6 +42,12 @@ export async function submitEnquiry(input: unknown): Promise<EnquiryResult> {
     consentAt: new Date().toISOString(),
     utm: data.utm,
   });
+
+  // Send real-time email notification via EmailJS (non-blocking)
+  sendEnquiryEmailNotification(enquiry).catch((err) => {
+    console.error('[Enquiries] Failed to dispatch email notification:', err);
+  });
+
   return { ok: true, id: enquiry.id };
 }
 
