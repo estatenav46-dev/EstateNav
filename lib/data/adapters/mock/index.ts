@@ -1,11 +1,11 @@
-import { corridorSchema, developerSchema, enquirySchema, propertySchema, siteSettingsSchema } from '../../schemas';
+import { corridorSchema, developerSchema, enquirySchema, marketSnapshotSchema, propertySchema, siteSettingsSchema } from '../../schemas';
 import type { CorridorRepo, DeveloperRepo, LeadRepo, PropertyRepo, Repos, SettingsRepo } from '../../repository';
-import type { Corridor, Developer, Enquiry, Property, SiteSettings } from '../../types';
+import type { Corridor, Developer, Enquiry, MarketSnapshot, Property, SiteSettings } from '../../types';
 import { seedCorridors, seedDevelopers, seedEnquiries, seedOfficeHubs, seedProperties, seedSettings } from './seed';
 
 // In-memory store. It lives on globalThis so dev hot reloads keep edits made in /admin.
 // On Vercel each serverless instance has its own copy, which is fine for previews only.
-type Store = { properties: Property[]; developers: Developer[]; corridors: Corridor[]; enquiries: Enquiry[]; settings: SiteSettings };
+type Store = { properties: Property[]; developers: Developer[]; corridors: Corridor[]; enquiries: Enquiry[]; settings: SiteSettings; marketSnapshots: MarketSnapshot[] };
 
 const globalStore = globalThis as typeof globalThis & { __estatenavMockStore?: Store };
 
@@ -22,6 +22,8 @@ function createStore(): Store {
     corridors: seedCorridors,
     enquiries: seedEnquiries,
     settings: seedSettings,
+    // No sourced market data yet; figures appear only once an editor adds them with a source.
+    marketSnapshots: [] as MarketSnapshot[],
   });
 }
 
@@ -152,9 +154,19 @@ const corridors: CorridorRepo = {
   async listOfficeHubs() {
     return copy(seedOfficeHubs);
   },
-  // No sourced market data yet, so every consumer hides its stats strip.
-  async listMarketSnapshots() {
-    return [];
+  async listMarketSnapshots(corridorId?: string) {
+    store.marketSnapshots ??= [];
+    return copy(store.marketSnapshots.filter((m) => !corridorId || m.corridorId === corridorId));
+  },
+  async saveMarketSnapshot(snapshot) {
+    const record = marketSnapshotSchema.parse(snapshot);
+    store.marketSnapshots ??= [];
+    const exists = store.marketSnapshots.some((m) => m.id === record.id);
+    store.marketSnapshots = exists ? store.marketSnapshots.map((m) => (m.id === record.id ? record : m)) : [...store.marketSnapshots, record];
+    return copy(record);
+  },
+  async deleteMarketSnapshot(id) {
+    store.marketSnapshots = (store.marketSnapshots ?? []).filter((m) => m.id !== id);
   },
 };
 

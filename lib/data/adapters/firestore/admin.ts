@@ -1,5 +1,6 @@
 import { getApps, initializeApp, cert, type App } from 'firebase-admin/app';
 import { getFirestore, type Firestore } from 'firebase-admin/firestore';
+import { getAuth, type Auth } from 'firebase-admin/auth';
 
 let adminApp: App | null = null;
 let firestoreDb: Firestore | null = null;
@@ -36,3 +37,9 @@ export function getAdminFirestore(): Firestore {
   return firestoreDb;
 }
 
+
+/** Verifies visitors' Firebase ID tokens (wishlist, account features). */
+export function getAdminAuth(): Auth {
+  getAdminFirestore();
+  return getAuth(adminApp ?? getApps()[0]);
+}

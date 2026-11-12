@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useId, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, ShieldCheck } from 'lucide-react';
 import { submitEnquiry } from '@/app/actions/enquiries';
 import { leadFieldsSchema } from '@/lib/data/schemas';
 import type { EnquiryIntent, EnquirySource } from '@/lib/data/types';
@@ -174,9 +174,14 @@ export function LeadForm({ consent, source, whatsapp, advisorName, property, int
       </div>
 
       <div className={variant === 'inline' ? 'lg:pt-[30px]' : ''}>
-        <p className={`mb-2 text-2xs text-ink-muted ${variant === 'inline' ? 'sr-only' : ''}`}>{consent.privacyNote}</p>
+        <div className={`mb-2 ${variant === 'inline' ? 'sr-only' : ''}`}>
+          <p className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-2.5 py-1 text-[11px] font-semibold text-accent-ink">
+            <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /> Zero-spam privacy shield
+          </p>
+          <p className="mt-1.5 text-2xs text-ink-muted">{consent.privacyNote}</p>
+        </div>
         <button type="submit" disabled={isSubmitting} className="btn-primary w-full disabled:opacity-60">
-          {isSubmitting ? 'Sending…' : submitLabel ?? (chosen === 'price-sheet' ? 'Get price sheet' : chosen === 'site-visit' ? 'Schedule site visit' : 'Send request')}
+          {isSubmitting ? 'Sending…' : submitLabel ?? (chosen === 'price-sheet' ? 'Unlock direct developer pricing sheet' : chosen === 'site-visit' ? 'Schedule guided VIP site visit' : 'Send request')}
         </button>
       </div>
       {serverError && <p role="alert" className={`text-sm text-danger ${variant === 'inline' ? 'sm:col-span-2 lg:col-span-4' : ''}`}>{serverError}</p>}

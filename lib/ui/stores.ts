@@ -2,8 +2,8 @@
 
 import { useSyncExternalStore } from 'react';
 
-// Small browser stores shared across the header, cards, dock and pages. Persisted lists use
-// localStorage today; the shortlist moves to users/{uid}.shortlist once Google sign-in exists.
+// Small browser stores shared across the header, cards, dock and pages. Compare and recent
+// searches persist in localStorage; the wishlist is saved to the signed-in user's account.
 
 type Listener = () => void;
 
@@ -61,7 +61,10 @@ function createStore<T>(initial: T, storageKey?: string) {
   return { get, set, subscribe, useValue };
 }
 
-export const shortlistStore = createStore<string[]>([], 'estatenav:shortlist');
+// The wishlist belongs to the signed-in user (see lib/ui/wishlist.ts); this is its in-memory copy.
+export const shortlistStore = createStore<string[]>([]);
+/** Why the sign-in dialog opened (e.g. to save a home), shown above the form. */
+export const authPromptStore = createStore<{ reason: string }>({ reason: '' });
 export type CompareItem = { id: string; slug: string; title: string };
 export const compareStore = createStore<CompareItem[]>([], 'estatenav:compare');
 export const recentSearchStore = createStore<{ label: string; href: string }[]>([], 'estatenav:recent');
@@ -70,9 +73,7 @@ export const heroSearchStore = createStore<{ visible: boolean; summary: string }
 
 export const MAX_COMPARE = 3;
 
-export function toggleShortlist(id: string) {
-  shortlistStore.set((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]));
-}
+
 
 export function toggleCompare(item: CompareItem): boolean {
   let accepted = true;

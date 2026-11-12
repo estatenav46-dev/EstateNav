@@ -20,15 +20,15 @@ type HeaderProps = {
 };
 
 const NAV = [
-  { label: 'Buy', href: '/properties?seg=residential' },
-  { label: 'Rent', href: '/properties?seg=rent' },
+  { label: 'Explore', href: '/properties' },
+  { label: 'Apartments', href: '/properties?seg=residential' },
   { label: 'Plots', href: '/properties?seg=plot' },
-  { label: 'Commercial', href: '/properties?seg=commercial' },
-  { label: 'New Launch', href: '/properties?status=pre-launch,new-launch' },
+  { label: 'Offices', href: '/properties?seg=commercial' },
+  { label: 'New launches', href: '/properties?status=pre-launch,new-launch', wide: true },
 ];
 const EXPLORE = [
-  { label: 'All listings', href: '/properties' },
-  { label: 'Corridors', href: '/#corridors' },
+  { label: 'Browse by region', href: '/#regions' },
+  { label: 'New launches', href: '/properties?status=pre-launch,new-launch', narrow: true },
   { label: 'Shortlist', href: '/shortlist' },
   { label: 'Contact', href: '/contact' },
 ];
@@ -50,13 +50,13 @@ function ExploreMenu() {
   }, [open]);
   return (
     <div ref={ref} className="relative">
-      <button type="button" aria-expanded={open} aria-haspopup="true" onClick={() => setOpen((v) => !v)} className="inline-flex h-12 items-center gap-1 rounded-lg px-3 text-sm text-ink hover:bg-surface-2">
-        Explore <ChevronDown className={`h-4 w-4 transition-transform duration-fast ${open ? 'rotate-180' : ''}`} aria-hidden="true" />
+      <button type="button" aria-expanded={open} aria-haspopup="true" onClick={() => setOpen((v) => !v)} className="inline-flex h-12 items-center gap-1 rounded-lg px-2.5 text-sm text-ink hover:bg-surface-2 xl:px-3">
+        More <ChevronDown className={`h-4 w-4 transition-transform duration-fast ${open ? 'rotate-180' : ''}`} aria-hidden="true" />
       </button>
       {open && (
         <ul className="panel absolute left-0 top-full mt-1 w-52 animate-fade-up p-1.5 shadow-[0_18px_40px_-20px_rgb(var(--shadow)/0.35)]">
           {EXPLORE.map((item) => (
-            <li key={item.href}>
+            <li key={item.href} className={'narrow' in item ? 'xl:hidden' : undefined}>
               <Link href={item.href} onClick={() => setOpen(false)} className="flex min-h-[44px] items-center rounded-lg px-3 text-sm hover:bg-surface-2">
                 {item.label}
               </Link>
@@ -121,7 +121,6 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, agentName, agentRera
       <div aria-hidden="true" className="site-header__chrome absolute inset-0 border-b border-line bg-bg/85 backdrop-blur-md" />
       <div className="site-header__inner relative mx-auto flex h-full max-w-container items-center gap-3 px-4 sm:px-6 lg:px-8">
         <Wordmark />
-        <span className="hidden whitespace-nowrap rounded-full border border-accent-ink/30 bg-accent-soft px-2.5 py-1 font-mono text-2xs text-accent-ink xl:inline-block">Direct developer</span>
 
         <div className="relative hidden min-w-0 flex-1 justify-center lg:flex">
           <nav
@@ -131,7 +130,7 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, agentName, agentRera
             aria-hidden={showPill}
           >
             {NAV.map((item) => (
-              <Link key={item.href} href={item.href} tabIndex={showPill ? -1 : undefined} className="inline-flex h-12 items-center whitespace-nowrap rounded-lg px-3 text-sm text-ink hover:bg-surface-2">
+              <Link key={item.href} href={item.href} tabIndex={showPill ? -1 : undefined} className={`h-12 items-center whitespace-nowrap rounded-lg px-2.5 text-sm text-ink hover:bg-surface-2 xl:px-3 ${'wide' in item ? 'hidden xl:inline-flex' : 'inline-flex'}`}>
                 {item.label}
               </Link>
             ))}
@@ -163,7 +162,8 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, agentName, agentRera
             {phoneDisplay}
           </a>
           <Link href="/contact?intent=site-visit" className="btn-primary ml-1 hidden lg:inline-flex">
-            Schedule site visit
+            <span className="2xl:hidden">VIP site visit</span>
+            <span className="hidden 2xl:inline">Schedule guided VIP site visit</span>
           </Link>
           <div className="ml-1 hidden sm:inline-flex">
             <UserMenu />
@@ -176,7 +176,7 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, agentName, agentRera
 
       <Sheet open={drawer} onOpenChange={setDrawer} direction="right" title="Menu" className="max-w-[420px]">
         <nav aria-label="Mobile" className="-mx-1 flex flex-col">
-          {[...NAV, ...EXPLORE].map((item) => (
+          {[...NAV, ...EXPLORE.filter((e) => !NAV.some((n) => n.href === e.href))].map((item) => (
             <Link key={item.href} href={item.href} className="flex min-h-[48px] items-center justify-between rounded-lg px-3 text-base hover:bg-surface-2">
               {item.label}
               {item.href === '/shortlist' && shortlist.length > 0 && <span className="rounded-full bg-accent px-2 text-2xs font-medium text-accent-on">{shortlist.length}</span>}
@@ -187,10 +187,10 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, agentName, agentRera
           <div className="pb-1 sm:hidden">
             <UserMenu />
           </div>
-          <Link href="/contact?intent=site-visit" className="btn-primary w-full">Schedule site visit</Link>
-          <div className="grid grid-cols-2 gap-2">
+          <Link href="/contact?intent=site-visit" className="btn-primary w-full">Schedule guided VIP site visit</Link>
+          <div className="grid gap-2">
             <a href={whatsAppLink(`Hi ${agentName}, I'm browsing EstateNav and would like some advice.`, whatsapp)} target="_blank" rel="noopener noreferrer" className="btn-secondary">
-              <MessageCircle className="h-4 w-4 text-accent-ink" aria-hidden="true" /> WhatsApp
+              <MessageCircle className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Connect with dedicated area advisor
             </a>
             <a href={tel} className="btn-secondary">
               <Phone className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Call

@@ -62,7 +62,7 @@ export function SiteFooter({ settings, corridors }: { settings: SiteSettings; co
           <div className="flex flex-wrap gap-x-5 gap-y-1">
             <a href={`tel:${contact.phone.replace(/[^0-9+]/g, '')}`} className="inline-flex min-h-[40px] items-center font-mono text-ink hover:text-accent-ink">{contact.phoneDisplay}</a>
             <a href={whatsAppLink(`Hi ${agent.name}, I'm browsing EstateNav and would like some advice.`, contact.whatsapp)} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[40px] items-center text-accent-ink hover:underline">
-              WhatsApp advisor
+              Connect with dedicated area advisor
             </a>
           </div>
         </div>
@@ -71,7 +71,10 @@ export function SiteFooter({ settings, corridors }: { settings: SiteSettings; co
       <div className="mx-auto mt-10 max-w-container space-y-2 border-t border-line px-4 pt-6 text-2xs leading-relaxed sm:px-6 lg:px-8">
         <p className="text-ink">{settings.disclaimers.portal}</p>
         <p>{settings.disclaimers.listing}</p>
-        <p>© {new Date().getFullYear()} EstateNav · Bengaluru</p>
+        <p className="flex flex-wrap items-center gap-x-3">
+          <span>© {new Date().getFullYear()} EstateNav · Bengaluru</span>
+          <a href="/sitemap.xml" className="inline-flex min-h-[40px] items-center hover:text-ink">Sitemap</a>
+        </p>
       </div>
     </footer>
   );

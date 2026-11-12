@@ -1,97 +1,100 @@
 'use client';
 
-import { AnimatePresence, m } from 'motion/react';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Search } from 'lucide-react';
-import type { Corridor, Property, SearchSegment } from '@/lib/data/types';
-import { matchesSegment, SEGMENT_LABEL } from '@/lib/property';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowDown, ArrowRight, ShieldCheck } from 'lucide-react';
+import type { Corridor, Property } from '@/lib/data/types';
+import { applyListing, DEFAULT_LISTING_STATE, serializeListingState, sortListings, type ListingState } from '@/lib/listingFilters';
+import { matchesSegment } from '@/lib/property';
+import { SALE_BUDGET_CHOICES } from '@/lib/categories';
 import { heroSearchStore } from '@/lib/ui/stores';
+import { QuickSearch } from '@/components/explore/QuickSearch';
 import { HeroCarousel } from './HeroCarousel';
-import { SearchConsole } from '@/components/search/SearchConsole';
-import { MobileSearchSheet } from '@/components/search/MobileSearchSheet';
-import { buildSuggestions } from '@/components/search/LocalityAutocomplete';
-import { useHeroSearch } from '@/components/search/useHeroSearch';
 
-const SEGMENTS: { id: SearchSegment; headline: string; sub: string }[] = [
-  { id: 'residential', headline: 'Verified homes across Bengaluru’s growth corridors.', sub: 'Direct-developer pricing, zero buyer brokerage, and RERA details you can check yourself.' },
-  { id: 'plot', headline: 'Plots with the paperwork in view.', sub: 'Gated layouts on the Sarjapur and Whitefield belts, with approval and title details shown wherever we hold them.' },
-  { id: 'commercial', headline: 'Workspaces on the city’s office corridors.', sub: 'Warm-shell floors and managed suites on Outer Ring Road and North Bengaluru, leased on direct terms.' },
-  { id: 'rent', headline: 'Leases without the broker layer.', sub: 'Rental listings on direct terms. Ask for availability and a walkthrough.' },
-];
+type Seg = 'residential' | 'plot' | 'commercial';
+type Choice = { id: string; label: string; patch: Partial<ListingState> };
 
-const isSegment = (value: string | null): value is SearchSegment => SEGMENTS.some((s) => s.id === value);
+// The state re-skin: one switch changes the headline, the second console field, the
+// featured slides and the search hint, without a page reload.
+const SEGMENTS: Record<Seg, { tab: string; noun: [string, string]; headline: string; sub: string; placeholder: string; fieldLabel: string; choices: Choice[] }> = {
+  residential: {
+    tab: 'Residential',
+    noun: ['home', 'homes'],
+    headline: 'Verified homes across Bengaluru’s growth corridors.',
+    sub: 'Direct developer pricing, zero buyer brokerage and K-RERA details you can check yourself.',
+    placeholder: 'Micro-market or project, e.g. Whitefield',
+    fieldLabel: 'Budget',
+    choices: SALE_BUDGET_CHOICES.map((b) => ({ id: b.id, label: b.label, patch: { min: b.min, max: b.max } })),
+  },
+  plot: {
+    tab: 'Plots',
+    noun: ['plot', 'plots'],
+    headline: 'Plots with the paperwork in view.',
+    sub: 'Gated layouts on the Sarjapur and Whitefield belts, with approval and title details shown wherever we hold them.',
+    placeholder: 'Plotted belt or layout, e.g. Sarjapur',
+    fieldLabel: 'Plot size',
+    choices: [
+      { id: 'any', label: 'Any plot size', patch: { sizeMin: null } },
+      { id: '1200', label: '1,200 sq.ft +', patch: { sizeMin: 1200 } },
+      { id: '1500', label: '1,500 sq.ft +', patch: { sizeMin: 1500 } },
+      { id: '1800', label: '1,800 sq.ft +', patch: { sizeMin: 1800 } },
+    ],
+  },
+  commercial: {
+    tab: 'Commercial',
+    noun: ['workspace', 'workspaces'],
+    headline: 'Workspaces on the city’s tech corridors.',
+    sub: 'Warm-shell floors and managed suites on Outer Ring Road and North Bengaluru, leased on direct terms.',
+    placeholder: 'Tech corridor, e.g. Outer Ring Road',
+    fieldLabel: 'Monthly rent',
+    choices: [
+      { id: 'any', label: 'Any monthly rent', patch: { min: null, max: null } },
+      { id: 'u10', label: 'Under ₹10 L / month', patch: { min: null, max: 1_000_000 } },
+      { id: '10-25', label: '₹10 – 25 L / month', patch: { min: 1_000_000, max: 2_500_000 } },
+      { id: '25+', label: '₹25 L + / month', patch: { min: 2_500_000, max: null } },
+    ],
+  },
+};
+const SEG_IDS = Object.keys(SEGMENTS) as Seg[];
 
-function SegmentSwitcher({ value, onChange, compact }: { value: SearchSegment; onChange: (s: SearchSegment) => void; compact?: boolean }) {
-  const refs = useRef<(HTMLButtonElement | null)[]>([]);
-  const [indicator, setIndicator] = useState({ x: 0, w: 0 });
-  const index = SEGMENTS.findIndex((s) => s.id === value);
-  useLayoutEffect(() => {
-    const measure = () => {
-      const el = refs.current[index];
-      if (el) setIndicator({ x: el.offsetLeft, w: el.offsetWidth });
-    };
-    measure();
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, [index]);
-
-  return (
-    <div role="tablist" aria-label="Property segment" className={`relative flex w-full rounded-full border border-line bg-surface p-1 sm:inline-flex sm:w-auto ${compact ? 'sm:w-full' : ''}`}>
-      <span
-        aria-hidden="true"
-        className="absolute left-0 top-1 h-[calc(100%-8px)] w-[100px] origin-left rounded-full bg-ink transition-transform duration-base ease-out"
-        style={{ transform: `translateX(${indicator.x}px) scaleX(${indicator.w / 100})` }}
-      />
-      {SEGMENTS.map((segment, i) => (
-        <button
-          key={segment.id}
-          ref={(node) => {
-            refs.current[i] = node;
-          }}
-          type="button"
-          role="tab"
-          aria-selected={value === segment.id}
-          onClick={() => onChange(segment.id)}
-          className={`relative z-10 min-h-[44px] flex-1 rounded-full px-2 text-sm transition-colors duration-base sm:flex-none sm:px-5 ${compact ? 'sm:flex-1' : ''} ${value === segment.id ? 'text-bg' : 'text-ink-muted hover:text-ink'}`}
-        >
-          {SEGMENT_LABEL[segment.id]}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function HeroInner({ properties, corridors, initialSeg }: { properties: Property[]; corridors: Corridor[]; initialSeg: SearchSegment }) {
-  const [seg, setSeg] = useState<SearchSegment>(initialSeg);
-  const [sheet, setSheet] = useState(false);
+export function HomeHero({ properties, corridors, partnerDeveloper }: { properties: Property[]; corridors: Corridor[]; partnerDeveloper: string }) {
+  const router = useRouter();
+  const [seg, setSeg] = useState<Seg>('residential');
+  const [choice, setChoice] = useState('any');
+  const [query, setQuery] = useState('');
   const consoleRef = useRef<HTMLDivElement>(null);
-  const search = useHeroSearch(properties, corridors, seg);
-  const suggestions = useMemo(() => buildSuggestions(properties, corridors), [properties, corridors]);
-  const copy = SEGMENTS.find((s) => s.id === seg)!;
-  const slides = useMemo(() => properties.filter((p) => matchesSegment(p, seg)).slice(0, 6), [properties, seg]);
+  const copy = SEGMENTS[seg];
+  const picked = copy.choices.find((c) => c.id === choice) ?? copy.choices[0];
 
-  const changeSeg = (next: SearchSegment) => {
+  const featured = useMemo(() => sortListings(properties.filter((p) => p.featured), 'relevance'), [properties]);
+  const slides = useMemo(() => {
+    const inSeg = featured.filter((p) => matchesSegment(p, seg));
+    return (inSeg.length ? inSeg : featured).slice(0, 6);
+  }, [featured, seg]);
+
+  const filters: ListingState = { ...DEFAULT_LISTING_STATE, seg, q: query.trim(), ...picked.patch };
+  const count = applyListing(properties, filters).length;
+  const params = Object.fromEntries(new URLSearchParams(serializeListingState({ ...filters, q: '' })));
+
+  const changeSeg = (next: Seg) => {
     setSeg(next);
+    setChoice('any');
     const url = new URL(window.location.href);
     if (next === 'residential') url.searchParams.delete('seg');
     else url.searchParams.set('seg', next);
     window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
   };
 
-  // Read ?seg= after hydration so the server-rendered hero (and its LCP image) is never replaced.
+  // ?seg= links open the matching state; read after hydration so the server render stays stable.
   useEffect(() => {
     const fromUrl = new URLSearchParams(window.location.search).get('seg');
-    if (isSegment(fromUrl) && fromUrl !== initialSeg) setSeg(fromUrl);
-  }, [initialSeg]);
+    if (fromUrl && (SEG_IDS as string[]).includes(fromUrl)) setSeg(fromUrl as Seg);
+  }, []);
 
   useEffect(() => {
-    heroSearchStore.set((s) => ({ ...s, summary: search.summary }));
-  }, [search.summary]);
-
-  useEffect(() => {
+    heroSearchStore.set((s) => ({ ...s, summary: 'Search a region, area or project' }));
     const el = consoleRef.current;
     if (!el) return;
-    // The header pill appears only once the console has scrolled up past the header.
     const io = new IntersectionObserver(([entry]) => heroSearchStore.set((s) => ({ ...s, visible: entry.isIntersecting || entry.boundingClientRect.top > 0 })), { rootMargin: '-72px 0px 0px 0px' });
     io.observe(el);
     return () => {
@@ -102,48 +105,66 @@ function HeroInner({ properties, corridors, initialSeg }: { properties: Property
 
   return (
     <section aria-labelledby="hero-title" className="relative">
-      <div className="border-b border-line bg-surface-2/60 pb-20 pt-6 lg:pb-14">
-        <div className="mx-auto max-w-container px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="sheet-label">Sheet A-01 · Bengaluru advisory catalogue</p>
-            <SegmentSwitcher value={seg} onChange={changeSeg} />
+      <div className="mx-auto grid max-w-container gap-8 px-4 pt-5 sm:px-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:items-center lg:gap-10 lg:px-8 lg:pt-8">
+        {/* Left console (40%) */}
+        <div className="min-w-0">
+          <div role="tablist" aria-label="Property segment" className="inline-flex w-full rounded-full border border-line bg-surface p-1 sm:w-auto">
+            {SEG_IDS.map((id) => (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={seg === id}
+                onClick={() => changeSeg(id)}
+                className={`min-h-[48px] flex-1 rounded-full px-4 text-sm font-semibold transition-colors duration-base sm:flex-none sm:px-5 ${seg === id ? 'bg-ink text-bg' : 'text-ink-muted hover:text-ink'}`}
+              >
+                {SEGMENTS[id].tab}
+              </button>
+            ))}
           </div>
-          <div className="mt-5 grid max-w-4xl xl:max-w-none [&>*]:[grid-area:1/1]">
-            <AnimatePresence initial={false}>
-              <m.div key={seg} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.24 }}>
-                <h1 id="hero-title" className="font-serif text-3xl sm:text-4xl">
-                  {copy.headline}
-                </h1>
-                <p className="mt-3 max-w-2xl text-base text-ink-muted sm:text-lg">{copy.sub}</p>
-              </m.div>
-            </AnimatePresence>
+
+          <div key={seg} className={`mt-5 ${seg === 'residential' ? '' : 'animate-fade-up'}`}>
+            <h1 id="hero-title" className="font-serif text-[2rem] leading-[1.08] sm:text-4xl">{copy.headline}</h1>
+            <p className="mt-3 max-w-xl text-base text-ink-muted">{copy.sub}</p>
           </div>
+
+          <div ref={consoleRef} className="relative z-30 mt-6 rounded-2xl border border-line bg-surface p-3 shadow-[0_18px_40px_-28px_rgb(var(--shadow)/0.55)]">
+            <QuickSearch id="hero-search-input" properties={properties} corridors={corridors} placeholder={copy.placeholder} params={params} value={query} onValueChange={setQuery} />
+            <div className="mt-2 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+              <label className="block">
+                <span className="sr-only">{copy.fieldLabel}</span>
+                <select value={picked.id} onChange={(e) => setChoice(e.target.value)} className="field min-h-[52px] rounded-2xl font-medium">
+                  {copy.choices.map((c) => (
+                    <option key={c.id} value={c.id}>{c.label}</option>
+                  ))}
+                </select>
+              </label>
+              <button
+                type="button"
+                onClick={() => router.push(`/properties?${serializeListingState(filters)}`)}
+                className="btn-primary min-h-[52px] rounded-2xl px-6"
+              >
+                Show {count} {count === 1 ? copy.noun[0] : copy.noun[1]} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+
+          <a href="#partner" className="group mt-4 inline-flex min-h-[48px] items-center gap-2 text-sm text-ink-muted hover:text-ink">
+            <ShieldCheck className="h-4 w-4 shrink-0 text-accent-ink" aria-hidden="true" />
+            <span>
+              Partner Developer: <strong className="font-semibold text-ink">{partnerDeveloper}</strong>
+            </span>
+            <ArrowDown className="h-4 w-4 shrink-0 text-accent-ink transition-transform group-hover:translate-y-0.5" aria-hidden="true" />
+          </a>
         </div>
 
-        <div className="mx-auto mt-6 max-w-[1720px]">
-          <AnimatePresence mode="wait" initial={false}>
-            <m.div key={seg} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.24 }}>
-              {slides.length ? <HeroCarousel slides={slides} label={`Featured ${SEGMENT_LABEL[seg].toLowerCase()} projects`} /> : <p className="px-4 text-ink-muted">No featured projects in this segment yet.</p>}
-            </m.div>
-          </AnimatePresence>
+        {/* Right spotlight (60%) */}
+        <div className="min-w-0">
+          <div key={seg} className={seg === 'residential' ? '' : 'animate-fade-up'}>
+            {slides.length > 0 && <HeroCarousel slides={slides} label={`Featured ${copy.tab.toLowerCase()} projects`} contained />}
+          </div>
         </div>
-      </div>
-
-      <div ref={consoleRef} className="relative z-20 mx-auto -mt-8 max-w-container px-4 sm:px-6 lg:px-8">
-        <div className="hidden lg:block">
-          <SearchConsole seg={seg} search={search} suggestions={suggestions} />
-        </div>
-        <button type="button" onClick={() => setSheet(true)} className="panel flex min-h-[56px] w-full items-center gap-3 px-4 text-left shadow-[0_18px_40px_-24px_rgb(var(--shadow)/0.5)] lg:hidden">
-          <Search className="h-5 w-5 text-accent-ink" aria-hidden="true" />
-          <span className="min-w-0 flex-1 truncate text-ink-muted">Search Sarjapur, Whitefield…</span>
-          <span className="shrink-0 font-mono text-2xs text-ink-muted">{search.count} found</span>
-        </button>
-        <MobileSearchSheet open={sheet} onOpenChange={setSheet} seg={seg} search={search} suggestions={suggestions} segmentSwitcher={<SegmentSwitcher value={seg} onChange={changeSeg} compact />} />
       </div>
     </section>
   );
-}
-
-export function HomeHero({ properties, corridors }: { properties: Property[]; corridors: Corridor[] }) {
-  return <HeroInner properties={properties} corridors={corridors} initialSeg="residential" />;
 }

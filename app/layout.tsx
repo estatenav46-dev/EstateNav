@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
-import { Instrument_Serif } from 'next/font/google';
+import { Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/theme/ThemeProvider';
 import { AuthProvider } from '@/lib/auth/context';
 import { AuthModal } from '@/components/auth/AuthModal';
+import { WishlistSync } from '@/components/auth/WishlistSync';
 import { BlueprintBackdrop } from '@/components/layout/BlueprintBackdrop';
 import { SiteHeader } from '@/components/layout/SiteHeader';
 import { SiteFooter } from '@/components/layout/SiteFooter';
@@ -18,7 +19,9 @@ import { SITE_URL } from '@/lib/site';
 const sans = localFont({ src: './fonts/Geist-Latin.woff2', variable: '--font-geist-sans', weight: '100 900', display: 'swap' });
 // Mono only sets RERA numbers and areas, so it loads after the critical content.
 const mono = localFont({ src: './fonts/GeistMono-Latin.woff2', variable: '--font-geist-mono', weight: '100 900', display: 'swap', preload: false });
-const serif = Instrument_Serif({ weight: '400', subsets: ['latin'], variable: '--font-serif', display: 'swap' });
+// Headings: Plus Jakarta Sans, a clean geometric sans (variable weight). Kept on the --font-serif
+// variable so every existing `font-serif` heading picks it up.
+const serif = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-serif', display: 'swap' });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -40,7 +43,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#FAF9F6' },
-    { media: '(prefers-color-scheme: dark)', color: '#0E1419' },
+    { media: '(prefers-color-scheme: dark)', color: '#111827' },
   ],
   width: 'device-width',
   initialScale: 1,
@@ -77,6 +80,7 @@ export default async function RootLayout({ children, modal }: { children: React.
             <CompareTray />
             <MobileDock settings={settings} consent={consent} />
             <AuthModal />
+            <WishlistSync />
           </AuthProvider>
         </Providers>
       </body>

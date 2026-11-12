@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Check, MapPin } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Check, MapPin } from 'lucide-react';
 import type { Corridor, Developer, OfficeHub, Property, SiteSettings } from '@/lib/data/types';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Markdown } from '@/components/ui/Markdown';
@@ -14,7 +14,8 @@ import { PropertyActions } from '@/components/property/PropertyActions';
 import { RequestButton } from '@/components/property/RequestButton';
 import { PropertyCard, ReraRow, StatusChip } from '@/components/property/PropertyCard';
 import { AdvisorTitleBlock } from '@/components/home/AdvisorBlock';
-import { CorridorMap } from '@/components/map/CorridorMap';
+import { ZoneDial } from '@/components/explore/ZoneDial';
+import { zoneById, zoneOfCorridor } from '@/lib/regions';
 import { propertyBreadcrumbs } from '@/lib/seo';
 import { rateLabel, sizeLabel } from '@/lib/property';
 
@@ -50,7 +51,7 @@ type Props = {
   settings: SiteSettings;
 };
 
-export default function PropertyDetail({ property, developer, corridors, hubs, related, allProperties, settings }: Props) {
+export default function PropertyDetail({ property, developer, hubs, related, allProperties, settings }: Props) {
   const crumbs = propertyBreadcrumbs(property);
   const facts = [
     ['Configurations', property.configurations.map((c) => c.label).join(', ')],
@@ -61,6 +62,9 @@ export default function PropertyDetail({ property, developer, corridors, hubs, r
     ['Developer', property.developerName],
   ].filter((f): f is [string, string] => Boolean(f[1]));
   const nearby = property.highlights.filter((h) => /\b(near|opposite|link to|minutes? to)\b/i.test(h));
+  const zone = zoneById(zoneOfCorridor(property.corridorId));
+  const sameArea = allProperties.filter((p) => p.corridorId === property.corridorId && p.id !== property.id).length;
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(property.geo ? `${property.geo.lat},${property.geo.lng}` : `${property.address}, Bengaluru`)}`;
   const developerFacts = developer
     ? [
         ['Years active', developer.yearsActive ? `${developer.yearsActive}+` : null, 'yearsActive'],
@@ -154,24 +158,41 @@ export default function PropertyDetail({ property, developer, corridors, hubs, r
           </Section>
 
           <Section id="location" title="Location" sheet="D-05">
-            <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-              <div className="panel p-3">
-                <CorridorMap corridors={corridors} properties={allProperties} focusPropertyId={property.id} animatePins={false} />
+            <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+              <div className="panel flex gap-4 p-5">
+                {zone && <ZoneDial zone={zone} size={52} />}
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted">{zone?.name ?? 'Bengaluru'}</p>
+                  <p className="mt-1 text-lg font-semibold">{property.locality}</p>
+                  <p className="text-sm text-ink-muted">{property.corridorName}</p>
+                  <p className="mt-3 flex gap-2 text-sm">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent-ink" aria-hidden="true" />
+                    <span>{property.address}</span>
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary min-h-[44px] px-4">
+                      Open in Google Maps <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+                    </a>
+                    {sameArea > 0 && (
+                      <Link href={`/properties?zone=${zoneOfCorridor(property.corridorId)}&corridor=${property.corridorId}`} className="btn-ghost min-h-[44px] px-4 text-accent-ink">
+                        {sameArea} more in {property.corridorName} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                      </Link>
+                    )}
+                  </div>
+                </div>
               </div>
               <div>
-                <p className="flex gap-2">
-                  <MapPin className="mt-1 h-4 w-4 shrink-0 text-accent-ink" aria-hidden="true" />
-                  <span>
-                    {property.address}
-                    <span className="block text-sm text-ink-muted">{property.corridorName} corridor</span>
-                  </span>
-                </p>
-                {nearby.length > 0 && (
-                  <ul className="mt-4 space-y-1 text-sm text-ink-muted">
-                    {nearby.map((n) => (
-                      <li key={n}>· {n}</li>
-                    ))}
-                  </ul>
+                {nearby.length > 0 ? (
+                  <>
+                    <h3 className="text-sm font-semibold">Nearby</h3>
+                    <ul className="mt-2 space-y-1 text-sm text-ink-muted">
+                      {nearby.map((n) => (
+                        <li key={n}>· {n}</li>
+                      ))}
+                    </ul>
+                  </>
+                ) : (
+                  <p className="text-sm text-ink-muted">Ask the advisor for schools, hospitals and office commutes near {property.locality}.</p>
                 )}
               </div>
             </div>

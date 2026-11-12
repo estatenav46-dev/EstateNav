@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Building2, Inbox, LayoutDashboard, Map, Settings, Users } from 'lucide-react';
+import { Building2, Inbox, LayoutDashboard, Map, Settings, Users, TrendingUp } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 const NAV = [
@@ -11,6 +11,7 @@ const NAV = [
   { href: '/admin/enquiries', label: 'Enquiries', icon: Inbox },
   { href: '/admin/developers', label: 'Developers', icon: Users },
   { href: '/admin/corridors', label: 'Corridors', icon: Map },
+  { href: '/admin/market', label: 'Market data', icon: TrendingUp },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 

@@ -3,8 +3,8 @@
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { z } from 'zod';
 import { getRepos } from '@/lib/data';
-import { corridorSchema, developerSchema, enquiryStatusSchema, propertySchema, publishStatusSchema, siteSettingsSchema } from '@/lib/data/schemas';
-import type { Corridor, Developer, Enquiry, Property, PublishStatus, SiteSettings } from '@/lib/data/types';
+import { corridorSchema, developerSchema, enquiryStatusSchema, marketSnapshotSchema, propertySchema, publishStatusSchema, siteSettingsSchema } from '@/lib/data/schemas';
+import type { Corridor, Developer, Enquiry, MarketSnapshot, Property, PublishStatus, SiteSettings } from '@/lib/data/types';
 import { ADMIN_ACTOR, isAdminPreview } from '@/lib/admin';
 import { getAdminFirestore } from '@/lib/data/adapters/firestore/admin';
 import {
@@ -87,6 +87,18 @@ export async function saveDeveloper(input: unknown): Promise<Result<Developer>> 
 
 export async function saveCorridor(input: unknown): Promise<Result<Corridor>> {
   return run(() => getRepos().corridors.save(corridorSchema.parse(input)), ['catalogue', 'properties']);
+}
+
+// Market figures are published only with a source and an as-of date (enforced by the schema).
+export async function saveMarketSnapshot(input: unknown): Promise<Result<MarketSnapshot>> {
+  return run(() => getRepos().corridors.saveMarketSnapshot(marketSnapshotSchema.parse(input)), ['catalogue']);
+}
+
+export async function deleteMarketSnapshot(id: string): Promise<Result<null>> {
+  return run(async () => {
+    await getRepos().corridors.deleteMarketSnapshot(z.string().min(1).parse(id));
+    return null;
+  }, ['catalogue']);
 }
 
 export async function saveSettings(input: unknown): Promise<Result<SiteSettings>> {

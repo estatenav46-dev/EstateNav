@@ -12,6 +12,7 @@ import {
   corridorSchema,
   developerSchema,
   enquirySchema,
+  marketSnapshotSchema,
   propertySchema,
   siteSettingsSchema,
 } from '../../schemas';
@@ -276,6 +277,17 @@ const corridors: CorridorRepo = {
     }
     const snapshot = await q.get();
     return snapshot.docs.map((d) => d.data());
+  },
+
+  async saveMarketSnapshot(snapshot: MarketSnapshot): Promise<MarketSnapshot> {
+    const db = getAdminFirestore();
+    const record = marketSnapshotSchema.parse(snapshot);
+    await db.collection('marketSnapshots').doc(record.id).withConverter(marketSnapshotConverter).set(record);
+    return record;
+  },
+
+  async deleteMarketSnapshot(id: string): Promise<void> {
+    await getAdminFirestore().collection('marketSnapshots').doc(id).delete();
   },
 };
 

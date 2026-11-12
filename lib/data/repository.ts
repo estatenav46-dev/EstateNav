@@ -57,6 +57,8 @@ export interface CorridorRepo {
   save(corridor: Corridor): Promise<Corridor>;
   listOfficeHubs(): Promise<OfficeHub[]>;
   listMarketSnapshots(corridorId?: string): Promise<MarketSnapshot[]>;
+  saveMarketSnapshot(snapshot: MarketSnapshot): Promise<MarketSnapshot>;
+  deleteMarketSnapshot(id: string): Promise<void>;
 }
 
 export interface SettingsRepo {

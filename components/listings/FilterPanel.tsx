@@ -115,7 +115,7 @@ export function FilterPanel({ state, update, corridors, properties, idPrefix }: 
         </Section>
       )}
 
-      <Section title="Approvals">
+      <Section title="RERA audit checklist">
         {APPROVAL_OPTIONS.map((o) => (
           <Check key={o.value} checked={state.approvals.includes(o.value)} onChange={() => update({ approvals: toggle(state.approvals, o.value) })} label={o.label} />
         ))}
@@ -128,7 +128,7 @@ export function FilterPanel({ state, update, corridors, properties, idPrefix }: 
         </label>
       </Section>
 
-      <Section title="Lens">
+      <Section title="Buyer lens">
         <div className="flex flex-wrap gap-1.5">
           {LENS_CHOICES.map((l) => (
             <button key={l} type="button" className="chip" aria-pressed={state.lens.includes(l)} onClick={() => update({ lens: toggle(state.lens, l) })}>

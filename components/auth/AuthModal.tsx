@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/lib/auth/context';
+import { authPromptStore } from '@/lib/ui/stores';
+import { clearPendingWishlist } from '@/lib/ui/wishlist';
 import { X, Mail, Lock, User, Eye, EyeOff, AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export function AuthModal() {
@@ -14,13 +16,21 @@ export function AuthModal() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resetSent, setResetSent] = useState(false);
+  const prompt = authPromptStore.useValue();
 
   if (!authModalOpen) return null;
 
   const handleClose = () => {
     setAuthModalOpen(false);
+    authPromptStore.set({ reason: '' });
     setError(null);
     setResetSent(false);
+  };
+
+  // Closing without signing in drops the home that was waiting to be saved.
+  const dismiss = () => {
+    clearPendingWishlist();
+    handleClose();
   };
 
   const getFriendlyError = (err: unknown): string => {
@@ -92,7 +102,7 @@ export function AuthModal() {
       <div className="panel bg-surface max-w-md w-full p-6 shadow-2xl relative border-line">
         {/* Close Button */}
         <button
-          onClick={handleClose}
+          onClick={dismiss}
           className="absolute right-4 top-4 p-1.5 rounded-lg hover:bg-surface-2 text-ink-muted hover:text-ink transition-colors"
           aria-label="Close"
         >
@@ -101,6 +111,9 @@ export function AuthModal() {
 
         {/* Modal Header */}
         <div className="mb-6">
+          {prompt.reason && (
+            <p role="status" className="mb-3 rounded-lg bg-accent-soft px-3 py-2 text-xs font-medium text-accent-ink">{prompt.reason}</p>
+          )}
           <span className="font-mono text-2xs uppercase tracking-wider text-accent-ink font-semibold">
             EstateNav Account
           </span>

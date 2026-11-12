@@ -1,20 +1,24 @@
 import type { Lens, Property, SearchSegment } from './data/types';
 import { matchesSegment, possessionMonths, statusChip } from './property';
 import { formatINR } from './price';
+import { inZone, ZONE_IDS, zoneOfCorridor } from './regions';
 
-// One filter engine for the hero search, the listings workspace, the corridor map and the
-// "relax filter" suggestions. Filtering runs in memory over the published catalogue.
+// One filter engine for home search, the explore page and the "relax filter" suggestions.
+// Filtering runs in memory over the published catalogue.
 
 export type ListingSort = 'relevance' | 'price-asc' | 'price-desc' | 'possession' | 'newest';
 export type PossessionBucket = '' | 'ready' | '12m' | '1-3y' | '3y+';
-export type ListingView = 'grid' | 'list' | 'map';
+export type ListingView = 'grid' | 'list';
 export type StatusKey = 'ready' | 'under-construction' | 'pre-launch' | 'new-launch';
 export type ApprovalKey = 'a-khata' | 'plan' | 'bank';
 
 export interface ListingState {
   seg: SearchSegment | '';
   q: string;
+  /** Region (see lib/regions.ts); corridors narrow it to an area, loc to one locality. */
+  zone: string;
   corridors: string[];
+  loc: string;
   bhk: number[];
   min: number | null;
   max: number | null;
@@ -31,7 +35,7 @@ export interface ListingState {
 }
 
 export const DEFAULT_LISTING_STATE: ListingState = {
-  seg: '', q: '', corridors: [], bhk: [], min: null, max: null, sizeMin: null, sizeMax: null,
+  seg: '', q: '', zone: '', corridors: [], loc: '', bhk: [], min: null, max: null, sizeMin: null, sizeMax: null,
   possession: '', status: [], amenities: [], approvals: [], verified: false, lens: [], sort: 'relevance', view: 'grid',
 };
 
@@ -105,8 +109,12 @@ function matchesPossession(property: Property, bucket: PossessionBucket) {
 export function matchesListing(property: Property, s: ListingState): boolean {
   if (!matchesSegment(property, s.seg)) return false;
   if (!matchesQuery(property, s.q)) return false;
+  if (s.zone && !inZone(property, s.zone)) return false;
   if (s.corridors.length && !s.corridors.includes(property.corridorId)) return false;
+  if (s.loc && property.locality !== s.loc) return false;
   if (s.bhk.length && !s.bhk.some((b) => (b >= 5 ? property.bhkOptions.some((o) => o >= 5) : property.bhkOptions.includes(b)))) return false;
+  // Without a segment the budget is a purchase budget; monthly rents don't compare with it.
+  if ((s.min != null || s.max != null) && !s.seg && property.transaction === 'rent') return false;
   if (!overlaps(property.priceMin, property.priceMax, s.min, s.max)) return false;
   if (!overlaps(property.sizeMin, property.sizeMax, s.sizeMin, s.sizeMax)) return false;
   if (!matchesPossession(property, s.possession)) return false;
@@ -155,7 +163,9 @@ export function relaxSuggestions(properties: Property[], s: ListingState) {
     candidates.push({ label: 'Any budget', patch: { min: null, max: null } });
   }
   if (s.bhk.length) candidates.push({ label: 'Any BHK', patch: { bhk: [] } });
-  if (s.corridors.length) candidates.push({ label: 'All corridors', patch: { corridors: [] } });
+  if (s.loc) candidates.push({ label: 'Any location', patch: { loc: '' } });
+  if (s.corridors.length) candidates.push({ label: 'Whole region', patch: { corridors: [], loc: '' } });
+  if (s.zone) candidates.push({ label: 'All of Bengaluru', patch: { zone: '', corridors: [], loc: '' } });
   if (s.possession) candidates.push({ label: 'Any possession date', patch: { possession: '' } });
   if (s.status.length) candidates.push({ label: 'Any project status', patch: { status: [] } });
   if (s.sizeMin != null || s.sizeMax != null) candidates.push({ label: 'Any size', patch: { sizeMin: null, sizeMax: null } });
@@ -164,7 +174,7 @@ export function relaxSuggestions(properties: Property[], s: ListingState) {
   if (s.lens.length) candidates.push({ label: 'Any buyer lens', patch: { lens: [] } });
   if (s.verified) candidates.push({ label: 'Include unverified listings', patch: { verified: false } });
   if (s.q) candidates.push({ label: `Clear “${s.q}”`, patch: { q: '' } });
-  if (s.seg) candidates.push({ label: 'All segments', patch: { seg: '' } });
+  if (s.seg) candidates.push({ label: 'All property types', patch: { seg: '' } });
   return candidates
     .map((c) => ({ ...c, count: properties.filter((p) => matchesListing(p, { ...s, ...c.patch })).length }))
     .filter((c) => c.count > 0)
@@ -187,6 +197,13 @@ export function parseListingState(params: URLSearchParams): ListingState {
   s.seg = oneOf(params.get('seg'), ['residential', 'plot', 'commercial', 'rent'] as const);
   s.q = params.get('q') ?? '';
   s.corridors = list(params.get('corridor')).map((c) => CORRIDOR_ALIASES[c.toLowerCase()] ?? c);
+  s.zone = oneOf(params.get('zone'), ZONE_IDS);
+  // Corridor links (footer, older pages) open inside their region.
+  if (!s.zone && s.corridors.length) {
+    const zones = new Set(s.corridors.map(zoneOfCorridor));
+    if (zones.size === 1) s.zone = Array.from(zones)[0];
+  }
+  s.loc = params.get('loc') ?? '';
   s.bhk = list(params.get('bhk')).map((b) => (b === '5+' ? 5 : Number(b))).filter((b) => Number.isFinite(b) && b > 0);
   s.min = num(params.get('min'));
   s.max = num(params.get('max'));
@@ -199,7 +216,7 @@ export function parseListingState(params: URLSearchParams): ListingState {
   s.verified = params.get('verified') === '1' || params.get('verifiedReraOnly') === '1';
   s.lens = list(params.get('lens')).filter((v): v is Lens => (LENSES as string[]).includes(v));
   s.sort = oneOf(params.get('sort'), ['relevance', 'price-asc', 'price-desc', 'possession', 'newest'] as const) || 'relevance';
-  s.view = oneOf(params.get('view'), ['grid', 'list', 'map'] as const) || 'grid';
+  s.view = oneOf(params.get('view'), ['grid', 'list'] as const) || 'grid';
 
   // Links from the previous version of the site keep working.
   const legacyFor = params.get('for');
@@ -228,7 +245,9 @@ export function serializeListingState(s: ListingState): string {
   const params = new URLSearchParams();
   if (s.seg) params.set('seg', s.seg);
   if (s.q.trim()) params.set('q', s.q.trim());
+  if (s.zone) params.set('zone', s.zone);
   if (s.corridors.length) params.set('corridor', s.corridors.join(','));
+  if (s.loc) params.set('loc', s.loc);
   if (s.bhk.length) params.set('bhk', s.bhk.join(','));
   if (s.min != null) params.set('min', String(s.min));
   if (s.max != null) params.set('max', String(s.max));

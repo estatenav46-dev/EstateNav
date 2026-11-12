@@ -33,13 +33,13 @@ export function PropertyActions({ property, settings, advisorCard }: Props) {
             <p className="mt-1 text-2xs text-ink-muted">Developer guide price · zero buyer brokerage</p>
             <div className="mt-5 grid gap-2">
               <button type="button" onClick={() => openLeadSheet('site-visit')} className="btn-primary">
-                <CalendarDays className="h-4 w-4" aria-hidden="true" /> Schedule site visit
+                <CalendarDays className="h-4 w-4" aria-hidden="true" /> Schedule guided VIP site visit
               </button>
               <button type="button" onClick={() => openLeadSheet('price-sheet')} className="btn-secondary">
-                <FileText className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Get price sheet
+                <FileText className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Unlock direct developer pricing sheet
               </button>
               <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="btn-ghost">
-                <MessageCircle className="h-4 w-4 text-accent-ink" aria-hidden="true" /> WhatsApp advisor
+                <MessageCircle className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Connect with dedicated area advisor
               </a>
             </div>
           </div>
@@ -49,12 +49,12 @@ export function PropertyActions({ property, settings, advisorCard }: Props) {
 
       <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-[1fr_1fr_auto] gap-2 border-t border-line bg-surface/95 px-3 pt-2 backdrop-blur-md safe-bottom lg:hidden">
         <button type="button" onClick={() => openLeadSheet('site-visit')} className="btn-primary px-3">
-          Schedule visit
+          VIP site visit
         </button>
         <button type="button" onClick={() => openLeadSheet('price-sheet')} className="btn-secondary px-3">
-          Price sheet
+          Pricing sheet
         </button>
-        <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="icon-btn" aria-label="WhatsApp advisor">
+        <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="icon-btn" aria-label="Connect with dedicated area advisor on WhatsApp">
           <MessageCircle className="h-5 w-5 text-accent-ink" aria-hidden="true" />
         </a>
       </div>
@@ -64,7 +64,7 @@ export function PropertyActions({ property, settings, advisorCard }: Props) {
         open={lead.open}
         onOpenChange={(open) => leadSheetStore.set((s) => ({ ...s, open }))}
         direction={desktop ? 'right' : 'bottom'}
-        title={lead.intent === 'site-visit' ? 'Schedule a site visit' : 'Get the price sheet'}
+        title={lead.intent === 'site-visit' ? 'Schedule a guided VIP site visit' : 'Unlock the direct developer pricing sheet'}
         description={property.title}
         className="lg:max-w-[480px]"
       >

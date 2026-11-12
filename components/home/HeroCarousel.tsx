@@ -5,7 +5,7 @@ import Link from 'next/link';
 import useEmblaCarousel from 'embla-carousel-react';
 import type { EmblaCarouselType } from 'embla-carousel';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play, ShieldCheck } from 'lucide-react';
 import type { Property } from '@/lib/data/types';
 import { configLabels, priceLabel, statusChip } from '@/lib/property';
 import { formatINR } from '@/lib/price';
@@ -23,14 +23,23 @@ function Plate({ property, overlay, active }: { property: Property; overlay: boo
     <div className={overlay ? 'panel w-[min(440px,calc(100%-3rem))] p-5' : 'px-1 pt-4'}>
       {overlay ? <StatusChip property={property} className="border border-line" /> : <span className="sheet-label">{statusChip(property)}</span>}
       <h2 className="mt-2 font-serif text-2xl leading-tight sm:text-3xl">{property.title}</h2>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {property.rera.number && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-semibold text-accent-ink">
+            <ShieldCheck className="h-3 w-3" aria-hidden="true" /> K-RERA registered
+          </span>
+        )}
+        {property.highlights[0] && <span className="max-w-full truncate rounded-full border border-line px-2 py-0.5 text-[11px] text-ink-muted">{property.highlights[0]}</span>}
+      </div>
       <p className="mt-1 text-sm text-ink-muted">
         {property.locality} · {property.corridorName}
       </p>
       <p className="mt-1 truncate text-sm text-ink">{configLabels(property).slice(0, 4).join(' · ')}</p>
       <div className="mt-4 flex items-center justify-between gap-3">
         <p className="tabular font-serif text-xl">{fromLabel(property)}</p>
-        <Link href={`/properties/${property.slug}`} className="btn-primary min-h-[44px] px-4" tabIndex={active ? 0 : -1}>
-          View details <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        <Link href={`/properties/${property.slug}`} target="_blank" rel="noopener noreferrer" className="btn-primary min-h-[48px] px-4" tabIndex={active ? 0 : -1}>
+          Inspect allocation deck <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          <span className="sr-only"> (opens in a new tab)</span>
         </Link>
       </div>
     </div>
@@ -39,7 +48,8 @@ function Plate({ property, overlay, active }: { property: Property; overlay: boo
 
 // Centre-focus "coverflow-lite": the active slide sits at ~72% width; neighbours shrink to
 // 0.92, dim to about 55% and peek in. Images drift at 0.15x the slide offset.
-export function HeroCarousel({ slides, label }: { slides: Property[]; label: string }) {
+// `contained` fits the carousel into a column (one full-width slide at a time) for the split hero.
+export function HeroCarousel({ slides, label, contained = false }: { slides: Property[]; label: string; contained?: boolean }) {
   const loop = slides.length > 2;
   const [viewportRef, embla] = useEmblaCarousel({ loop, align: 'center', containScroll: loop ? false : 'keepSnaps', duration: 30 });
   const [selected, setSelected] = useState(0);
@@ -139,7 +149,7 @@ export function HeroCarousel({ slides, label }: { slides: Property[]; label: str
       }}
     >
       <div ref={viewportRef} className="overflow-hidden" tabIndex={0} aria-label={`${label}. Use the left and right arrow keys to move between projects.`}>
-        <div className="flex touch-pan-y translate-x-[8%] sm:translate-x-[11%] lg:translate-x-[14%]">
+        <div className={`flex touch-pan-y ${contained ? '-ml-3' : 'translate-x-[8%] sm:translate-x-[11%] lg:translate-x-[14%]'}`}>
           {slides.map((property, index) => (
             <div
               key={property.id}
@@ -149,10 +159,10 @@ export function HeroCarousel({ slides, label }: { slides: Property[]; label: str
               role="group"
               aria-roledescription="slide"
               aria-label={`${index + 1} of ${slides.length}: ${property.title}`}
-              className="min-w-0 shrink-0 grow-0 basis-[84%] pl-3 sm:basis-[78%] lg:basis-[72%] lg:pl-5"
+              className={`min-w-0 shrink-0 grow-0 ${contained ? 'basis-full pl-3' : 'basis-[84%] pl-3 sm:basis-[78%] lg:basis-[72%] lg:pl-5'}`}
             >
               <div data-frame className="origin-center will-change-transform" style={index === 0 ? undefined : { transform: 'scale(0.92)' }}>
-                <div className="relative aspect-[4/3] overflow-hidden rounded-slide bg-surface-2 sm:aspect-[16/9] lg:aspect-[16/7]">
+                <div className={`relative overflow-hidden rounded-slide bg-surface-2 ${contained ? 'aspect-[4/3] sm:aspect-[16/10] lg:aspect-[16/12] xl:aspect-[16/11]' : 'aspect-[4/3] max-h-[52vh] sm:aspect-[16/9] lg:aspect-[16/6.5]'}`}>
                   <div data-image className="absolute inset-y-0 -left-[16%] -right-[16%] will-change-transform">
                     <Image
                       src={property.media.cover.url}
@@ -180,7 +190,7 @@ export function HeroCarousel({ slides, label }: { slides: Property[]; label: str
         </div>
       </div>
 
-      <div className="mx-auto mt-5 flex max-w-container items-center gap-3 px-4 sm:px-6 lg:px-8">
+      <div className={`mt-5 flex items-center gap-3 ${contained ? '' : 'mx-auto max-w-container px-4 sm:px-6 lg:px-8'}`}>
         <p className="tabular shrink-0 font-mono text-sm text-ink-muted" aria-live={running ? 'off' : 'polite'}>
           <span className="text-ink">{String(selected + 1).padStart(2, '0')}</span> / {String(slides.length).padStart(2, '0')}
           <span className="sr-only">: {current?.title}</span>

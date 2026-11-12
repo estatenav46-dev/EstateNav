@@ -11,6 +11,8 @@ type Props = {
   min?: number;
   max?: number;
   idPrefix?: string;
+  /** Single column, for narrow sheets. */
+  stacked?: boolean;
 };
 
 function useAnimatedNumber(target: number) {
@@ -74,7 +76,10 @@ function Toggle<T extends number>({ label, value, options, onChange, format }: {
 
 // EMI, interest and purchase costs. Stamp duty and registration come from settings/site
 // (with their as-of date), never from numbers typed into this component.
-export default function CostStudio({ costs, disclaimer, initialValue, min = 2_500_000, max = 50_000_000, idPrefix = 'cost' }: Props) {
+// Section 24(b): interest on a self-occupied home is deductible up to ₹2,00,000 a year (old tax regime).
+const SEC_24B_CAP = 200_000;
+
+export default function CostStudio({ costs, disclaimer, initialValue, min = 6_000_000, max = 35_000_000, idPrefix = 'cost', stacked = false }: Props) {
   const lower = Math.min(min, initialValue);
   const upper = Math.max(max, initialValue);
   const [value, setValue] = useState(initialValue);
@@ -90,11 +95,15 @@ export default function CostStudio({ costs, disclaimer, initialValue, min = 2_50
   const stamp = (value * costs.stampDutyPct) / 100;
   const registration = (value * costs.registrationPct) / 100;
   const share = loan + totalInterest > 0 ? loan / (loan + totalInterest) : 1;
+  // First-year interest: 12 EMIs minus the principal repaid in those 12 months.
+  const balance12 = r === 0 ? loan - emi * 12 : loan * (1 + r) ** 12 - (emi * ((1 + r) ** 12 - 1)) / r;
+  const yearOneInterest = Math.max(0, emi * Math.min(12, n) - (loan - Math.max(0, balance12)));
+  const sec24b = Math.min(yearOneInterest, SEC_24B_CAP);
   const circumference = 2 * Math.PI * 42;
   const asOf = new Date(`${costs.asOf.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-IN', { month: 'short', year: 'numeric', timeZone: 'UTC' });
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+    <div className={`grid gap-6 ${stacked ? '' : 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]'}`}>
       <div className="space-y-5">
         <div>
           <div className="mb-2 flex items-baseline justify-between gap-3">
@@ -157,6 +166,7 @@ export default function CostStudio({ costs, disclaimer, initialValue, min = 2_50
           <Output label={`Stamp duty (${costs.stampDutyPct}%)`} value={stamp} />
           <Output label={`Registration (${costs.registrationPct}%)`} value={registration} />
         </div>
+        <Output label="Section 24(b) deduction, year 1" value={sec24b} note={`Home-loan interest on a self-occupied home, capped at ₹2,00,000 a year under the old tax regime. Your year-1 interest: ${formatINR(Math.round(yearOneInterest))}. The tax saved depends on your slab; confirm with a tax adviser.`} />
         <p className="text-2xs leading-relaxed text-ink-muted">
           Karnataka rates as of {asOf} · Source: {costs.source}. {costs.note} {disclaimer}
         </p>
