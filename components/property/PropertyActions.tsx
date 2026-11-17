@@ -25,12 +25,15 @@ export function PropertyActions({ property, settings, advisorCard }: Props) {
   return (
     <>
       <div className="hidden lg:block">
-        <div className="sticky top-[132px] space-y-4">
+        <div className="sticky top-[88px] space-y-4">
           <div className="panel p-5">
             <p className="sheet-label">{property.transaction === 'rent' ? 'Monthly rent' : 'Price'}</p>
-            <p className="tabular mt-1 font-serif text-3xl leading-tight">{priceLabel(property)}</p>
+            <p className="tabular mt-1 font-serif text-3xl leading-tight">
+              {priceLabel(property)}
+              <sup className="ml-0.5 text-base text-brass">*</sup>
+            </p>
             {rate && <p className="mt-1 text-sm text-ink-muted">{rate}{property.transaction === 'sale' ? ' from' : ''}</p>}
-            <p className="mt-1 text-2xs text-ink-muted">Developer guide price · zero buyer brokerage</p>
+            <p className="mt-1 text-2xs text-ink-muted">*Approximate developer guide price; T&amp;C apply. Varies by unit and offers. Zero buyer brokerage.</p>
             <div className="mt-5 grid gap-2">
               <button type="button" onClick={() => openLeadSheet('site-visit')} className="btn-primary">
                 <CalendarDays className="h-4 w-4" aria-hidden="true" /> Schedule guided VIP site visit
@@ -47,7 +50,7 @@ export function PropertyActions({ property, settings, advisorCard }: Props) {
         </div>
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-[1fr_1fr_auto] gap-2 border-t border-line bg-surface/95 px-3 pt-2 backdrop-blur-md safe-bottom lg:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-[1fr_1fr_auto] gap-2 border-t border-line bg-surface px-3 pt-2 safe-bottom lg:hidden">
         <button type="button" onClick={() => openLeadSheet('site-visit')} className="btn-primary px-3">
           VIP site visit
         </button>

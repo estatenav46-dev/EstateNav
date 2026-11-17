@@ -4,6 +4,7 @@ import PropertyDetail from './PropertyDetail';
 import { JsonLd } from '@/components/ui/JsonLd';
 import { getCorridors, getDevelopers, getOfficeHubs, getPublishedProperties, getPublishedProperty, getSettings } from '@/lib/data/cached';
 import { breadcrumbJsonLd, propertyBreadcrumbs, propertyJsonLd } from '@/lib/seo';
+import { similarProperties } from '@/lib/similar';
 
 export const revalidate = 300;
 
@@ -28,7 +29,9 @@ export default async function PropertyPage({ params }: { params: { slug: string 
   const property = await getPublishedProperty(params.slug);
   if (!property) notFound();
   const [all, corridors, developers, hubs, settings] = await Promise.all([getPublishedProperties(), getCorridors(), getDevelopers(), getOfficeHubs(), getSettings()]);
-  const related = all.filter((p) => p.corridorId === property.corridorId && p.id !== property.id).slice(0, 6);
+  // Similar homes (area, BHK, price) for the rail and the automatic comparison.
+  const similar = similarProperties(property, all, 6);
+  const related = similar.map((m) => m.property);
 
   return (
     <>
@@ -40,6 +43,7 @@ export default async function PropertyPage({ params }: { params: { slug: string 
         corridors={corridors}
         hubs={hubs}
         related={related}
+        similar={similar}
         allProperties={all}
         settings={settings}
       />

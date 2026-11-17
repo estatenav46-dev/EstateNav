@@ -1,12 +1,13 @@
 'use client';
 
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { Building2, MapPin, Navigation, Search, X } from 'lucide-react';
+import { ArrowUpRight, Building2, CornerDownLeft, MapPin, Navigation, Search, X } from 'lucide-react';
 import type { Corridor, Property } from '@/lib/data/types';
 import { liveZones, zoneOfCorridor } from '@/lib/regions';
 
-type Suggestion = { key: string; group: 'Regions' | 'Areas' | 'Locations' | 'Projects'; label: string; hint: string; href: string };
+type Suggestion = { key: string; group: 'Regions' | 'Areas' | 'Locations' | 'Projects'; label: string; hint: string; href: string; img?: string };
 
 const ICON = { Regions: Navigation, Areas: MapPin, Locations: MapPin, Projects: Building2 };
 
@@ -35,7 +36,7 @@ function buildIndex(properties: Property[], corridors: Corridor[]): Suggestion[]
     });
   }
   for (const p of properties) {
-    out.push({ key: `p-${p.id}`, group: 'Projects', label: p.title, hint: `${p.locality} · ${p.developerName}`, href: `/properties/${p.slug}` });
+    out.push({ key: `p-${p.id}`, group: 'Projects', label: p.title, hint: `${p.locality} · ${p.developerName}`, href: `/properties/${p.slug}`, img: p.media.cover.url });
   }
   return out;
 }
@@ -143,7 +144,7 @@ export function QuickSearch({ properties, corridors, id = 'quick-search', classN
             }
           }}
           placeholder={placeholder}
-          className="h-14 w-full rounded-2xl border border-line bg-surface pl-12 pr-12 text-base text-ink shadow-[0_10px_30px_-22px_rgb(var(--shadow)/0.5)] placeholder:text-ink-muted/80 hover:border-line-strong focus:border-accent-ink focus:outline-none [&::-webkit-search-cancel-button]:hidden"
+          className="h-[60px] w-full rounded-[20px] border border-line bg-surface pl-12 pr-12 text-base text-ink transition-[border-color,box-shadow] duration-base placeholder:text-ink-muted/80 hover:border-line-strong focus:border-accent-ink focus:shadow-[0_0_0_4px_rgb(var(--accent)/0.12)] focus:outline-none [&::-webkit-search-cancel-button]:hidden"
         />
         {query && (
           <button type="button" onClick={() => setQuery('')} className="absolute right-1 top-1/2 inline-flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full text-ink-muted hover:bg-surface-2 hover:text-ink" aria-label="Clear search">
@@ -153,15 +154,15 @@ export function QuickSearch({ properties, corridors, id = 'quick-search', classN
       </form>
 
       {open && (
-        <div className="absolute inset-x-0 top-full z-40 mt-2 overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_24px_60px_-28px_rgb(var(--shadow)/0.55)]">
+        <div className="pop-in absolute inset-x-0 top-full z-40 mt-2 overflow-hidden rounded-[22px] border border-line bg-surface shadow-[0_30px_70px_-28px_rgb(var(--shadow)/0.55)]">
           {results.length ? (
-            <ul id={listId} role="listbox" aria-label="Suggestions" className="max-h-[min(420px,60vh)] overflow-y-auto overscroll-contain p-2">
+            <ul id={listId} role="listbox" aria-label="Suggestions" className="no-scrollbar max-h-[min(420px,60vh)] overflow-y-auto overscroll-contain p-2">
               {results.map((s, i) => {
                 const Icon = ICON[s.group];
                 const heading = s.group !== lastGroup ? (lastGroup = s.group) : null;
                 return (
                   <li key={s.key} role="presentation">
-                    {heading && <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-ink-muted">{q ? heading : 'Start with a region'}</p>}
+                    {heading && <p className="px-3 pb-1.5 pt-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-muted">{q ? heading : 'Start with a region'}</p>}
                     <div
                       id={`${listId}-${i}`}
                       role="option"
@@ -169,14 +170,24 @@ export function QuickSearch({ properties, corridors, id = 'quick-search', classN
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={() => go(s.href)}
                       onMouseEnter={() => setActive(i)}
-                      className={`flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 ${i === active ? 'bg-surface-2' : ''}`}
+                      style={{ '--i': i } as React.CSSProperties}
+                      className={`group/opt flex cursor-pointer items-center gap-3 rounded-2xl px-2.5 py-2 transition-colors duration-fast ${i === active ? 'bg-surface-2' : ''}`}
                     >
-                      <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent-ink">
-                        <Icon className="h-4 w-4" aria-hidden="true" />
-                      </span>
-                      <span className="min-w-0">
+                      {s.img ? (
+                        <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl bg-surface-2">
+                          <Image src={s.img} alt="" fill sizes="44px" quality={40} className="object-cover" />
+                        </span>
+                      ) : (
+                        <span className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors ${i === active ? 'bg-forest text-forest-on' : 'bg-sand text-forest dark:text-brass'}`}>
+                          <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
+                        </span>
+                      )}
+                      <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm font-semibold">{s.label}</span>
                         <span className="block truncate text-xs text-ink-muted">{s.hint}</span>
+                      </span>
+                      <span className={`shrink-0 text-ink-muted transition-[opacity,transform] duration-base ${i === active ? 'translate-x-0 opacity-100' : '-translate-x-1 opacity-0'}`} aria-hidden="true">
+                        {s.group === 'Projects' ? <ArrowUpRight className="h-4 w-4" /> : <CornerDownLeft className="h-4 w-4" />}
                       </span>
                     </div>
                   </li>

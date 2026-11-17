@@ -98,7 +98,7 @@ export function AuthModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-scrim/60 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-scrim/65 animate-fade-in">
       <div className="panel bg-surface max-w-md w-full p-6 shadow-2xl relative border-line">
         {/* Close Button */}
         <button
@@ -123,7 +123,7 @@ export function AuthModal() {
             {mode === 'forgot' && 'Reset your password'}
           </h2>
           <p className="text-xs text-ink-muted mt-1">
-            {mode === 'signin' && 'Sign in to access your saved shortlisted properties and advisory notes.'}
+            {mode === 'signin' && 'Sign in to see your wishlist and advisory notes.'}
             {mode === 'signup' && 'Join EstateNav to track Hyderabad verified projects and commute radars.'}
             {mode === 'forgot' && 'Enter your email address and we will send you a password reset link.'}
           </p>

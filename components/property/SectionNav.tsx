@@ -21,7 +21,7 @@ export function SectionNav({ sections }: { sections: { id: string; label: string
   }, [sections]);
 
   return (
-    <nav aria-label="On this page" className="sticky top-[60px] z-30 -mx-4 border-b border-line bg-bg/95 px-4 backdrop-blur sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0">
+    <nav aria-label="On this page" className="sticky top-[60px] z-30 -mx-4 border-b border-line bg-bg px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0">
       <ul className="no-scrollbar flex gap-1 overflow-x-auto">
         {sections.map((s) => (
           <li key={s.id}>

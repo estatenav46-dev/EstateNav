@@ -41,7 +41,7 @@ export function Modal({ open, onOpenChange, title, description, children, footer
       aria-describedby={description ? descId : undefined}
       onClose={() => onOpenChange(false)}
       onClick={(e) => e.target === ref.current && onOpenChange(false)}
-      className={`m-auto max-h-[min(86vh,880px)] w-[min(680px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-line bg-surface p-0 text-ink shadow-[0_30px_80px_-30px_rgb(var(--shadow)/0.6)] backdrop:bg-scrim/50 backdrop:backdrop-blur-[2px] open:flex open:animate-fade-up open:flex-col ${className}`}
+      className={`m-auto max-h-[min(86vh,880px)] w-[min(680px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-line bg-surface p-0 text-ink shadow-[0_30px_80px_-30px_rgb(var(--shadow)/0.6)] backdrop:bg-scrim/50 open:flex open:animate-fade-up open:flex-col ${className}`}
     >
       <div className="flex shrink-0 items-start justify-between gap-4 border-b border-line px-6 py-4">
         <div className="min-w-0">

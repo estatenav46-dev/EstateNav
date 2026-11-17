@@ -28,6 +28,17 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Visitor profiles, welcome-form details and browsing signals are written by the server
+    // only (Admin SDK); staff can read them.
+    match /visitors/{vid} {
+      allow read: if isStaff();
+      allow write: if false;
+      match /{sub=**} {
+        allow read: if isStaff();
+        allow write: if false;
+      }
+    }
+
     // A visitor can read and change only their own shortlist; roles are admin-only.
     match /users/{uid} {
       allow read: if signedIn() && (request.auth.uid == uid || isAdmin());

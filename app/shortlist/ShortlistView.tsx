@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Columns3, Heart, LogIn, MessageCircle, Share2 } from 'lucide-react';
 import type { Property } from '@/lib/data/types';
-import { PropertyCard } from '@/components/property/PropertyCard';
+import { ExploreCard } from '@/components/explore/ExploreCard';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { whatsAppLink } from '@/lib/contact';
 import { priceLabel } from '@/lib/property';
@@ -28,7 +28,7 @@ export function ShortlistView({ properties, whatsapp, advisorName }: { propertie
 
   const share = async () => {
     try {
-      if (navigator.share) await navigator.share({ title: 'My EstateNav shortlist', url: shareUrl });
+      if (navigator.share) await navigator.share({ title: 'My EstateNav wishlist', url: shareUrl });
       else {
         await navigator.clipboard.writeText(shareUrl);
         setCopied(true);
@@ -49,7 +49,7 @@ export function ShortlistView({ properties, whatsapp, advisorName }: { propertie
   if (!shared && (loading || !user)) {
     return (
       <main id="main" className="mx-auto max-w-container px-4 pb-16 pt-4 sm:px-6 lg:px-8">
-        <Breadcrumbs items={[{ name: 'Home', path: '/' }, { name: 'Shortlist', path: '/shortlist' }]} />
+        <Breadcrumbs items={[{ name: 'Home', path: '/' }, { name: 'Wishlist', path: '/shortlist' }]} />
         {loading ? (
           <div className="skeleton mt-8 h-48 rounded-card" />
         ) : (
@@ -75,10 +75,10 @@ export function ShortlistView({ properties, whatsapp, advisorName }: { propertie
 
   return (
     <main id="main" className="mx-auto max-w-container px-4 pb-16 pt-4 sm:px-6 lg:px-8">
-      <Breadcrumbs items={[{ name: 'Home', path: '/' }, { name: 'Shortlist', path: '/shortlist' }]} />
+      <Breadcrumbs items={[{ name: 'Home', path: '/' }, { name: 'Wishlist', path: '/shortlist' }]} />
       <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-serif text-3xl">{shared ? 'A shared shortlist' : 'Your shortlist'}</h1>
+          <h1 className="font-serif text-3xl">{shared ? 'A shared wishlist' : 'Your wishlist'}</h1>
           <p className="mt-1 text-ink-muted">{items.length} {items.length === 1 ? 'project' : 'projects'}{shared ? '' : ' saved to your account'}</p>
         </div>
         {items.length > 0 && (
@@ -92,7 +92,7 @@ export function ShortlistView({ properties, whatsapp, advisorName }: { propertie
               <Columns3 className="h-4 w-4" aria-hidden="true" /> Compare{items.length > MAX_COMPARE ? ` first ${MAX_COMPARE}` : ''}
             </button>
             <button type="button" onClick={share} className="btn-secondary">
-              <Share2 className="h-4 w-4" aria-hidden="true" /> {copied ? 'Link copied' : 'Share shortlist'}
+              <Share2 className="h-4 w-4" aria-hidden="true" /> {copied ? 'Link copied' : 'Share wishlist'}
             </button>
             <a href={whatsAppLink(message, whatsapp)} target="_blank" rel="noopener noreferrer" className="btn-primary">
               <MessageCircle className="h-4 w-4" aria-hidden="true" /> Send to advisor on WhatsApp
@@ -105,7 +105,7 @@ export function ShortlistView({ properties, whatsapp, advisorName }: { propertie
         <ul className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {items.map((p) => (
             <li key={p.id}>
-              <PropertyCard property={p} />
+              <ExploreCard property={p} />
             </li>
           ))}
         </ul>

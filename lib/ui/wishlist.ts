@@ -3,6 +3,7 @@
 import type { User } from 'firebase/auth';
 import { loadWishlist, saveWishlist } from '@/app/actions/wishlist';
 import { authPromptStore, shortlistStore } from './stores';
+import { track } from './visitor';
 
 // Wishlist rules: only signed-in visitors can save homes. The list is stored on the account
 // (users/{uid}.shortlist via a token-checked server action) and cached on the device per user.
@@ -91,8 +92,10 @@ export function toggleWishlist(id: string): boolean {
     }
     return false;
   }
+  const adding = !shortlistStore.get().includes(id);
   shortlistStore.set((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]));
   schedulePersist();
+  if (adding) track('wishlist', { id });
   return true;
 }
 

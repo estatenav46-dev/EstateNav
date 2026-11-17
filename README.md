@@ -17,7 +17,7 @@ To open the admin preview locally, set `NEXT_PUBLIC_ADMIN_PREVIEW=true` and visi
 
 | Route | What it is |
 | --- | --- |
-| `/` | Featured carousel with search, then "Where do you want to live?" region tiles (North, East, South-East, South; West and Central marked coming soon), "What are you looking for?" shortcut tiles, trust strip and advisor card |
+| `/` | Hero (segment switch, search console, featured carousel), "Where do you want to live?" photo cards (West and Central as coming-soon cards), "What are you looking for?" (type photo cards and need pills with custom icons), "Picked for you", partner section and the advisory band |
 | `/properties` | Explore page, app-style: a left rail goes region → area → location, with type chips (Apartments, Plots, Offices), budget, sort, a "More filters" sheet and compact cards. URL-backed (`?zone=east&corridor=whitefield&loc=…`); each region or area step is a history entry, so Back goes up a level. Opening a card shows the quick-view sheet |
 | `/properties/[slug]` | Full detail page. Property cards, the carousel and search open it in a new tab; clicking a card photo opens the photo viewer instead |
 | `/contact` | Enquiry form (`?intent=site-visit|price-sheet|loan-help|general&property=slug`) |
@@ -49,6 +49,28 @@ What the site implements from the blueprint, and what stays hidden until verifie
 | Dark theme on the blueprint palette (#111827 canvas, #10B981 actions); 48 px touch targets on phones | `app/globals.css` |
 
 Not added: the deck's sample figures (corridor ₹/sq.ft, ~79,200 unsold units, absorption, yields, developer track record) and "Abhee Urban Glen" are unsourced or not in the catalogue. Commute filtering waits for measured drive times on listings.
+
+## Visitors, consent and personalisation
+
+- **Cookie banner** (`components/privacy/CookieBanner.tsx`): "Accept all", "Essential only" or "Customise" (essential always on, personalisation as a switch), reopened from "Cookie settings" in the footer. Nothing is tracked until personalisation is allowed; choosing "Essential only" clears the personalisation data on the device.
+- **Welcome concierge** (`components/concierge/ConciergeFlow.tsx`): goal → region → budget → name and mobile, with a live match count and photos of matching homes. It opens as a centred dialog on the home page shortly after the cookie choice (`WelcomeConcierge.tsx`; never for signed-in users, not again once answered, or for 3 days after "I'll browse first"), from the hero's "Get matched in 30 seconds", and sits inline in the home page's "Your brief" section until answered, which then shows the picks. Answers are saved by `app/actions/visitors.ts` to `visitors/{visitorId}` (plus a `leads` subcollection) with the consent text and version, and UTM tags.
+- **Browsing signals** (`lib/ui/visitor.ts` → `POST /api/track`): page and property views, filters, region picks, wishlist and compare events, batched and rate-limited, stored under `visitors/{visitorId}/events` with interest counters (`interest.zone.east`, …) on the visitor document. The same signals drive the home page's "Picked for you" rail on the device.
+- Visitor data is written by the server only; `firestore.rules.draft` gives staff read access and denies client writes. Admin screens for visitors come next (separate admin app).
+
+## Motion and interaction
+
+- **Scroll reveals** (`components/Reveal.tsx`): `variant` = `up`, `zoom`, `left`, `right`, `clip` (photo wipes up while it settles) or `words` (wrap the title in `<Words>`); one shared observer, each runs once.
+- **Scroll-linked effects** (`components/ui/Interactions.tsx`): elements with `data-scrub` (`enter`, `exit` or a full pass) get `--p` from 0 to 1 for the `.sc-*` classes in `app/globals.css`: the hero drifting away, the partner and advisory panels expanding to full width, the footer wordmark. `data-parallax` moves photo layers; `data-scroll-progress` is the bar under the header.
+- **Hero**: Residential → Plots → Commercial cycle with the featured projects until the visitor picks a segment or starts searching (`components/home/HomeHero.tsx`, `HeroShowcase.tsx`).
+- **Dropdowns** use `components/ui/Select.tsx` (listbox with keyboard support, counts per option) instead of native selects; **navigation** shows a top progress bar at once (`components/ui/NavProgress.tsx`) and the explore and project pages have loading skeletons.
+- Everything respects the visitor's reduced-motion setting.
+
+## Property page extras
+
+- Prices carry an asterisk: approximate developer guide price, terms and conditions apply, contact for the latest sheet.
+- "Similar homes" ranks other listings by area/region, BHK overlap and price (`lib/similar.ts`): four cards in a grid (a swipe row on phones), with the reasons shown on each photo.
+- Property cards open the project page (new tab) from anywhere on the card; the photo-count chip opens the gallery.
+- "Compared for you" puts the project beside its two closest matches, with swappable columns and highlighted differences (`components/property/AutoCompare.tsx`).
 
 ## Data architecture (Firebase-ready, not connected)
 

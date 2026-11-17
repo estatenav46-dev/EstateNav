@@ -142,6 +142,8 @@ export const corridorSchema = z.object({
   svgPathId: z.string().min(1),
   heroImage: imageRefSchema.nullable(),
   order: z.number().int().nonnegative(),
+  /** Region set in the admin (north, east, south-east, south, west, central); older records may not have it. */
+  zone: z.enum(['north', 'east', 'south-east', 'south', 'west', 'central']).nullable().optional(),
 });
 
 export const marketSnapshotSchema = z
@@ -246,4 +248,38 @@ export const userSchema = z.object({
   displayName: z.string(),
   email: z.string().email(),
   shortlist: z.array(z.string()),
+});
+
+// ---- Visitors: details shared in the welcome concierge, plus consented browsing signals ----
+// Written only by the server (app/actions/visitors.ts, app/api/track). The visitor id is a
+// random UUID kept in the browser; no account is needed.
+export const visitorIdSchema = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, 'Invalid visitor id');
+
+export const visitorGoalSchema = z.enum(['buy-home', 'invest', 'plot', 'office', 'browsing']);
+export const visitorRegionSchema = z.enum(['north', 'east', 'south-east', 'south', 'west', 'central', 'any']);
+export const visitorBudgetSchema = z.enum(['u1', '1-1.5', '1.5-2', '2+', 'any']);
+
+export const visitorLeadSchema = z.object({
+  name: z.string().trim().min(2, 'Please tell us your name').max(80),
+  phone: z
+    .string()
+    .transform((v) => v.replace(/\D/g, '').replace(/^91(?=\d{10}$)/, ''))
+    .pipe(z.string().regex(/^[6-9]\d{9}$/, 'Enter a 10-digit mobile number')),
+  goal: visitorGoalSchema,
+  region: visitorRegionSchema,
+  budget: visitorBudgetSchema,
+  consentText: z.string().min(1).max(600),
+  consentVersion: z.string().min(1).max(40),
+  page: z.string().max(200),
+  utm: z.object({ source: z.string().max(80).nullable(), medium: z.string().max(80).nullable(), campaign: z.string().max(80).nullable() }),
+  website: z.string().max(0).optional(), // honeypot: must stay empty
+});
+
+export const visitorEventTypeSchema = z.enum(['page_view', 'property_view', 'search', 'filter', 'region', 'wishlist', 'compare', 'cta']);
+
+export const visitorEventSchema = z.object({
+  type: visitorEventTypeSchema,
+  path: z.string().max(200),
+  at: z.string().datetime(),
+  data: z.record(z.string().max(40), z.union([z.string().max(160), z.number().finite(), z.boolean()])).refine((d) => Object.keys(d).length <= 12, 'Too many fields').optional(),
 });

@@ -1,32 +1,65 @@
-import { ShieldCheck, CheckCircle2, Tag, UserCheck } from 'lucide-react';
+import { CheckCircle2, FileCheck, ShieldCheck, Tag, UserCheck } from 'lucide-react';
+import { Reveal } from '@/components/Reveal';
 
-const TRUST_POINTS = [
-  { icon: ShieldCheck, text: 'Zero buyer brokerage' },
-  { icon: CheckCircle2, text: 'K-RERA details shown' },
-  { icon: Tag, text: 'Direct developer price' },
-  { icon: UserCheck, text: 'Dedicated advisor' },
+const TRUST_PILLARS = [
+  {
+    icon: ShieldCheck,
+    title: 'Zero Buyer Brokerage',
+    sub: 'Direct developer inventory',
+    detail: 'Save standard 1–2% advisory commission with 100% direct developer terms.',
+  },
+  {
+    icon: CheckCircle2,
+    title: 'K-RERA Certified',
+    sub: 'License: ...007810',
+    detail: 'Operated by SV Praveen, K-RERA agent registered through September 2031.',
+  },
+  {
+    icon: Tag,
+    title: 'Direct Developer Pricing',
+    sub: 'Zero markup guarantee',
+    detail: 'Official builder cost sheets, allocation decks, and pre-launch price locks.',
+  },
+  {
+    icon: FileCheck,
+    title: 'Legal & Title Diligence',
+    sub: 'Kaveri & Khata verified',
+    detail: 'Full title scrutiny, plan sanction clearances, and pre-approved bank APFs.',
+  },
 ];
 
 export function TrustStrip() {
   return (
-    <section className="mx-auto max-w-container px-4 pt-10 sm:px-6 sm:pt-14 lg:px-8" aria-label="Why buyers use EstateNav">
-      <div className="rounded-2xl border border-line bg-surface-2/60 p-4 sm:p-5">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-          {TRUST_POINTS.map((item, idx) => {
-            const Icon = item.icon;
-            return (
-              <div key={idx} className="flex items-center gap-2">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent-ink">
-                  <Icon className="h-4 w-4" aria-hidden="true" />
+    <section className="mx-auto max-w-container px-4 pt-12 sm:px-6 sm:pt-16 lg:px-8" aria-label="Why buyers choose EstateNav">
+      <Reveal>
+        <div className="rounded-2xl border border-line bg-surface shadow-sm overflow-hidden">
+          <div className="grid grid-cols-1 divide-y divide-line sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4 lg:divide-x">
+            {TRUST_PILLARS.map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <div key={idx} className="group p-5 transition-colors duration-fast hover:bg-surface-2/50 sm:p-6">
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-line bg-surface-2 text-ink transition-colors group-hover:border-accent-ink group-hover:bg-accent-soft group-hover:text-accent-ink">
+                      <Icon className="h-4.5 w-4.5" strokeWidth={1.75} aria-hidden="true" />
+                    </span>
+                    <div>
+                      <h3 className="font-serif text-sm font-bold text-ink sm:text-base leading-tight">
+                        {item.title}
+                      </h3>
+                      <p className="font-mono text-[10px] text-accent-ink font-semibold uppercase tracking-wider">
+                        {item.sub}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-xs leading-relaxed text-ink-muted">
+                    {item.detail}
+                  </p>
                 </div>
-                <span className="text-xs font-semibold text-ink sm:text-sm">
-                  {item.text}
-                </span>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }

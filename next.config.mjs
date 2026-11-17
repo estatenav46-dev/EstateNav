@@ -2,7 +2,14 @@
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  distDir: process.env.VERCEL ? '.next' : '.next_build',
+  // Keep the development server's output separate from production builds.
+  // Next writes both outputs into distDir, so sharing it can leave either
+  // process with incomplete manifests and vendor chunks.
+  distDir: process.env.VERCEL
+    ? '.next'
+    : process.env.NODE_ENV === 'development'
+      ? '.next_dev'
+      : '.next_build',
   experimental: {
     serverComponentsExternalPackages: ['firebase-admin', '@google-cloud/firestore'],
   },

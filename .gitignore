@@ -9,6 +9,7 @@
 # next.js
 /.next/
 /.next_build/
+/.next_dev/
 /.next-estatenav/
 /build-output/
 /out/

@@ -17,11 +17,11 @@ function Figure({ s, name }: { s: MarketSnapshot; name: string }) {
   const up = s.yoyChangePct >= 0;
   const Arrow = up ? ArrowUpRight : ArrowDownRight;
   return (
-    <span className="inline-flex items-center gap-2 whitespace-nowrap">
-      <span className="font-semibold text-ink">{name}</span>
+    <span className="inline-flex items-center gap-2.5 whitespace-nowrap">
+      <span className="font-semibold text-[rgb(var(--on-night))]">{name}</span>
       <span className="tabular font-mono">₹{Math.round(s.avgPricePerSqft).toLocaleString('en-IN')}/sq.ft</span>
-      <span className={`tabular inline-flex items-center font-mono ${up ? 'text-accent-ink' : 'text-danger'}`}>
-        <Arrow className="h-3.5 w-3.5" aria-hidden="true" />
+      <span className={`tabular inline-flex items-center rounded-full px-1.5 py-0.5 font-mono text-xs ${up ? 'bg-emerald-400/15 text-emerald-300' : 'bg-rose-400/15 text-rose-300'}`}>
+        <Arrow className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
         {Math.abs(s.yoyChangePct).toFixed(1)}% YoY
       </span>
     </span>
@@ -38,20 +38,29 @@ export function MarketTicker({ snapshots, corridors }: { snapshots: MarketSnapsh
   const sources = Array.from(new Set(latest.map(({ s }) => `${s.source}, ${monthYear(s.asOf)}`)));
 
   return (
-    <section aria-label="Corridor price benchmarks" className="mx-auto max-w-container px-4 pt-8 sm:px-6 lg:px-8">
-      <div className="overflow-hidden rounded-2xl border border-line bg-surface">
-        <div className="ticker-mask overflow-hidden py-3">
-          <ul className="ticker-track flex w-max gap-10 px-5 text-sm text-ink-muted">
-            {[0, 1].map((copy) =>
-              latest.map(({ s, name }) => (
-                <li key={`${copy}-${s.id}`} aria-hidden={copy === 1 ? true : undefined} className={copy === 1 ? 'ticker-dup' : undefined}>
-                  <Figure s={s} name={name} />
-                </li>
-              )),
-            )}
-          </ul>
+    <section aria-label="Corridor price benchmarks" className="mx-auto max-w-container px-4 pt-6 sm:px-6 lg:px-8">
+      <div className="overflow-hidden rounded-[22px] bg-[rgb(var(--night))] text-[rgb(var(--on-night)/0.7)] shadow-[0_30px_60px_-40px_rgb(0_0_0/0.7)]">
+        <div className="flex items-stretch">
+          <p className="hidden shrink-0 items-center gap-2 border-r border-white/10 px-5 text-[11px] font-semibold uppercase tracking-[0.16em] text-brass sm:flex">
+            <span className="relative flex h-2 w-2" aria-hidden="true">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+            </span>
+            Market pulse
+          </p>
+          <div className="ticker-mask min-w-0 flex-1 overflow-hidden py-3.5">
+            <ul className="ticker-track flex w-max gap-12 px-5 text-sm">
+              {[0, 1].map((copy) =>
+                latest.map(({ s, name }) => (
+                  <li key={`${copy}-${s.id}`} aria-hidden={copy === 1 ? true : undefined} className={copy === 1 ? 'ticker-dup' : undefined}>
+                    <Figure s={s} name={name} />
+                  </li>
+                )),
+              )}
+            </ul>
+          </div>
         </div>
-        <p className="border-t border-line px-5 py-2 text-[11px] text-ink-muted">
+        <p className="border-t border-white/10 px-5 py-2 text-[11px] text-[rgb(var(--on-night)/0.5)]">
           Benchmark rates, not listing prices. Source: {sources.join(' · ')}.
         </p>
       </div>

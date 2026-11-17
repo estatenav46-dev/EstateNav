@@ -29,8 +29,18 @@ const OTHER: Zone = { id: 'other', name: 'Other areas', short: 'Other', areas: '
 
 export const ZONE_IDS = [...ZONES.map((z) => z.id), OTHER.id] as const;
 
+// Areas created in the admin carry their region on the corridor record (`zone`). Those
+// choices are registered here (server: lib/data/cached.ts, browser: ZoneRegistry) and win
+// over the built-in mapping above.
+const corridorZones = new Map<string, ZoneId>();
+const isZoneId = (value: unknown): value is ZoneId => typeof value === 'string' && (ZONE_IDS as readonly string[]).includes(value);
+
+export function registerCorridorZones(corridors: { id: string; zone?: string | null }[]) {
+  for (const c of corridors) if (isZoneId(c.zone)) corridorZones.set(c.id, c.zone);
+}
+
 export function zoneOfCorridor(corridorId: string): ZoneId {
-  return ZONES.find((z) => z.corridorIds.includes(corridorId))?.id ?? 'other';
+  return corridorZones.get(corridorId) ?? ZONES.find((z) => z.corridorIds.includes(corridorId))?.id ?? 'other';
 }
 
 export function zoneById(id: string): Zone | undefined {
@@ -41,10 +51,15 @@ export function inZone(property: Property, zoneId: string): boolean {
   return zoneOfCorridor(property.corridorId) === zoneId;
 }
 
-/** Regions with listings, in display order; "Other areas" only appears when it has listings. */
+/** Regions to browse, in display order: open regions plus any region that has listings. */
 export function liveZones(properties: Property[]): Zone[] {
-  const live = ZONES.filter((z) => z.available);
-  return properties.some((p) => zoneOfCorridor(p.corridorId) === 'other') ? [...live, OTHER] : live;
+  const used = new Set(properties.map((p) => zoneOfCorridor(p.corridorId)));
+  const live = ZONES.filter((z) => z.available || used.has(z.id));
+  return used.has('other') ? [...live, OTHER] : live;
 }
 
-export const comingSoonZones = () => ZONES.filter((z) => !z.available);
+/** Regions not open yet; a region drops off this list as soon as it has a listing. */
+export function comingSoonZones(properties: Property[] = []): Zone[] {
+  const used = new Set(properties.map((p) => zoneOfCorridor(p.corridorId)));
+  return ZONES.filter((z) => !z.available && !used.has(z.id));
+}

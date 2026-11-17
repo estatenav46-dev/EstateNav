@@ -6,6 +6,8 @@ const token = (name: string) => `rgb(var(--${name}) / <alpha-value>)`;
 
 const config: Config = {
   darkMode: 'class',
+  // Hover styles only on devices that can hover, so taps never leave cards stuck in hover.
+  future: { hoverOnlyWhenSupported: true },
   content: ['./app/**/*.{ts,tsx,mdx}', './components/**/*.{ts,tsx,mdx}', './lib/**/*.{ts,tsx}'],
   theme: {
     extend: {
@@ -22,6 +24,9 @@ const config: Config = {
           on: token('on-accent'),
         },
         danger: token('danger'),
+        forest: { DEFAULT: token('forest'), on: token('on-forest') },
+        sand: token('sand'),
+        brass: token('brass'),
         scrim: token('scrim'),
       },
       fontFamily: {

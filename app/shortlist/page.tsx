@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { ShortlistView } from './ShortlistView';
 import { getPublishedProperties, getSettings } from '@/lib/data/cached';
 
-export const metadata: Metadata = { title: 'Your shortlist', robots: { index: false } };
+export const metadata: Metadata = { title: 'Your wishlist', robots: { index: false } };
 export const revalidate = 300;
 
 export default async function ShortlistPage() {

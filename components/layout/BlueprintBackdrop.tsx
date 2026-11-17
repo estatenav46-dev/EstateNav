@@ -1,18 +1,16 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef } from 'react';
 
 // A faint architectural drawing behind every page: drafting grid, dimension lines and an
-// isometric mid-rise. The outline draws once on load; on the homepage, scrolling adds floors
-// and fades in survey lines (transform and opacity only).
+// isometric mid-rise. The outline draws once on load and then stays still (nothing repaints
+// while scrolling).
 
 const S = 17; // px per model unit
 const W = 10; // building width (x)
 const D = 6; // building depth (y)
 const H = 1.45; // floor height
 const BASE_FLOORS = 6;
-const MAX_FLOORS = 12;
 const ORIGIN = { x: 262, y: 480 };
 const C = Math.cos(Math.PI / 6);
 const SN = Math.sin(Math.PI / 6);
@@ -67,56 +65,10 @@ const crane = [
   line([W + 5.3, 2, 24.5], [W + 9, 2, 22.6]),
   line([W - 4, 2, 22.6], [W - 4, 2, 17]),
 ];
-const survey = [
-  line([0, D + 2.5, 0], [-14, D + 9, 0]),
-  line([W + 2.5, D + 2, 0], [W + 2.5, D + 14, 0]),
-  line([0, 0, 0], [-10, 2, 0]),
-];
-const surveyMarks = [iso(-14, D + 9, 0), iso(W + 2.5, D + 14, 0), iso(-10, 2, 0), iso(0, D + 2.5, 0)];
 
 export function BlueprintBackdrop() {
   const pathname = usePathname();
-  const svgRef = useRef<SVGSVGElement>(null);
-  const roofRef = useRef<SVGGElement>(null);
-  const isHome = pathname === '/';
   const hidden = pathname?.startsWith('/admin');
-
-  useEffect(() => {
-    const svg = svgRef.current;
-    const roofGroup = roofRef.current;
-    if (!svg || !roofGroup) return;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const wide = window.matchMedia('(min-width: 768px)');
-    let frame = 0;
-
-    const apply = (progress: number) => {
-      svg.style.setProperty('--bp-p', progress.toFixed(3));
-      const floorsUp = Math.min(1, progress / 0.8) * (MAX_FLOORS - BASE_FLOORS);
-      roofGroup.style.transform = `translateY(${(-floorsUp * H * S).toFixed(1)}px)`;
-    };
-    const update = () => {
-      frame = 0;
-      if (document.hidden) return;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      apply(max > 0 ? Math.min(1, window.scrollY / max) : 0);
-    };
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(update);
-    };
-
-    if (!isHome || reduce.matches || !wide.matches) {
-      apply(0);
-      return;
-    }
-    update();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    document.addEventListener('visibilitychange', onScroll);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener('scroll', onScroll);
-      document.removeEventListener('visibilitychange', onScroll);
-    };
-  }, [isHome]);
 
   if (hidden) return null;
 
@@ -153,7 +105,6 @@ export function BlueprintBackdrop() {
       </svg>
 
       <svg
-        ref={svgRef}
         viewBox="0 0 560 640"
         className="absolute -bottom-6 right-0 w-[92vw] max-w-[640px] md:w-[48vw]"
         fill="none"
@@ -166,28 +117,11 @@ export function BlueprintBackdrop() {
           {Array.from({ length: BASE_FLOORS }, (_, k) => floorPaths(k).map((d, i) => <path key={`${k}-${i}`} d={d} pathLength={1} className="bp-draw" />))}
           {crane.map((d) => <path key={d} d={d} pathLength={1} className="bp-draw" strokeWidth="0.8" />)}
         </g>
-        {isHome &&
-          Array.from({ length: MAX_FLOORS - BASE_FLOORS }, (_, i) => (
-            <g key={i} className="bp-floor" style={{ ['--k' as string]: ((i / (MAX_FLOORS - BASE_FLOORS)) * 0.8).toFixed(3) }}>
-              {floorPaths(BASE_FLOORS + i).map((d) => <path key={d} d={d} />)}
-            </g>
-          ))}
-        <g ref={roofRef} style={{ transition: 'transform 120ms linear' }}>
+        <g>
           <g transform={`translate(0 ${(-BASE_FLOORS * H * S).toFixed(1)})`}>
             {roof.map((d) => <path key={d} d={d} pathLength={1} className="bp-draw" />)}
           </g>
         </g>
-        {isHome && (
-          <g className="bp-survey" style={{ color: 'rgb(var(--survey))' }} stroke="currentColor" strokeDasharray="6 5" strokeWidth="1">
-            {survey.map((d) => <path key={d} d={d} />)}
-            {surveyMarks.map(([x, y]) => (
-              <g key={`${x}-${y}`} strokeDasharray="none">
-                <circle cx={x} cy={y} r="5" />
-                <path d={`M${x - 9} ${y}H${x + 9}M${x} ${y - 9}V${y + 9}`} />
-              </g>
-            ))}
-          </g>
-        )}
       </svg>
     </div>
   );

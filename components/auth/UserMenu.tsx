@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth/context';
 import { shortlistStore } from '@/lib/ui/stores';
-import { User, LogOut, Bookmark, Calendar, ChevronDown, LogIn } from 'lucide-react';
+import { LogOut, Heart, Calendar, ChevronDown, LogIn } from 'lucide-react';
 
 export function UserMenu() {
   const { user, loading, logout, setAuthModalOpen } = useAuth();
@@ -36,7 +36,7 @@ export function UserMenu() {
       <button
         type="button"
         onClick={() => setAuthModalOpen(true)}
-        className="inline-flex items-center gap-1.5 h-10 px-3.5 rounded-lg border border-line bg-surface hover:bg-surface-2 text-ink text-xs font-semibold transition-colors"
+        className="inline-flex h-11 items-center gap-1.5 rounded-full border border-line bg-surface px-4 text-sm font-semibold text-ink transition-colors hover:border-ink hover:bg-surface-2"
       >
         <LogIn className="w-3.5 h-3.5 text-accent-ink" />
         <span>Sign In</span>
@@ -51,7 +51,7 @@ export function UserMenu() {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="inline-flex items-center gap-2 h-10 px-2 rounded-lg hover:bg-surface-2 transition-colors border border-line/60"
+        className="inline-flex h-11 items-center gap-2 rounded-full border border-line bg-surface pl-1.5 pr-3 transition-colors hover:border-ink"
         aria-expanded={open}
       >
         {user.photoURL ? (
@@ -72,7 +72,7 @@ export function UserMenu() {
       </button>
 
       {open && (
-        <div className="panel absolute right-0 top-full mt-2 w-60 p-2 shadow-xl border-line animate-fade-up z-50 bg-surface">
+        <div className="pop-in absolute right-0 top-full z-50 mt-2 w-64 rounded-[20px] border border-line bg-surface p-2 shadow-[0_28px_70px_-24px_rgb(var(--shadow)/0.55)]">
           <div className="px-3 py-2 border-b border-line mb-1">
             <p className="text-xs font-bold text-ink truncate">{user.displayName || 'EstateNav User'}</p>
             <p className="text-2xs text-ink-muted font-mono truncate">{user.email}</p>
@@ -81,11 +81,11 @@ export function UserMenu() {
           <Link
             href="/shortlist"
             onClick={() => setOpen(false)}
-            className="flex items-center justify-between px-3 py-2 text-xs rounded-md hover:bg-surface-2 text-ink transition-colors"
+            className="flex min-h-[44px] items-center justify-between rounded-xl px-3 text-sm font-semibold text-ink transition-colors hover:bg-surface-2"
           >
-            <span className="flex items-center gap-2">
-              <Bookmark className="w-3.5 h-3.5 text-accent-ink" />
-              <span>Saved Shortlist</span>
+            <span className="flex items-center gap-2.5">
+              <Heart className="h-4 w-4 text-accent-ink" />
+              <span>My wishlist</span>
             </span>
             {shortlist.length > 0 && (
               <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-accent-soft text-accent-ink">
@@ -97,10 +97,10 @@ export function UserMenu() {
           <Link
             href="/contact?intent=site-visit"
             onClick={() => setOpen(false)}
-            className="flex items-center gap-2 px-3 py-2 text-xs rounded-md hover:bg-surface-2 text-ink transition-colors"
+            className="flex min-h-[44px] items-center gap-2.5 rounded-xl px-3 text-sm text-ink transition-colors hover:bg-surface-2"
           >
-            <Calendar className="w-3.5 h-3.5 text-accent-ink" />
-            <span>Schedule Site Visit</span>
+            <Calendar className="h-4 w-4 text-accent-ink" />
+            <span>Book a site visit</span>
           </Link>
 
           <div className="border-t border-line my-1" />
@@ -111,10 +111,10 @@ export function UserMenu() {
               setOpen(false);
               await logout();
             }}
-            className="w-full flex items-center gap-2 px-3 py-2 text-xs rounded-md hover:bg-danger/10 text-danger transition-colors text-left"
+            className="flex min-h-[44px] w-full items-center gap-2.5 rounded-xl px-3 text-left text-sm text-danger transition-colors hover:bg-danger/10"
           >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Sign Out</span>
+            <LogOut className="h-4 w-4" />
+            <span>Sign out</span>
           </button>
         </div>
       )}

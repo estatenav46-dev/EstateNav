@@ -25,16 +25,16 @@ export function ShortlistCartBar() {
 
   return (
     <aside
-      aria-label="Shortlist summary"
+      aria-label="Wishlist summary"
       className="fixed inset-x-3 bottom-[76px] z-30 mx-auto max-w-lg transition-transform duration-base md:bottom-6 md:right-6 md:left-auto md:w-auto"
     >
-      <div className="flex items-center justify-between gap-3 rounded-full border border-accent/40 bg-surface/95 p-2 pl-4 shadow-xl backdrop-blur-md ring-1 ring-accent/20">
+      <div className="flex items-center justify-between gap-3 rounded-full border border-accent/40 bg-surface p-2 pl-4 shadow-xl ring-1 ring-accent/20">
         <Link href="/shortlist" className="flex items-center gap-2 group">
           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-accent-on shadow-sm">
             <Heart className="h-4 w-4 fill-current" aria-hidden="true" />
           </span>
           <span className="text-xs font-semibold text-ink group-hover:text-accent-ink sm:text-sm">
-            <strong className="font-bold text-accent-ink">{count}</strong> {count === 1 ? 'home' : 'homes'} shortlisted
+            <strong className="font-bold text-accent-ink">{count}</strong> {count === 1 ? 'home' : 'homes'} in your wishlist
           </span>
         </Link>
 

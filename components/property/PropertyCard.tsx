@@ -27,7 +27,7 @@ const STATUS_DOT: Record<ReturnType<typeof statusChip>, string> = {
 export function StatusChip({ property, className = '' }: { property: Property; className?: string }) {
   const status = statusChip(property);
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full bg-surface/95 px-2.5 py-1 text-2xs font-medium text-ink backdrop-blur ${className}`}>
+    <span className={`inline-flex items-center gap-1.5 rounded-full bg-surface px-2.5 py-1 text-2xs font-medium text-ink ${className}`}>
       <i className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[status]}`} aria-hidden="true" />
       {status}
     </span>
@@ -43,7 +43,7 @@ export function ReraRow({ property, className = '' }: { property: Property; clas
       <span className="min-w-0 truncate" title={number}>{shortRera(number)}</span>
       {verifyUrl && (
         <a href={verifyUrl} target="_blank" rel="noopener noreferrer" className="relative z-10 -my-3 inline-flex shrink-0 items-center gap-0.5 py-3 font-sans text-accent-ink hover:underline" aria-label={`Verify ${property.title} on the Karnataka RERA portal`}>
-          Verify <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
+          Verify <ArrowUpRight className="h-3 w-3" strokeWidth={2} aria-hidden="true" />
         </a>
       )}
     </p>
@@ -104,7 +104,7 @@ export function PropertyCard({ property, priority = false, variant = 'grid', siz
         />
         <StatusChip property={property} className="pointer-events-none absolute left-3 top-3 z-[6]" />
         <div className="absolute right-2 top-2 z-10 flex items-center gap-1.5">
-          <label className={`relative inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full backdrop-blur transition-colors duration-fast ${comparing ? 'bg-accent text-accent-on' : 'bg-surface/95 text-ink'}`} title={comparing ? 'Remove from compare' : 'Add to compare'}>
+          <label className={`relative inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full transition-colors duration-fast ${comparing ? 'bg-accent text-accent-on' : 'bg-surface text-ink'}`} title={comparing ? 'Remove from compare' : 'Add to compare'}>
             <input
               type="checkbox"
               checked={comparing}
@@ -120,9 +120,9 @@ export function PropertyCard({ property, priority = false, variant = 'grid', siz
             onClick={() => toggleWishlist(property.id)}
             aria-pressed={saved}
             aria-label={saved ? `Remove ${property.title} from your wishlist` : `Save ${property.title} to your wishlist`}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-surface/95 text-ink backdrop-blur transition-transform duration-fast active:scale-90"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-surface text-ink transition-transform duration-fast active:scale-[0.96]"
           >
-            <Heart className={`h-[18px] w-[18px] transition-colors duration-fast ${saved ? 'fill-[rgb(var(--danger))] text-danger' : ''}`} aria-hidden="true" />
+            <Heart className={`h-[18px] w-[18px] transition-colors duration-fast ${saved ? 'fill-[rgb(var(--danger))] text-danger' : ''}`} strokeWidth={1.75} aria-hidden="true" />
           </button>
         </div>
         <span className="absolute bottom-2.5 right-3 rounded-md bg-scrim/60 px-1.5 py-0.5 font-mono text-2xs text-white">1/{photos.length}</span>
@@ -160,11 +160,11 @@ export function PropertyCard({ property, priority = false, variant = 'grid', siz
             {rate && <p className="mt-1 text-2xs text-ink-muted">{rate}{property.transaction === 'sale' ? ' (from)' : ''}</p>}
           </div>
           <div className="relative z-10 flex shrink-0 gap-1">
-            <a href={propertyWhatsApp({ title: property.title, url: absoluteUrl(href) })} target="_blank" rel="noopener noreferrer" className="icon-btn h-11 w-11" aria-label={`WhatsApp the advisor about ${property.title}`}>
-              <MessageCircle className="h-[18px] w-[18px] text-accent-ink" aria-hidden="true" />
+            <a href={propertyWhatsApp({ title: property.title, url: absoluteUrl(href) })} target="_blank" rel="noopener noreferrer" className="icon-btn h-11 w-11 active:scale-[0.96]" aria-label={`WhatsApp the advisor about ${property.title}`}>
+              <MessageCircle className="h-[18px] w-[18px] text-accent-ink" strokeWidth={1.75} aria-hidden="true" />
             </a>
-            <Link href={`/contact?intent=site-visit&property=${property.slug}`} className="icon-btn h-11 w-11" aria-label={`Schedule a site visit to ${property.title}`}>
-              <CalendarDays className="h-[18px] w-[18px]" aria-hidden="true" />
+            <Link href={`/contact?intent=site-visit&property=${property.slug}`} className="icon-btn h-11 w-11 active:scale-[0.96]" aria-label={`Schedule a site visit to ${property.title}`}>
+              <CalendarDays className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
             </Link>
           </div>
         </div>

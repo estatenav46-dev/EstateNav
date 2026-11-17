@@ -10,6 +10,8 @@ import type {
   PublishStatus,
   Segment,
   SiteSettings,
+  VisitorEvent,
+  VisitorLead,
 } from './types';
 
 // Storage-agnostic contracts. The mock adapter implements them in memory today; the
@@ -82,10 +84,17 @@ export interface MediaRepo {
   remove(image: ImageRef): Promise<void>;
 }
 
+/** Visitors who have not signed in: welcome-concierge details and consented browsing signals. */
+export interface VisitorRepo {
+  saveLead(visitorId: string, lead: VisitorLead): Promise<void>;
+  recordEvents(visitorId: string, events: VisitorEvent[]): Promise<void>;
+}
+
 export interface Repos {
   properties: PropertyRepo;
   leads: LeadRepo;
   developers: DeveloperRepo;
   corridors: CorridorRepo;
   settings: SettingsRepo;
+  visitors: VisitorRepo;
 }

@@ -28,7 +28,7 @@ export function compareRows(properties: Property[]): Row[] {
 export function CompareTable({ properties }: { properties: Property[] }) {
   const rows = compareRows(properties);
   return (
-    <div className="-mx-5 overflow-x-auto px-5">
+    <div className="relative -mx-5 overflow-x-auto px-5">
       <table className="w-full min-w-[560px] border-separate border-spacing-0 text-sm">
         <caption className="sr-only">Comparison of {properties.map((p) => p.title).join(', ')}</caption>
         <thead>

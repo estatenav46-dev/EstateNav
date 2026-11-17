@@ -1,5 +1,7 @@
 import type { z } from 'zod';
 import type {
+  visitorEventSchema,
+  visitorLeadSchema,
   configurationSchema,
   corridorSchema,
   developerSchema,
@@ -41,3 +43,6 @@ export type AppUser = z.infer<typeof userSchema>;
 
 /** The home and listing pages switch between these four views of the catalogue. */
 export type SearchSegment = Segment | 'rent';
+export type VisitorLead = z.output<typeof visitorLeadSchema>;
+export type VisitorLeadInput = z.input<typeof visitorLeadSchema>;
+export type VisitorEvent = z.infer<typeof visitorEventSchema>;

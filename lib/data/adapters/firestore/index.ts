@@ -26,7 +26,10 @@ import type {
   PropertyRepo,
   Repos,
   SettingsRepo,
+  VisitorRepo,
 } from '../../repository';
+import { FieldValue } from 'firebase-admin/firestore';
+import { interestDeltas } from '../../visitorSignals';
 import type { Corridor, Developer, Enquiry, MarketSnapshot, OfficeHub, Property, PublishStatus, SiteSettings } from '../../types';
 import { seedSettings } from '../mock/seed';
 
@@ -310,7 +313,38 @@ const settings: SettingsRepo = {
   },
 };
 
-export const firestoreRepos: Repos = { properties, leads, developers, corridors, settings };
+const visitors: VisitorRepo = {
+  async saveLead(visitorId, lead) {
+    const db = getAdminFirestore();
+    const ref = db.collection('visitors').doc(visitorId);
+    const now = new Date().toISOString();
+    const snap = await ref.get();
+    const { website: _honeypot, ...record } = lead;
+    const batch = db.batch();
+    batch.set(ref, { lead: { ...record, savedAt: now }, leadAt: now, lastSeenAt: now, ...(snap.exists ? {} : { firstSeenAt: now }) }, { merge: true });
+    batch.create(ref.collection('leads').doc(), { ...record, savedAt: now });
+    await batch.commit();
+  },
+
+  async recordEvents(visitorId, events) {
+    if (!events.length) return;
+    const db = getAdminFirestore();
+    const ref = db.collection('visitors').doc(visitorId);
+    const now = new Date().toISOString();
+    const snap = await ref.get();
+    const { counters, viewed } = interestDeltas(events);
+    const batch = db.batch();
+    batch.set(ref, { lastSeenAt: now, ...(snap.exists ? {} : { firstSeenAt: now }) }, { merge: true });
+    const update: Record<string, FieldValue> = { eventCount: FieldValue.increment(events.length) };
+    for (const [key, n] of Object.entries(counters)) update[`interest.${key}`] = FieldValue.increment(n);
+    if (viewed.length) update.viewedProperties = FieldValue.arrayUnion(...viewed);
+    batch.update(ref, update);
+    for (const event of events) batch.create(ref.collection('events').doc(), { ...event, receivedAt: now });
+    await batch.commit();
+  },
+};
+
+export const firestoreRepos: Repos = { properties, leads, developers, corridors, settings, visitors };
 
 // Fallback media repo if invoked on server; client uploads use Cloudinary or browser repo
 export const firestoreMediaRepo: MediaRepo = {

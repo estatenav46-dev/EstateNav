@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { usePathname, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowDownRight, ArrowDownUp, ArrowLeft, ArrowUpRight, Calculator, ChevronRight, GitCompareArrows, MessageCircle, Search, ShieldCheck, SlidersHorizontal, X } from 'lucide-react';
+import { ArrowDownRight, ArrowDownUp, ArrowLeft, ArrowUpRight, Calculator, ChevronRight, GitCompareArrows, IndianRupee, MessageCircle, Search, ShieldCheck, SlidersHorizontal, X } from 'lucide-react';
 import type { Corridor, Lens, MarketSnapshot, Property, SiteSettings } from '@/lib/data/types';
 import {
   APPROVAL_OPTIONS,
@@ -16,6 +16,7 @@ import {
   parseListingState,
   relaxSuggestions,
   serializeListingState,
+  sortListings,
   SORT_OPTIONS,
   type ListingState,
 } from '@/lib/listingFilters';
@@ -25,15 +26,16 @@ import { SALE_BUDGET_CHOICES, TYPE_CHIPS } from '@/lib/categories';
 import { budgetSummary } from '@/components/search/BudgetRange';
 import { FilterPanel } from '@/components/listings/FilterPanel';
 import { ExploreCard } from '@/components/explore/ExploreCard';
-import { ZoneDial } from '@/components/explore/ZoneDial';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { JsonLd } from '@/components/ui/JsonLd';
 import { LazySheet as Sheet } from '@/components/ui/LazySheet';
 import { Modal } from '@/components/ui/Modal';
+import { Select } from '@/components/ui/Select';
 import { useMediaQuery } from '@/lib/ui/hooks';
 import { breadcrumbJsonLd } from '@/lib/seo';
 import { ADVISOR_NAME, whatsAppLink } from '@/lib/contact';
 import { compareSheetStore, compareStore } from '@/lib/ui/stores';
+import { budgetBucket, track } from '@/lib/ui/visitor';
 import { latestSnapshots } from '@/components/home/MarketTicker';
 
 const CostStudio = dynamic(() => import('@/components/property/CostStudio'), { ssr: false, loading: () => <div className="skeleton h-80 rounded-xl" /> });
@@ -86,7 +88,7 @@ function Rail({ items, back, label, tools }: { items: RailItem[]; back?: { label
     <nav aria-label={label} className="no-scrollbar sticky top-[60px] h-[calc(100dvh-60px)] w-[88px] shrink-0 overflow-y-auto overscroll-contain border-r border-line bg-surface/60 pb-24 sm:w-[210px] lg:w-[250px] md:pb-6">
       {back && (
         <button type="button" onClick={back.onSelect} className="flex min-h-[48px] w-full items-center justify-center gap-1 border-b border-line px-2 text-xs font-semibold text-accent-ink hover:bg-surface-2 sm:justify-start sm:px-4 sm:text-sm">
-          <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden="true" />
+          <ArrowLeft className="h-4 w-4 shrink-0" strokeWidth={2} aria-hidden="true" />
           <span className="truncate">{back.label}</span>
         </button>
       )}
@@ -159,6 +161,20 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
   };
   useEffect(() => () => clearTimeout(writeTimer.current), []);
 
+  // Personalisation signal (sent only with cookie consent): what this visitor is narrowing to.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      if (!state.zone && !state.seg && !state.corridors.length && state.min == null && state.max == null) return;
+      track('filter', {
+        zone: state.zone || null,
+        corridor: state.corridors.length === 1 ? state.corridors[0] : null,
+        seg: state.seg || null,
+        budget: state.max != null || state.min != null ? budgetBucket(state.max ?? state.min ?? 0) : null,
+      });
+    }, 900);
+    return () => clearTimeout(t);
+  }, [state.zone, state.seg, state.corridors, state.min, state.max]);
+
   // Area changes from the filter sheet keep the region in step with the chosen corridors.
   const panelUpdate = (patch: Partial<ListingState>) => {
     if (!patch.corridors) return update(patch);
@@ -198,7 +214,7 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
         sub: 'Every region',
         count: countWith({ zone: '', corridors: [], loc: '' }),
         active: true,
-        visual: <ZoneDial zone={{ id: 'central', name: 'All', short: 'All', areas: '', corridorIds: [], available: true, heading: null }} size={44} />,
+        visual: <Thumb property={sortListings(properties, 'relevance')[0]} label="All" />,
         onSelect: () => goZone(null),
       },
       ...liveZones(properties).map((z) => ({
@@ -207,7 +223,7 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
         sub: z.areas,
         count: countWith({ zone: z.id, corridors: [], loc: '' }),
         active: false,
-        visual: <ZoneDial zone={z} size={44} />,
+        visual: <Thumb property={sortListings(properties.filter((p) => zoneOfCorridor(p.corridorId) === z.id), 'relevance')[0]} label={z.short} />,
         onSelect: () => goZone(z),
       })),
     ];
@@ -221,7 +237,7 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
         sub: zone.areas,
         count: countWith({ corridors: [], loc: '' }),
         active: (!state.corridors.length || (singleArea && state.corridors[0] === zoneCorridors[0]?.id)) && !state.loc,
-        visual: <ZoneDial zone={zone} size={44} />,
+        visual: <Thumb property={sortListings(inZoneList, 'relevance')[0]} label={zone.short} />,
         onSelect: () => update({ corridors: [], loc: '' }, true),
       },
       ...(singleArea
@@ -303,7 +319,7 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
           <div className="space-y-5">
             <fieldset>
               <legend className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted">
-                <ShieldCheck className="h-3.5 w-3.5 text-accent-ink" aria-hidden="true" /> RERA audit checklist
+                <ShieldCheck className="h-3.5 w-3.5 text-accent-ink" strokeWidth={1.75} aria-hidden="true" /> RERA audit checklist
               </legend>
               <div className="mt-2 space-y-0.5">
                 {APPROVAL_OPTIONS.map((o) => (
@@ -322,11 +338,11 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
             </fieldset>
             <div className="space-y-2">
               <button type="button" onClick={() => setStudio(true)} className="btn-secondary min-h-[44px] w-full justify-start px-3">
-                <Calculator className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Cost &amp; EMI studio
+                <Calculator className="h-4 w-4 text-accent-ink" strokeWidth={1.75} aria-hidden="true" /> Cost &amp; EMI studio
               </button>
               {compare.length > 0 && (
                 <button type="button" onClick={() => compareSheetStore.set(true)} className="btn-secondary min-h-[44px] w-full justify-start px-3">
-                  <GitCompareArrows className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Compare {compare.length} selected
+                  <GitCompareArrows className="h-4 w-4 text-accent-ink" strokeWidth={1.75} aria-hidden="true" /> Compare {compare.length} selected
                 </button>
               )}
             </div>
@@ -342,7 +358,7 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
         <div className="flex items-start gap-2 sm:mt-1">
           {zone && (
             <button type="button" onClick={up} className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-line bg-surface hover:bg-surface-2 sm:hidden" aria-label="Go back one level">
-              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+              <ArrowLeft className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
             </button>
           )}
           <div className="min-w-0 flex-1">
@@ -357,7 +373,7 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
                   Benchmark <strong className="tabular font-mono text-ink">₹{Math.round(benchmark.avgPricePerSqft).toLocaleString('en-IN')}/sq.ft</strong>
                 </span>
                 <span className={`tabular inline-flex items-center font-mono ${benchmark.yoyChangePct >= 0 ? 'text-accent-ink' : 'text-danger'}`}>
-                  {benchmark.yoyChangePct >= 0 ? <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" /> : <ArrowDownRight className="h-3.5 w-3.5" aria-hidden="true" />}
+                  {benchmark.yoyChangePct >= 0 ? <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" /> : <ArrowDownRight className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />}
                   {Math.abs(benchmark.yoyChangePct).toFixed(1)}% YoY
                 </span>
                 <span>· {benchmark.source}, {new Date(`${benchmark.asOf.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-IN', { month: 'short', year: 'numeric', timeZone: 'UTC' })}</span>
@@ -366,13 +382,13 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
           </div>
           <label className="relative hidden w-56 shrink-0 md:block lg:w-72">
             <span className="sr-only">Search in these results</span>
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" aria-hidden="true" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" strokeWidth={1.75} aria-hidden="true" />
             <input value={state.q} onChange={(e) => update({ q: e.target.value })} placeholder="Search project or builder" className="field min-h-[44px] rounded-full pl-9 text-sm" />
           </label>
         </div>
 
         {/* Toolbar: what kind of property, then budget, filters and sort. */}
-        <div className="sticky top-[60px] z-20 -mx-3 mt-3 border-b border-line bg-bg/95 px-3 py-2 backdrop-blur sm:-mx-5 sm:px-5 lg:-mx-8 lg:px-8">
+        <div className="sticky top-[60px] z-20 -mx-3 mt-3 border-b border-line bg-bg px-3 py-2 sm:-mx-5 sm:px-5 lg:-mx-8 lg:px-8">
           <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 py-0.5" role="group" aria-label="Property type">
             {typeChips.map((t) => (
               <button
@@ -390,46 +406,46 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
           </div>
           <div className="mt-2 flex items-center gap-2">
             {saleBudgets && (
-              <label className="min-w-0 flex-1 sm:flex-none">
-                <span className="sr-only">Budget</span>
-                <select
-                  value={budgetId}
-                  onChange={(e) => {
-                    const b = SALE_BUDGET_CHOICES.find((x) => x.id === e.target.value);
-                    if (b) update({ min: b.min, max: b.max });
-                  }}
-                  className="h-12 w-full rounded-full border border-line bg-surface pl-3 pr-2 text-[13px] font-medium text-ink hover:border-line-strong sm:h-10 sm:w-44 sm:text-sm"
-                >
-                  {budgetId === 'custom' && <option value="custom">{budgetSummary(state.min, state.max, false)}</option>}
-                  {SALE_BUDGET_CHOICES.map((b) => (
-                    <option key={b.id} value={b.id}>{b.label}</option>
-                  ))}
-                </select>
-              </label>
+              <Select
+                label="Budget"
+                value={budgetId}
+                options={[
+                  ...(budgetId === 'custom' ? [{ value: 'custom', label: budgetSummary(state.min, state.max, false) }] : []),
+                  ...SALE_BUDGET_CHOICES.map((b) => ({ value: b.id, label: b.label, count: countWith({ min: b.min, max: b.max }) })),
+                ]}
+                onChange={(id) => {
+                  const b = SALE_BUDGET_CHOICES.find((x) => x.id === id);
+                  if (b) update({ min: b.min, max: b.max });
+                }}
+                icon={<IndianRupee className="hidden h-4 w-4 text-accent-ink sm:block" aria-hidden="true" />}
+                className="h-12 min-w-0 flex-1 gap-1.5 rounded-full border border-line bg-surface pl-4 pr-1.5 text-[13px] font-semibold sm:gap-2.5 hover:border-line-strong data-[open=true]:border-ink sm:h-10 sm:w-52 sm:flex-none sm:text-sm"
+              />
             )}
-            {/* Phones get an icon-sized sort control; the native picker still opens on tap. */}
-            <label className={`relative inline-flex h-12 w-12 shrink-0 items-center sm:h-10 justify-center rounded-full border sm:w-auto ${state.sort !== 'relevance' ? 'border-accent-ink bg-accent-soft text-accent-ink' : 'border-line bg-surface text-ink'} sm:border-0 sm:bg-transparent`}>
-              <span className="sr-only">Sort by</span>
-              <ArrowDownUp className="h-4 w-4 sm:hidden" aria-hidden="true" />
-              <select
-                value={state.sort}
-                onChange={(e) => update({ sort: e.target.value as ListingState['sort'] })}
-                className="absolute inset-0 h-12 w-12 cursor-pointer opacity-0 sm:static sm:h-10 sm:w-48 sm:rounded-full sm:border sm:border-line sm:bg-surface sm:px-3 sm:text-sm sm:font-medium sm:text-ink sm:opacity-100 sm:hover:border-line-strong"
-              >
-                {SORT_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>{o.value === 'relevance' ? 'Sort: Featured' : o.label}</option>
-                ))}
-              </select>
-            </label>
+            <Select
+              label="Sort by"
+              value={state.sort}
+              options={SORT_OPTIONS.map((o) => ({ value: o.value, label: o.value === 'relevance' ? 'Featured first' : o.label }))}
+              onChange={(v) => update({ sort: v as ListingState['sort'] })}
+              hideChevron
+              align="end"
+              menuWidth={230}
+              display={
+                <span className="flex items-center justify-center gap-2">
+                  <ArrowDownUp className="h-4 w-4 shrink-0" strokeWidth={2} aria-hidden="true" />
+                  <span className="hidden sm:inline">{state.sort === 'relevance' ? 'Featured first' : SORT_OPTIONS.find((o) => o.value === state.sort)?.label}</span>
+                </span>
+              }
+              className={`h-12 w-12 shrink-0 justify-center rounded-full border text-sm font-semibold sm:h-10 sm:w-auto sm:px-4 ${state.sort !== 'relevance' ? 'border-accent-ink bg-accent-soft text-accent-ink' : 'border-line bg-surface text-ink hover:border-line-strong'}`}
+            />
             <button
               type="button"
               onClick={() => setSheet(true)}
-              className={`inline-flex h-12 shrink-0 items-center gap-1.5 rounded-full px-4 text-sm font-semibold transition-colors sm:h-10 ${chips.length ? 'bg-ink text-bg' : 'border border-line bg-surface text-ink hover:border-line-strong'}`}
+              className={`relative inline-flex h-12 w-12 shrink-0 items-center justify-center gap-1.5 rounded-full text-sm font-semibold transition-colors active:scale-[0.96] sm:h-10 sm:w-auto sm:px-4 ${chips.length ? 'bg-ink text-bg' : 'border border-line bg-surface text-ink hover:border-line-strong'}`}
             >
-              <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+              <SlidersHorizontal className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
               <span className="hidden sm:inline">More filters</span>
-              <span className={`sm:hidden ${chips.length ? 'sr-only' : ''}`}>Filters</span>
-              {chips.length > 0 && <span className="rounded-full bg-bg/20 px-1.5 text-xs">{chips.length}</span>}
+              <span className="sr-only sm:hidden">Filters</span>
+              {chips.length > 0 && <span className="absolute -right-1 -top-1 min-w-[18px] rounded-full bg-accent px-1 text-center text-[10px] leading-[18px] text-accent-on sm:static sm:bg-bg/20 sm:px-1.5 sm:text-xs sm:text-bg">{chips.length}</span>}
             </button>
           </div>
         </div>
@@ -475,7 +491,7 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
               <li key={chip.key}>
                 <button type="button" onClick={() => update(chip.patch)} className="chip min-h-[48px] px-3.5 text-xs sm:min-h-[36px]" aria-label={`Remove filter ${chip.label}`}>
                   {chip.label}
-                  <X className="h-3 w-3" aria-hidden="true" />
+                  <X className="h-3 w-3" strokeWidth={2} aria-hidden="true" />
                 </button>
               </li>
             ))}
@@ -494,28 +510,28 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
         <section id="listing-results" aria-label="Matching properties" className="mt-4">
           {results.length === 0 ? (
             <div className="flex flex-col items-center rounded-2xl border border-dashed border-line-strong bg-surface px-5 py-10 text-center">
-              <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-soft text-accent-ink">
-                <Search className="h-6 w-6" aria-hidden="true" />
+              <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-soft text-accent-ink ring-1 ring-accent/20">
+                <Search className="h-6 w-6" strokeWidth={1.75} aria-hidden="true" />
               </span>
               <h2 className="mt-4 font-serif text-xl sm:text-2xl">Nothing listed here yet</h2>
               <p className="mt-1 max-w-md text-sm text-ink-muted">Our advisor often knows of launches and resale units before they are listed. Ask, or widen the search.</p>
               {suggestions.length > 0 && (
                 <div className="mt-5 flex flex-wrap justify-center gap-2">
                   {suggestions.map((s) => (
-                    <button key={s.label} type="button" onClick={() => update(s.patch, Boolean(s.patch.zone !== undefined || s.patch.corridors || s.patch.loc !== undefined))} className="chip text-sm">
+                    <button key={s.label} type="button" onClick={() => update(s.patch, Boolean(s.patch.zone !== undefined || s.patch.corridors || s.patch.loc !== undefined))} className="chip text-sm active:scale-[0.96]">
                       {s.label} <span className="text-xs text-ink-muted">{s.count}</span>
                     </button>
                   ))}
                 </div>
               )}
-              <a href={whatsAppLink(askText)} target="_blank" rel="noopener noreferrer" className="btn-primary mt-5">
-                <MessageCircle className="h-4 w-4" aria-hidden="true" /> Connect with dedicated area advisor
+              <a href={whatsAppLink(askText)} target="_blank" rel="noopener noreferrer" className="btn-primary mt-5 active:scale-[0.98]">
+                <MessageCircle className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" /> Connect with dedicated area advisor
               </a>
             </div>
           ) : (
-            <ul key={`${state.zone}|${state.corridors.join()}|${state.loc}|${state.seg}`} className="grid animate-fade-up grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-3 2xl:grid-cols-4">
+            <ul key={`${state.zone}|${state.corridors.join()}|${state.loc}|${state.seg}`} className="stagger grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-3 2xl:grid-cols-4">
               {shown.map((p, i) => (
-                <li key={p.id}>
+                <li key={p.id} style={{ '--i': Math.min(i, 8) } as React.CSSProperties}>
                   <ExploreCard property={p} priority={i < 2} />
                 </li>
               ))}
@@ -530,9 +546,9 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
             </div>
           )}
 
-          {!zone && results.length > 0 && comingSoonZones().length > 0 && (
+          {!zone && results.length > 0 && comingSoonZones(properties).length > 0 && (
             <p className="mt-6 text-center text-xs text-ink-muted">
-              {comingSoonZones()
+              {comingSoonZones(properties)
                 .map((z) => z.name)
                 .join(' and ')}{' '}
               coming soon.
@@ -542,7 +558,7 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
 
         {zone && results.length > 0 && !area && !state.loc && zoneCorridors.length > 1 && (
           <p className="mt-6 flex items-center justify-center gap-1 text-xs text-ink-muted">
-            Tip: pick an area on the left to see its locations <ChevronRight className="h-3 w-3" aria-hidden="true" />
+            Tip: pick an area on the left to see its locations <ChevronRight className="h-3 w-3" strokeWidth={2} aria-hidden="true" />
           </p>
         )}
       </div>

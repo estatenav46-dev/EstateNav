@@ -1,5 +1,6 @@
 import { corridorSchema, developerSchema, enquirySchema, marketSnapshotSchema, propertySchema, siteSettingsSchema } from '../../schemas';
-import type { CorridorRepo, DeveloperRepo, LeadRepo, PropertyRepo, Repos, SettingsRepo } from '../../repository';
+import type { CorridorRepo, DeveloperRepo, LeadRepo, PropertyRepo, Repos, SettingsRepo, VisitorRepo } from '../../repository';
+import { interestDeltas } from '../../visitorSignals';
 import type { Corridor, Developer, Enquiry, MarketSnapshot, Property, SiteSettings } from '../../types';
 import { seedCorridors, seedDevelopers, seedEnquiries, seedOfficeHubs, seedProperties, seedSettings } from './seed';
 
@@ -180,4 +181,28 @@ const settings: SettingsRepo = {
   },
 };
 
-export const mockRepos: Repos = { properties, leads, developers, corridors, settings };
+// Visitors live in memory on this server instance (preview only; Firestore in production).
+type MockVisitor = { firstSeenAt: string; lastSeenAt: string; lead?: unknown; interest: Record<string, number>; viewedProperties: string[]; events: unknown[] };
+const visitorStore = ((globalThis as typeof globalThis & { __estatenavVisitors?: Map<string, MockVisitor> }).__estatenavVisitors ??= new Map());
+const touch = (id: string) => {
+  const now = new Date().toISOString();
+  const v = visitorStore.get(id) ?? { firstSeenAt: now, lastSeenAt: now, interest: {}, viewedProperties: [], events: [] };
+  v.lastSeenAt = now;
+  visitorStore.set(id, v);
+  return v;
+};
+
+const visitors: VisitorRepo = {
+  async saveLead(visitorId, lead) {
+    touch(visitorId).lead = { ...copy(lead), savedAt: new Date().toISOString() };
+  },
+  async recordEvents(visitorId, events) {
+    const v = touch(visitorId);
+    const { counters, viewed } = interestDeltas(events);
+    for (const [k, n] of Object.entries(counters)) v.interest[k] = (v.interest[k] ?? 0) + n;
+    v.viewedProperties = Array.from(new Set([...v.viewedProperties, ...viewed]));
+    v.events = [...v.events, ...copy(events)].slice(-200);
+  },
+};
+
+export const mockRepos: Repos = { properties, leads, developers, corridors, settings, visitors };

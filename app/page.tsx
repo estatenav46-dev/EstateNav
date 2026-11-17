@@ -3,9 +3,10 @@ import { HomeHero } from '@/components/home/HomeHero';
 import { MarketTicker } from '@/components/home/MarketTicker';
 import { RegionTiles } from '@/components/home/RegionTiles';
 import { NeedTiles } from '@/components/home/NeedTiles';
+import { ForYou } from '@/components/home/ForYou';
+import { SavedRail } from '@/components/home/SavedRail';
 import { PartnerShowcase } from '@/components/home/PartnerShowcase';
-import { TrustStrip } from '@/components/home/TrustStrip';
-import { AdvisorBlock } from '@/components/home/AdvisorBlock';
+import { AdvisoryBand } from '@/components/home/AdvisoryBand';
 import { JsonLd } from '@/components/ui/JsonLd';
 import { getCorridors, getDevelopers, getMarketSnapshots, getPublishedProperties, getSettings } from '@/lib/data/cached';
 import { realEstateAgentJsonLd } from '@/lib/seo';
@@ -19,8 +20,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
 };
 
-// Fold 1 hero console + spotlight, Fold 2 sourced corridor ticker, then browse by region or
-// need, Fold 3 inline developer partnership, trust strip and the advisor.
+// Hero (auto-cycling segments) → market pulse → region → need → your brief / picks → partner → advisory.
 export default async function HomePage() {
   const [properties, corridors, developers, snapshots, settings] = await Promise.all([
     getPublishedProperties(),
@@ -32,17 +32,18 @@ export default async function HomePage() {
   const partner = developers.find((d) => d.legalName === settings.partnerDeveloper) ?? developers[0];
 
   return (
-    <main id="main" className="pb-20 md:pb-0">
+    <main id="main">
       <JsonLd data={realEstateAgentJsonLd(settings, corridors.map((c) => c.name))} />
       <HomeHero properties={properties} corridors={corridors} partnerDeveloper={settings.partnerDeveloper} />
       <MarketTicker snapshots={snapshots} corridors={corridors} />
+      <SavedRail properties={properties} />
       <RegionTiles properties={properties} advisorName={settings.agent.name} whatsapp={settings.contact.whatsapp} />
       <NeedTiles properties={properties} />
+      <ForYou properties={properties} settings={settings} />
       {partner && (
         <PartnerShowcase developer={partner} legalName={settings.partnerDeveloper} projectCount={properties.filter((p) => p.developerId === partner.id).length} />
       )}
-      <TrustStrip />
-      <AdvisorBlock settings={settings} />
+      <AdvisoryBand settings={settings} />
     </main>
   );
 }

@@ -5,6 +5,7 @@ import { MessageCircle, Phone, ShieldCheck, ChevronDown, UserCheck, UserRound } 
 import type { SiteSettings } from '@/lib/data/types';
 import { LazyLeadForm as LeadForm } from '@/components/forms/LazyLeadForm';
 import { whatsAppLink } from '@/lib/contact';
+import { Reveal } from '@/components/Reveal';
 
 // The advisor's credentials title block used across detail pages and contact page.
 export function AdvisorTitleBlock({ settings, compact = false }: { settings: SiteSettings; compact?: boolean }) {
@@ -44,79 +45,93 @@ export function AdvisorBlock({ settings }: { settings: SiteSettings }) {
   };
 
   return (
-    <section className="mx-auto max-w-container px-4 pb-8 pt-4 sm:px-6 sm:pb-10 sm:pt-6 lg:px-8" aria-label="Talk to the advisor">
-      <div className="overflow-hidden rounded-2xl border border-line bg-surface p-4 sm:p-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          {/* Advisor Identity & K-RERA credentials */}
-          <div className="flex items-start gap-3 sm:items-center">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent-soft text-accent-ink">
-              <UserCheck className="h-6 w-6" aria-hidden="true" />
-            </div>
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-base font-bold text-ink sm:text-lg">{agent.name}</h2>
-                <span className="inline-flex items-center gap-1 rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-medium text-accent-ink">
-                  <ShieldCheck className="h-3 w-3" />
-                  <span>K-RERA Registered Advisor</span>
-                </span>
+    <section className="mx-auto max-w-container px-4 pb-12 pt-8 sm:px-6 sm:pb-16 sm:pt-10 lg:px-8" aria-label="Talk to the advisor">
+      <Reveal>
+        <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-sm transition-[border-color,box-shadow] duration-base hover:border-line-strong">
+          <div className="p-5 sm:p-8">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              {/* Advisor Identity & K-RERA credentials */}
+              <div className="flex items-start gap-4">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-line bg-surface-2 text-ink">
+                  <UserCheck className="h-7 w-7 text-accent-ink" strokeWidth={1.75} aria-hidden="true" />
+                </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-accent-ink">
+                      Private Client Advisory Desk
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full border border-line bg-surface-2 px-2.5 py-0.5 text-[11px] font-mono text-ink">
+                      <ShieldCheck className="h-3.5 w-3.5 text-accent-ink" strokeWidth={1.75} />
+                      <span>K-RERA Certified</span>
+                    </span>
+                  </div>
+                  <h2 className="mt-1 font-serif text-xl font-bold text-ink sm:text-2xl">{agent.name}</h2>
+                  <p className="mt-0.5 font-mono text-xs text-ink-muted">
+                    License: {agent.reraNumber} · Valid: {agent.validFrom} to {agent.validTo}
+                  </p>
+                  <p className="mt-1 text-xs text-ink-muted sm:text-sm">
+                    Direct developer price sheets · Zero buyer brokerage · Title verification &amp; Kaveri scrutiny
+                  </p>
+                </div>
               </div>
-              <p className="mt-0.5 font-mono text-[11px] text-ink-muted">
-                K-RERA: {agent.reraNumber} · Valid: {agent.validFrom} to {agent.validTo}
-              </p>
-              <p className="mt-0.5 text-xs text-ink-muted">
-                Direct developer pricing · Zero buyer brokerage · Complete paperwork assistance
-              </p>
+
+              {/* Action Buttons: WhatsApp + Call + Callback Toggle */}
+              <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                <a
+                  href={whatsAppLink(
+                    `Hi ${agent.name}, I am browsing EstateNav and would like advice on Bengaluru properties.`,
+                    contact.whatsapp
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-primary min-h-[44px] gap-2 rounded-xl px-5 text-xs font-semibold sm:text-sm active:scale-[0.98]"
+                >
+                  <MessageCircle className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
+                  <span>WhatsApp Advisor</span>
+                </a>
+                <a
+                  href={`tel:${contact.phone.replace(/[^0-9+]/g, '')}`}
+                  className="btn-secondary min-h-[44px] gap-2 rounded-xl px-4 text-xs font-semibold sm:text-sm active:scale-[0.98]"
+                >
+                  <Phone className="h-4 w-4 text-accent-ink" strokeWidth={1.75} aria-hidden="true" />
+                  <span>Call Desk</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setShowCallback(!showCallback)}
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-xl border border-line bg-surface-2 px-3.5 text-xs font-semibold text-ink transition-colors hover:border-line-strong active:scale-[0.98]"
+                >
+                  <span>Request Callback</span>
+                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showCallback ? 'rotate-180' : ''}`} strokeWidth={2} />
+                </button>
+              </div>
             </div>
+
+            {/* Collapsible Callback Lead Form */}
+            {showCallback && (
+              <div className="mt-6 border-t border-line pt-6">
+                <h3 className="mb-3 font-serif text-sm font-bold text-ink">Schedule a Dedicated Advisory Callback</h3>
+                <LeadForm
+                  consent={consent}
+                  source="home"
+                  intent="callback"
+                  variant="compact"
+                  whatsapp={contact.whatsapp}
+                  advisorName={agent.name}
+                  submitLabel="Request callback"
+                />
+              </div>
+            )}
           </div>
 
-          {/* Action Buttons: WhatsApp + Call + Callback Toggle */}
-          <div className="flex flex-wrap items-center gap-2">
-            <a
-              href={whatsAppLink(
-                `Hi ${agent.name}, I am browsing EstateNav and would like advice on Bengaluru properties.`,
-                contact.whatsapp
-              )}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-10 items-center gap-1.5 rounded-full bg-accent px-4 text-xs font-semibold text-accent-on transition-all hover:bg-accent-hover active:scale-95 sm:text-sm"
-            >
-              <MessageCircle className="h-4 w-4" aria-hidden="true" />
-              <span>Connect with dedicated area advisor</span>
-            </a>
-            <a
-              href={`tel:${contact.phone.replace(/[^0-9+]/g, '')}`}
-              className="inline-flex h-10 items-center gap-1.5 rounded-full border border-line bg-surface px-4 text-xs font-semibold text-ink transition-all hover:border-line-strong hover:bg-surface-2 active:scale-95 sm:text-sm"
-            >
-              <Phone className="h-4 w-4 text-accent-ink" aria-hidden="true" />
-              <span>Call</span>
-            </a>
-            <button
-              type="button"
-              onClick={() => setShowCallback(!showCallback)}
-              className="inline-flex h-10 items-center gap-1 rounded-full border border-line bg-surface-2 px-3 text-xs font-medium text-ink transition-all hover:bg-surface active:scale-95"
-            >
-              <span>Request Callback</span>
-              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showCallback ? 'rotate-180' : ''}`} />
-            </button>
+          {/* Bottom Security / Trust Assurance Strip */}
+          <div className="grid grid-cols-1 divide-y divide-line border-t border-line bg-surface-2/60 px-5 py-3 sm:grid-cols-3 sm:divide-y-0 sm:divide-x text-center sm:text-left text-2xs text-ink-muted">
+            <span className="py-1 sm:px-2">✓ Zero-Spam Privacy Protocol: Direct advisory only</span>
+            <span className="py-1 sm:px-2">✓ Guided VIP Site Visits with direct builder allocation</span>
+            <span className="py-1 sm:px-2">✓ Complete legal title vetting and Kaveri portal check</span>
           </div>
         </div>
-
-        {/* Collapsible Callback Lead Form */}
-        {showCallback && (
-          <div className="mt-4 border-t border-line pt-4">
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-ink-muted">Request a Callback</h3>
-            <LeadForm
-              consent={consent}
-              source="home"
-              intent="callback"
-              variant="compact"
-              whatsapp={contact.whatsapp}
-              advisorName={agent.name}
-              submitLabel="Request callback"
-            />
-          </div>
-        )}
-      </div>
+      </Reveal>
     </section>
   );
 }

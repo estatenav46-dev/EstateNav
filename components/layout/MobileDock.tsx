@@ -25,9 +25,9 @@ const CostStudio = dynamic(() => import('@/components/property/CostStudio'), {
 type Props = { settings: SiteSettings; consent: ConsentInfo };
 
 const tab =
-  'flex h-16 flex-1 flex-col items-center justify-center gap-1 text-[11px] text-ink-muted active:scale-95 transition-transform duration-fast';
+  'flex h-16 flex-1 flex-col items-center justify-center gap-1 text-[11px] text-ink-muted active:scale-[0.96] transition-[transform,color] duration-fast';
 
-// Phone-only bottom dock: Home · Explore · Calculator · Shortlist · Concierge
+// Phone-only bottom dock: Home · Explore · Calculator · Wishlist · Concierge
 export function MobileDock({ settings, consent }: Props) {
   const pathname = usePathname() ?? '';
   const visible = useScrollDirectionVisible();
@@ -39,44 +39,43 @@ export function MobileDock({ settings, consent }: Props) {
 
   return (
     <>
-      {/* Floating Shortlist Cart Bar above dock */}
       <ShortlistCartBar />
 
       <nav
         aria-label="Quick navigation"
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 backdrop-blur-md safe-bottom md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface safe-bottom shadow-[0_-12px_30px_-24px_rgb(var(--shadow)/0.5)] md:hidden"
         style={{ transform: visible ? 'none' : 'translateY(110%)', transition: 'transform var(--dur-base) var(--ease)' }}
       >
         <div className="flex px-1">
           <Link href="/" className={`${tab} ${pathname === '/' ? 'text-accent-ink font-semibold' : ''}`}>
-            <Home className="h-5 w-5" aria-hidden="true" />
+            <Home className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
             Home
           </Link>
 
           <Link href="/properties" className={`${tab} ${pathname === '/properties' ? 'text-accent-ink font-semibold' : ''}`}>
-            <Compass className="h-5 w-5" aria-hidden="true" />
+            <Compass className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
             Explore
           </Link>
 
           <button type="button" onClick={() => setSheet('calculator')} className={`${tab} ${sheet === 'calculator' ? 'text-accent-ink font-semibold' : ''}`}>
-            <Calculator className="h-5 w-5" aria-hidden="true" />
+            <Calculator className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
             Calculator
           </button>
 
           <Link href="/shortlist" className={`${tab} ${pathname === '/shortlist' ? 'text-accent-ink font-semibold' : ''}`}>
             <span className="relative">
-              <Heart className="h-5 w-5" aria-hidden="true" />
+              <Heart className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
               {shortlist.length > 0 && (
                 <span className="absolute -right-2.5 -top-1.5 min-w-[18px] rounded-full bg-accent px-1 text-center text-[10px] font-bold leading-[18px] text-accent-on shadow-sm">
                   {shortlist.length}
                 </span>
               )}
             </span>
-            Shortlist
+            Wishlist
           </Link>
 
           <button type="button" onClick={() => setSheet('advisor')} className={`${tab} ${sheet === 'advisor' ? 'text-accent-ink font-semibold' : ''}`}>
-            <ConciergeBell className="h-5 w-5" aria-hidden="true" />
+            <ConciergeBell className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
             Concierge
           </button>
         </div>
@@ -97,10 +96,10 @@ export function MobileDock({ settings, consent }: Props) {
               rel="noopener noreferrer"
               className="btn-primary"
             >
-              <MessageCircle className="h-4 w-4" aria-hidden="true" /> Connect with dedicated area advisor
+              <MessageCircle className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" /> Connect with dedicated area advisor
             </a>
             <a href={`tel:${contact.phone.replace(/[^0-9+]/g, '')}`} className="btn-secondary">
-              <Phone className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Call
+              <Phone className="h-4 w-4 text-accent-ink" strokeWidth={1.75} aria-hidden="true" /> Call
             </a>
           </div>
 
