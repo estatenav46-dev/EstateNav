@@ -1,4 +1,4 @@
-﻿# EstateNav
+# EstateNav
 
 Curated Bengaluru property discovery and advisory portal (estatenav.in), operated by SV Praveen, K-RERA registered agent (PRM/KA/RERA/1251/310/AG/260916/007810). Next.js 14 App Router, TypeScript, Tailwind, deployed on Vercel.
 
@@ -71,6 +71,25 @@ Not added: the deck's sample figures (corridor ₹/sq.ft, ~79,200 unsold units, 
 - "Similar homes" ranks other listings by area/region, BHK overlap and price (`lib/similar.ts`): four cards in a grid (a swipe row on phones), with the reasons shown on each photo.
 - Property cards open the project page (new tab) from anywhere on the card; the photo-count chip opens the gallery.
 - "Compared for you" puts the project beside its two closest matches, with swappable columns and highlighted differences (`components/property/AutoCompare.tsx`).
+
+## Listing details (entered in EstateNav-admin)
+
+Listings are created in the separate admin app (`EstateNav-admin`, see its README for the step-by-step flow). The project page (`app/properties/[slug]/PropertyDetail.tsx`) shows each section only when it has data, with a sticky "On this page" bar:
+
+| Section | Data (in `lib/data/schemas.ts`) |
+| --- | --- |
+| Overview | type, configurations, size, rate, `facts` (acres, units, towers, floors, open space, clubhouse, launch), possession and RERA completion dates |
+| Unit types & prices | `configurations` with carpet / super built-up area, bathrooms, dimensions, availability, note and the linked floor plan (`components/property/UnitTable.tsx`) |
+| Floor plans | `media.masterPlan` and `media.floorPlans`, opened in the photo viewer (`PlanGallery.tsx`) |
+| Amenities | `amenities`, grouped by `lib/listingMeta.ts` |
+| Specifications | `specifications` (category and detail) |
+| Location & connectivity | address, Google Maps link, `nearby` places grouped by transit, work, education, health and leisure, and the commute radar |
+| RERA & approvals | verification ledger |
+| Brochure & documents | `documents`: public files download; "on request" files open the enquiry form, and their links are removed before listings reach the browser (`lib/data/publicView.ts`) |
+| More details | `extraDetails` label and value rows, grouped |
+| Developer | partner profile and sourced track record |
+
+`priceOnRequest` shows "Price on request" everywhere a price would appear (cards, header, compare, JSON-LD); `priceMin` still drives budget filters. An active `offer` shows as a badge on the card and the project page. Every new field has a schema default, so listings saved before these fields existed still load.
 
 ## Data architecture (Firebase-ready, not connected)
 
