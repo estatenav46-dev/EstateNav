@@ -142,14 +142,14 @@ export function ConfigExplorer({ property }: { property: Property }) {
 
           <div className="border-t border-line bg-white p-3 md:border-l md:border-t-0">
             {plan ? (
-              <button type="button" onClick={() => setViewer(planIndex)} className="group relative block aspect-[4/3] w-full overflow-hidden rounded-xl" aria-label={`Open the ${unit.label} floor plan`}>
-                <Image src={plan.url} alt={plan.alt} fill sizes="(min-width: 768px) 40vw, 100vw" className="object-contain" />
+              <button type="button" onClick={() => setViewer(planIndex)} className="group relative block h-[200px] w-full overflow-hidden rounded-xl sm:h-[240px]" aria-label={`Open the ${unit.label} floor plan`}>
+                <Image src={plan.url} alt={plan.alt} fill sizes="(min-width: 768px) 30vw, 100vw" className="object-contain" />
                 <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-full bg-black/65 px-2.5 py-1 text-xs font-semibold text-white">
                   <Maximize2 className="h-3.5 w-3.5" aria-hidden="true" /> Floor plan
                 </span>
               </button>
             ) : (
-              <div className="flex aspect-[4/3] flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-line-strong bg-surface-2/50 p-6 text-center">
+              <div className="flex h-[200px] flex-col items-center justify-center gap-3 rounded-xl border border-dashed sm:h-[240px] border-line-strong bg-surface-2/50 p-6 text-center">
                 <svg viewBox="0 0 120 80" className="h-14 w-20 text-ink-muted" fill="none" stroke="currentColor" aria-hidden="true">
                   <path d="M6 6h108v68H6zM6 40h46M52 6v68M80 40h34M80 40v34M52 56h28" />
                 </svg>

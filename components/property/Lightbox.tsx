@@ -114,7 +114,7 @@ export default function Lightbox({ images, start, title, onClose }: { images: Im
                 onDoubleClick={() => setZoom((z) => (z.scale > 1 ? NONE : { scale: 2, x: 0, y: 0 }))}
                 style={i === index ? { transform: `translate(${zoom.x}px, ${zoom.y}px) scale(${zoom.scale})`, transition: pointers.current.size ? 'none' : 'transform 240ms var(--ease)' } : undefined}
               >
-                <Image src={img.url} alt={img.alt} fill sizes="100vw" placeholder="blur" blurDataURL={img.blurDataURL} className="object-contain" priority={i === start} />
+                <Image src={img.url} alt={img.alt} fill sizes="100vw" placeholder={img.blurDataURL ? 'blur' : 'empty'} blurDataURL={img.blurDataURL || undefined} className="object-contain" priority={i === start} />
               </div>
             </div>
           ))}

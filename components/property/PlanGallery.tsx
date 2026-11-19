@@ -21,12 +21,12 @@ export function PlanGallery({ property }: { property: Property }) {
 
   return (
     <>
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {items.map(({ image, caption }, i) => (
           <li key={image.id}>
             <button type="button" onClick={() => setViewer(i)} className="group block w-full text-left" aria-label={`Open ${caption}`}>
               <span className="relative block aspect-[4/3] overflow-hidden rounded-card border border-line bg-white">
-                <Image src={image.url} alt={image.alt} fill sizes="(min-width: 640px) 22vw, 45vw" className="object-contain p-1 transition-transform duration-slow group-hover:scale-[1.03]" />
+                <Image src={image.url} alt={image.alt} fill sizes="(min-width: 1024px) 16vw, (min-width: 640px) 22vw, 45vw" className="object-contain p-1 transition-transform duration-slow group-hover:scale-[1.03]" />
                 <span className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-black/55 text-white opacity-0 transition-opacity group-hover:opacity-100">
                   <Maximize2 className="h-3.5 w-3.5" aria-hidden="true" />
                 </span>
