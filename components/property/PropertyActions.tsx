@@ -12,10 +12,10 @@ import { leadSheetStore, openLeadSheet } from '@/lib/ui/stores';
 
 const LeadForm = dynamic(() => import('@/components/forms/LeadForm').then((m) => m.LeadForm), { ssr: false, loading: () => <div className="skeleton h-72 rounded-xl" /> });
 
-type Props = { property: Property; settings: SiteSettings; advisorCard?: React.ReactNode };
+type Props = { property: Property; settings: SiteSettings; advisorCard?: React.ReactNode; /** 'dock': a compact button row (used under the media panel) instead of the sticky price column. */ layout?: 'sidebar' | 'dock' };
 
 // Desktop: sticky price-and-actions column. Phones: a sticky bottom bar (the dock steps aside).
-export function PropertyActions({ property, settings, advisorCard }: Props) {
+export function PropertyActions({ property, settings, advisorCard, layout = 'sidebar' }: Props) {
   const lead = leadSheetStore.useValue();
   const desktop = useMediaQuery('(min-width: 1024px)');
   const consent = { text: settings.consentText, version: settings.consentVersion, privacyNote: settings.privacyNote };
@@ -24,6 +24,19 @@ export function PropertyActions({ property, settings, advisorCard }: Props) {
 
   return (
     <>
+      {layout === 'dock' ? (
+        <div className="mt-3 hidden gap-2 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
+          <button type="button" onClick={() => openLeadSheet('site-visit')} className="btn-primary">
+            <CalendarDays className="h-4 w-4" aria-hidden="true" /> Book a site visit
+          </button>
+          <button type="button" onClick={() => openLeadSheet('price-sheet')} className="btn-secondary">
+            <FileText className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Price sheet
+          </button>
+          <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="icon-btn" aria-label="Ask the area advisor on WhatsApp">
+            <MessageCircle className="h-5 w-5 text-accent-ink" aria-hidden="true" />
+          </a>
+        </div>
+      ) : (
       <div className="hidden lg:block">
         <div className="sticky top-[88px] space-y-4">
           <div className="panel p-5">
@@ -52,6 +65,7 @@ export function PropertyActions({ property, settings, advisorCard }: Props) {
           {advisorCard}
         </div>
       </div>
+      )}
 
       <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-[1fr_1fr_auto] gap-2 border-t border-line bg-surface px-3 pt-2 safe-bottom lg:hidden">
         <button type="button" onClick={() => openLeadSheet('site-visit')} className="btn-primary px-3">
