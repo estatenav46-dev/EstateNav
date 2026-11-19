@@ -4,10 +4,10 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowUpRight, GitCompareArrows, Heart, Images, MapPin, Sparkles } from 'lucide-react';
+import { ArrowUpRight, BadgePercent, GitCompareArrows, Heart, Images, MapPin, Sparkles } from 'lucide-react';
 import type { Property } from '@/lib/data/types';
 import { formatINR } from '@/lib/price';
-import { scaleFacts, statusChip } from '@/lib/property';
+import { activeOffer, scaleFacts, statusChip } from '@/lib/property';
 import { compareStore, MAX_COMPARE, shortlistStore, toggleCompare } from '@/lib/ui/stores';
 import { toggleWishlist } from '@/lib/ui/wishlist';
 import { track } from '@/lib/ui/visitor';
@@ -63,6 +63,7 @@ export function ExploreCard({ property, priority = false, reasons, sizes }: { pr
   const rent = property.transaction === 'rent';
   const { cover } = property.media;
   const photos = propertyPhotos(property);
+  const offer = activeOffer(property);
   const possession = property.possession.status === 'ready' ? 'Ready to move' : property.possession.status === 'pre-launch' ? 'Pre-launch' : `Possession ${property.possession.label}`;
   const facts = [...scaleFacts(property).slice(0, 2), possession];
 
@@ -85,6 +86,12 @@ export function ExploreCard({ property, priority = false, reasons, sizes }: { pr
           <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT[status]}`} />
           <span className="truncate">{status}</span>
         </span>
+        {offer && !reasons?.length && (
+          <span className="absolute bottom-3 left-3 right-16 z-[1] inline-flex max-w-max items-center gap-1 truncate rounded-full bg-brass px-2.5 py-1 text-[11px] font-semibold text-neutral-900 shadow-sm">
+            <BadgePercent className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            <span className="truncate">{offer.text}</span>
+          </span>
+        )}
         {reasons && reasons.length > 0 && (
           <ul className="cq-wide absolute bottom-3 left-3 right-16 flex flex-wrap gap-1" aria-label="Why it is similar">
             {reasons.slice(0, 2).map((r) => (
