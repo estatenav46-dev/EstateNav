@@ -18,9 +18,10 @@ export function AutoCompare({ base, suggested, pool }: { base: Property; suggest
 
   const insights = useMemo(() => {
     const out: { label: string; value: string }[] = [];
-    const cheapest = [...columns].sort((a, b) => a.priceMin - b.priceMin)[0];
-    out.push({ label: 'Lowest entry price', value: `${cheapest.title} · ${formatINR(cheapest.priceMin)}*` });
-    const rated = columns.filter((p) => p.pricePerSqft != null);
+    const priced = columns.filter((p) => !p.priceOnRequest);
+    const cheapest = [...priced].sort((a, b) => a.priceMin - b.priceMin)[0];
+    if (cheapest && priced.length > 1) out.push({ label: 'Lowest entry price', value: `${cheapest.title} · ${formatINR(cheapest.priceMin)}*` });
+    const rated = columns.filter((p) => p.pricePerSqft != null && !p.priceOnRequest);
     if (rated.length > 1) {
       const best = [...rated].sort((a, b) => a.pricePerSqft! - b.pricePerSqft!)[0];
       out.push({ label: 'Best rate per sq.ft', value: `${best.title} · ₹${Math.round(best.pricePerSqft!).toLocaleString('en-IN')}` });
@@ -68,7 +69,7 @@ export function AutoCompare({ base, suggested, pool }: { base: Property; suggest
                       value={p.id}
                       options={pool
                         .filter((o) => o.id !== base.id && (o.id === p.id || !ids.includes(o.id)))
-                        .map((o) => ({ value: o.id, label: o.title, hint: `${o.locality} · ${formatINR(o.priceMin)}` }))}
+                        .map((o) => ({ value: o.id, label: o.title, hint: `${o.locality} · ${o.priceOnRequest ? 'Price on request' : formatINR(o.priceMin)}` }))}
                       onChange={(v) => setIds((current) => current.map((id, i) => (i === col - 1 ? v : id)))}
                       menuWidth={300}
                       display={

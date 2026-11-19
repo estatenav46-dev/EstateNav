@@ -12,14 +12,15 @@ export function DetailsOnRequest({ property, settings }: { property: Property; s
   const whatsapp = propertyWhatsApp({ title: property.title, url: absoluteUrl(`/properties/${property.slug}`) }, settings.contact.whatsapp);
   const units = property.configurations.length;
   const plans = property.media.floorPlans.length;
+  // Only what the page does not already show is listed as "on request".
   const items = [
-    { icon: Layers, label: 'Unit types and prices', hint: units ? `${units} ${units === 1 ? 'configuration' : 'configurations'}` : 'Current price sheet' },
-    { icon: Ruler, label: 'Floor plans', hint: plans ? `${plans} ${plans === 1 ? 'plan' : 'plans'}` : 'Unit layouts' },
-    { icon: ShieldCheck, label: 'Approvals and title', hint: 'Khata, plan sanction, bank approvals' },
-    { icon: MapPinned, label: 'Location and commute', hint: 'Map, nearby schools, office drive times' },
-    { icon: Calculator, label: 'Cost sheet and EMI', hint: 'Stamp duty, registration, loan EMI' },
-    { icon: Building2, label: 'Developer track record', hint: 'Delivered projects and timelines' },
-  ];
+    { icon: Layers, label: 'Latest price sheet', hint: property.priceOnRequest ? 'Unit-wise prices and offers' : units ? `Current prices for ${units} ${units === 1 ? 'unit type' : 'unit types'}` : 'Current price sheet', show: true },
+    { icon: Ruler, label: 'Floor plans', hint: 'Unit layouts', show: plans === 0 },
+    { icon: ShieldCheck, label: 'Approvals and title', hint: 'Khata, plan sanction, title documents', show: true },
+    { icon: MapPinned, label: 'Location and commute', hint: 'Map, nearby schools, office drive times', show: property.nearby.length < 3 },
+    { icon: Calculator, label: 'Cost sheet and EMI', hint: 'Stamp duty, registration, loan EMI', show: true },
+    { icon: Building2, label: 'Availability and site visit', hint: 'Units left, floors, visit slots', show: true },
+  ].filter((item) => item.show);
 
   return (
     <section id="details" aria-labelledby="details-title" className="scroll-mt-[96px] border-t border-line py-10">

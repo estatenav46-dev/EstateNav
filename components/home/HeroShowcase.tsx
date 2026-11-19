@@ -15,6 +15,7 @@ const STATUS_DOT: Record<ReturnType<typeof statusChip>, string> = {
 };
 
 function fromLabel(property: Property) {
+  if (property.priceOnRequest) return priceLabel(property);
   return property.priceMax ? priceLabel(property) : `From ${formatINR(property.priceMin)}${property.transaction === 'rent' ? ' /month' : ''}`;
 }
 

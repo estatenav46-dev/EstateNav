@@ -20,6 +20,13 @@ import type {
   segmentSchema,
   siteSettingsSchema,
   userSchema,
+  projectFactsSchema,
+  specificationSchema,
+  nearbyCategorySchema,
+  nearbyPlaceSchema,
+  documentKindSchema,
+  propertyDocumentSchema,
+  extraDetailSchema,
 } from './schemas';
 
 export type ImageRef = z.infer<typeof imageRefSchema>;
@@ -40,6 +47,13 @@ export type EnquirySource = z.infer<typeof enquirySourceSchema>;
 export type EnquiryStatus = z.infer<typeof enquiryStatusSchema>;
 export type SiteSettings = z.infer<typeof siteSettingsSchema>;
 export type AppUser = z.infer<typeof userSchema>;
+export type ProjectFacts = z.infer<typeof projectFactsSchema>;
+export type Specification = z.infer<typeof specificationSchema>;
+export type NearbyCategory = z.infer<typeof nearbyCategorySchema>;
+export type NearbyPlace = z.infer<typeof nearbyPlaceSchema>;
+export type DocumentKind = z.infer<typeof documentKindSchema>;
+export type PropertyDocument = z.infer<typeof propertyDocumentSchema>;
+export type ExtraDetail = z.infer<typeof extraDetailSchema>;
 
 /** The home and listing pages switch between these four views of the catalogue. */
 export type SearchSegment = Segment | 'rent';

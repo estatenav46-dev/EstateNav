@@ -19,7 +19,7 @@ export async function sendEnquiryEmailNotification(enquiry: Enquiry): Promise<bo
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://estatenav.in';
   const cleanPhone = enquiry.phone.replace(/[^0-9]/g, '');
   const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-    `Hi ${enquiry.name}, thank you for contacting EstateNav regarding ${enquiry.propertyTitle || 'Hyderabad properties'}.`
+    `Hi ${enquiry.name}, thank you for contacting EstateNav regarding ${enquiry.propertyTitle || 'Bengaluru properties'}.`
   )}`;
 
   const templateParams = {
@@ -28,7 +28,7 @@ export async function sendEnquiryEmailNotification(enquiry: Enquiry): Promise<bo
     buyer_email: enquiry.email || 'Not provided',
     intent: enquiry.intent.replace('-', ' ').toUpperCase(),
     preferred_date: enquiry.preferredDate ? new Date(enquiry.preferredDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Flexible / ASAP',
-    property_title: enquiry.propertyTitle || 'General Hyderabad Advisory',
+    property_title: enquiry.propertyTitle || 'General Bengaluru advisory',
     property_url: enquiry.propertySlug ? `${siteUrl}/properties/${enquiry.propertySlug}` : siteUrl,
     message: enquiry.message || 'None provided.',
     source: enquiry.source,

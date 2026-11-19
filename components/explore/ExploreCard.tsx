@@ -7,7 +7,7 @@ import { createPortal } from 'react-dom';
 import { ArrowUpRight, GitCompareArrows, Heart, Images, MapPin, Sparkles } from 'lucide-react';
 import type { Property } from '@/lib/data/types';
 import { formatINR } from '@/lib/price';
-import { statusChip } from '@/lib/property';
+import { scaleFacts, statusChip } from '@/lib/property';
 import { compareStore, MAX_COMPARE, shortlistStore, toggleCompare } from '@/lib/ui/stores';
 import { toggleWishlist } from '@/lib/ui/wishlist';
 import { track } from '@/lib/ui/visitor';
@@ -25,6 +25,9 @@ const TYPE_NOUN: Record<Property['propertyType'], string> = {
   apartment: 'Apartment',
   villa: 'Villa',
   'row-house': 'Row house',
+  villament: 'Villament',
+  penthouse: 'Penthouse',
+  'independent-house': 'Independent house',
   plot: 'Plot',
   office: 'Office',
   retail: 'Retail',
@@ -60,6 +63,8 @@ export function ExploreCard({ property, priority = false, reasons, sizes }: { pr
   const rent = property.transaction === 'rent';
   const { cover } = property.media;
   const photos = propertyPhotos(property);
+  const possession = property.possession.status === 'ready' ? 'Ready to move' : property.possession.status === 'pre-launch' ? 'Pre-launch' : `Possession ${property.possession.label}`;
+  const facts = [...scaleFacts(property).slice(0, 2), possession];
 
   return (
     <article className="cq group relative flex h-full flex-col overflow-hidden rounded-[24px] border border-line bg-surface transition-[transform,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] [@media(hover:hover)]:hover:-translate-y-1.5 [@media(hover:hover)]:hover:border-transparent [@media(hover:hover)]:hover:shadow-[0_30px_60px_-30px_rgb(var(--shadow)/0.55)]">
@@ -102,9 +107,15 @@ export function ExploreCard({ property, priority = false, reasons, sizes }: { pr
       <div className="cq-pad flex flex-1 flex-col px-4 pb-4 pt-3.5">
         <div className="flex items-baseline justify-between gap-3">
           <p className="tabular whitespace-nowrap text-[1.15rem] font-bold leading-tight tracking-[-0.01em]">
-            {formatINR(property.priceMin)}
-            <sup className="ml-px text-[0.65em] font-semibold text-brass">*</sup>
-            {(rent || property.priceMax) && <span className="ml-1 text-xs font-medium text-ink-muted">{rent ? '/month' : 'onwards'}</span>}
+            {property.priceOnRequest ? (
+              <span className="text-[0.95rem]">Price on request</span>
+            ) : (
+              <>
+                {formatINR(property.priceMin)}
+                <sup className="ml-px text-[0.65em] font-semibold text-brass">*</sup>
+                {(rent || property.priceMax) && <span className="ml-1 text-xs font-medium text-ink-muted">{rent ? '/month' : 'onwards'}</span>}
+              </>
+            )}
           </p>
           <p className="cq-wide truncate text-xs font-medium text-ink-muted">{configSummary(property)}</p>
         </div>
@@ -123,6 +134,7 @@ export function ExploreCard({ property, priority = false, reasons, sizes }: { pr
             <ArrowUpRight className="h-4 w-4" />
           </span>
         </div>
+        {facts.length > 0 && <p className="cq-wide mt-2 truncate border-t border-line pt-2 text-[11px] font-medium text-ink-muted">{facts.join(' · ')}</p>}
       </div>
 
       <div className="absolute right-3 top-3 z-[2] flex flex-col gap-2">

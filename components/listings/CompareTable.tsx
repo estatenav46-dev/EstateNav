@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import type { Property } from '@/lib/data/types';
-import { priceLabel, rateLabel, sizeLabel, statusChip } from '@/lib/property';
+import { priceLabel, rateLabel, scaleFacts, sizeLabel, statusChip } from '@/lib/property';
 
 type Row = { label: string; values: string[] };
 
@@ -14,6 +14,7 @@ export function compareRows(properties: Property[]): Row[] {
     { label: '₹ / sq.ft', values: properties.map((p) => rateLabel(p) ?? '—') },
     { label: 'Sizes', values: properties.map((p) => sizeLabel(p) ?? 'Ask advisor') },
     { label: 'Configurations', values: properties.map((p) => p.configurations.map((c) => c.label).join(', ')) },
+    { label: 'Project size', values: properties.map((p) => scaleFacts(p).join(' · ') || '—') },
     { label: 'Possession', values: properties.map((p) => p.possession.label) },
     { label: 'Status', values: properties.map(statusChip) },
     { label: 'Approvals', values: properties.map(approvals) },

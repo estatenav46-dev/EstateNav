@@ -1,6 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { emptyListingDetails } from '@/lib/data/defaults';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, useFieldArray, useForm, useWatch, type FieldErrors } from 'react-hook-form';
@@ -54,6 +55,7 @@ function blankProperty(developer?: Developer, corridor?: Corridor): Draft {
     media: { cover: EMPTY_IMAGE, gallery: [], floorPlans: [], brochure: null },
     metrics: null, commute: [],
     seo: { title: '', description: '', ogImageId: null },
+    ...emptyListingDetails(),
   };
 }
 

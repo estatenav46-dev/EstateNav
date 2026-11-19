@@ -1,13 +1,14 @@
 import { unstable_cache } from 'next/cache';
 import { getRepos } from '.';
 import { registerCorridorZones } from '@/lib/regions';
+import { toPublicProperty } from './publicView';
 
 // Cached reads for public pages (ISR on Vercel). Admin publish actions call
 // revalidateTag('properties' | 'catalogue' | 'settings') to refresh them immediately.
 const REVALIDATE = process.env.NODE_ENV === 'development' ? 1 : 60;
 
 const cachedProperties = unstable_cache(
-  () => getRepos().properties.list({ status: 'published' }),
+  async () => (await getRepos().properties.list({ status: 'published' })).map(toPublicProperty),
   ['published-properties'],
   { tags: ['properties'], revalidate: REVALIDATE },
 );

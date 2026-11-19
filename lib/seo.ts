@@ -55,7 +55,7 @@ export function propertyJsonLd(property: Property) {
     brand: { '@type': 'Brand', name: property.developerName },
     category: property.segment === 'plot' ? 'Residential plot' : property.segment === 'commercial' ? 'Commercial office space' : 'Residential apartment',
     ...(property.rera.number ? { identifier: { '@type': 'PropertyValue', propertyID: 'K-RERA project registration', value: property.rera.number } } : {}),
-    offers: {
+    ...(property.priceOnRequest ? {} : { offers: {
       '@type': 'AggregateOffer',
       priceCurrency: 'INR',
       lowPrice: property.priceMin,
@@ -64,7 +64,7 @@ export function propertyJsonLd(property: Property) {
       url,
       ...(property.transaction === 'rent' ? { priceSpecification: { '@type': 'UnitPriceSpecification', price: property.priceMin, priceCurrency: 'INR', unitText: 'MONTH' } } : {}),
       seller: { '@type': 'RealEstateAgent', name: 'EstateNav', url: SITE_URL },
-    },
+    } }),
     additionalProperty: [
       { '@type': 'PropertyValue', name: 'Locality', value: `${property.locality}, ${property.corridorName}, Bengaluru` },
       { '@type': 'PropertyValue', name: 'Possession', value: property.possession.label },

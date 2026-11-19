@@ -1,5 +1,6 @@
 import type { Corridor, Developer, Enquiry, ImageRef, OfficeHub, Property, SiteSettings } from '../../types';
 import { UNSPLASH } from './unsplash';
+import { emptyListingDetails, type ListingDetailKey } from '../../defaults';
 
 // Seed data for the in-memory adapter, migrated from the original lib/mockData.ts.
 // Removed during migration: gross yield and cap-rate figures (no source or date on record).
@@ -30,7 +31,8 @@ function gallery(owner: string, title: string, ids: string[]) {
   );
 }
 
-type Seed = Omit<Property, 'media' | 'createdAt' | 'updatedAt' | 'publishedAt' | 'createdBy' | 'updatedBy' | 'bhkOptions' | 'sizeMin' | 'sizeMax' | 'priceMax'> & {
+type Seed = Omit<Property, ListingDetailKey | 'media' | 'createdAt' | 'updatedAt' | 'publishedAt' | 'createdBy' | 'updatedBy' | 'bhkOptions' | 'sizeMin' | 'sizeMax' | 'priceMax'> &
+  Partial<Pick<Property, ListingDetailKey>> & {
   photos: string[];
   sizeMin?: number | null;
   sizeMax?: number | null;
@@ -401,6 +403,7 @@ export const seedProperties: Property[] = seeds.map(({ photos, ...seed }) => {
   const images = gallery(seed.id, seed.title, photos);
   const bhkOptions = Array.from(new Set(seed.configurations.map((c) => c.bhk).filter((b): b is number => b != null))).sort((a, b) => a - b);
   return {
+    ...emptyListingDetails(),
     ...seed,
     bhkOptions,
     priceMax: seed.priceMax ?? null,
@@ -426,6 +429,8 @@ export const seedDevelopers: Developer[] = [
     yearsActive: 15,
     sqftDelivered: 3500000,
     constructionTech: 'Mivan aluminium formwork',
+    projectsDelivered: null,
+    headquarters: null,
     sources: [],
     website: 'https://www.abheeventures.co.in/',
     logo: null,
@@ -438,6 +443,8 @@ export const seedDevelopers: Developer[] = [
     yearsActive: null,
     sqftDelivered: null,
     constructionTech: null,
+    projectsDelivered: null,
+    headquarters: null,
     sources: [],
     website: null,
     logo: null,
@@ -450,6 +457,8 @@ export const seedDevelopers: Developer[] = [
     yearsActive: null,
     sqftDelivered: null,
     constructionTech: null,
+    projectsDelivered: null,
+    headquarters: null,
     sources: [],
     website: null,
     logo: null,
