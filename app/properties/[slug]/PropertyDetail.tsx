@@ -17,7 +17,7 @@ import { AutoCompare } from '@/components/property/AutoCompare';
 import { TrackView } from '@/components/property/TrackView';
 import { DetailsOnRequest } from '@/components/property/DetailsOnRequest';
 import { SectionNav } from '@/components/property/SectionNav';
-import { UnitTable } from '@/components/property/UnitTable';
+import { ConfigExplorer } from '@/components/property/ConfigExplorer';
 import { PlanGallery } from '@/components/property/PlanGallery';
 import { DocumentList } from '@/components/property/DocumentList';
 import { VerificationLedger } from '@/components/property/VerificationLedger';
@@ -97,7 +97,8 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
 
   const sections = [
     { id: 'overview', label: 'Overview' },
-    property.configurations.length > 0 && { id: 'units', label: property.segment === 'plot' ? 'Plots & prices' : 'Units & prices' },
+    property.configurations.length > 0 && { id: 'units', label: property.segment === 'plot' ? 'Plots & prices' : 'Configurations' },
+    (property.description || property.highlights.length > 0) && { id: 'about', label: 'About' },
     plansCount > 0 && { id: 'plans', label: 'Floor plans' },
     amenityGroups.length > 0 && { id: 'amenities', label: 'Amenities' },
     property.specifications.length > 0 && { id: 'specifications', label: 'Specifications' },
@@ -175,15 +176,25 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
           {sections.length > 2 && <SectionNav sections={sections} />}
 
           <Section id="overview" title="Overview" sheet={nextSheet()}>
-            <dl className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
+            <dl className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 xl:grid-cols-4">
               {facts.map(([label, value]) => (
-                <div key={label} className="min-w-0 border-t border-line pt-2">
-                  <dt className="text-2xs text-ink-muted">{label}</dt>
-                  <dd className="mt-0.5 text-sm">{value}</dd>
+                <div key={label} className="min-w-0 rounded-2xl border border-line bg-surface px-4 py-3">
+                  <dt className="text-[11px] font-medium uppercase tracking-wide text-ink-muted">{label}</dt>
+                  <dd className="mt-1 text-[0.95rem] font-semibold leading-snug">{value}</dd>
                 </div>
               ))}
             </dl>
-            {property.description && <Markdown source={property.description} className="mt-6 max-w-2xl text-base leading-relaxed text-ink-muted" />}
+          </Section>
+
+          {property.configurations.length > 0 && (
+            <Section id="units" title={property.segment === 'plot' ? 'Plot sizes & prices' : 'Configurations & prices'} sheet={nextSheet()}>
+              <ConfigExplorer property={property} />
+            </Section>
+          )}
+
+          {(property.description || property.highlights.length > 0) && (
+          <Section id="about" title="About the project" sheet={nextSheet()}>
+            {property.description && <Markdown source={property.description} className="max-w-2xl text-base leading-relaxed text-ink-muted" />}
             {property.highlights.length > 0 && (
               <>
                 <ul className="mt-6 grid gap-2 sm:grid-cols-2">
@@ -198,11 +209,6 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
               </>
             )}
           </Section>
-
-          {property.configurations.length > 0 && (
-            <Section id="units" title={property.segment === 'plot' ? 'Plot sizes & prices' : 'Unit types & prices'} sheet={nextSheet()}>
-              <UnitTable property={property} />
-            </Section>
           )}
 
           {plansCount > 0 && (
