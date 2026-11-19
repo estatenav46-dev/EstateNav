@@ -152,6 +152,7 @@ type Props = {
 // The welcome concierge: three taps (goal, region, budget), then name and mobile. A live
 // count and photos of matching homes on the left answer back with every tap.
 export function ConciergeCard({ variant, consent, advisorName, catalogue, onClose, onDone, onFinish, titleId = 'concierge-title' }: Props) {
+  const inline = variant === 'inline';
   const pathname = usePathname() ?? '/';
   const router = useRouter();
   const [step, setStep] = useState(0);
@@ -240,25 +241,25 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
   };
 
   const heading = (text: string) => (
-    <h3 id={titleId} tabIndex={-1} data-step-focus className="font-serif text-[1.6rem] leading-[1.1] tracking-[-0.02em] outline-none sm:text-[1.9rem]">
+    <h3 id={titleId} tabIndex={-1} data-step-focus className={`font-serif leading-[1.1] tracking-[-0.02em] outline-none ${inline ? 'text-[1.35rem] sm:text-[1.5rem]' : 'text-[1.6rem] sm:text-[1.9rem]'}`}>
       {text}
     </h3>
   );
 
   return (
-    <div className={`grid overflow-hidden rounded-[32px] bg-surface md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] ${variant === 'inline' ? 'border border-line shadow-[0_50px_100px_-60px_rgb(var(--shadow)/0.6)]' : 'shadow-[0_60px_120px_-40px_rgb(0_0_0/0.6)]'}`}>
-      <aside className="relative isolate flex flex-col overflow-hidden bg-forest p-5 text-forest-on sm:p-7 md:min-h-[520px] md:p-8">
+    <div className={`grid overflow-hidden bg-surface ${inline ? 'rounded-[22px] border border-line shadow-[0_30px_60px_-45px_rgb(var(--shadow)/0.6)] md:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]' : 'rounded-[32px] shadow-[0_60px_120px_-40px_rgb(0_0_0/0.6)] md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]'}`}>
+      <aside className={`relative isolate flex flex-col overflow-hidden bg-forest text-forest-on ${inline ? 'p-5 sm:p-6' : 'p-5 sm:p-7 md:min-h-[520px] md:p-8'}`}>
         <div aria-hidden="true" className="absolute -right-24 -top-24 -z-10 h-72 w-72 rounded-full bg-brass/25 blur-3xl" />
         <div aria-hidden="true" className="absolute inset-0 -z-10 opacity-[0.08] [background-image:linear-gradient(rgb(var(--on-forest))_1px,transparent_1px),linear-gradient(90deg,rgb(var(--on-forest))_1px,transparent_1px)] [background-size:40px_40px]" />
         <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-forest-on/70">
           <span aria-hidden="true" className="h-px w-8 bg-brass" /> EstateNav concierge
         </p>
-        <p className="mt-3 font-serif text-[1.65rem] leading-[1.05] tracking-[-0.03em] text-forest-on sm:text-[2.1rem]">
+        <p className={`mt-3 font-serif leading-[1.08] tracking-[-0.03em] text-forest-on ${inline ? 'text-[1.4rem] sm:text-[1.6rem]' : 'text-[1.65rem] sm:text-[2.1rem]'}`}>
           Tell us what you&apos;re after. <span className="text-brass">We&apos;ll do the shortlisting.</span>
         </p>
 
-        <div className="mt-5 flex items-end gap-3 md:mt-8">
-          <span className="font-serif text-[2.75rem] leading-none tracking-[-0.04em] text-forest-on sm:text-[3.25rem]">
+        <div className={`flex items-end gap-3 ${inline ? 'mt-4' : 'mt-5 md:mt-8'}`}>
+          <span className={`font-serif leading-none tracking-[-0.04em] text-forest-on ${inline ? 'text-[2.25rem]' : 'text-[2.75rem] sm:text-[3.25rem]'}`}>
             <NumberRoll value={matches.length} />
           </span>
           <span className="pb-1.5 text-sm text-forest-on/75" aria-live="polite">
@@ -274,7 +275,7 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
           </ul>
         )}
 
-        <div className="relative mt-auto hidden h-[170px] md:block" aria-hidden="true">
+        <div className={`relative mt-auto h-[170px] ${inline ? 'hidden' : 'hidden md:block'}`} aria-hidden="true">
           {photos.map((p, i) => (
             <div
               key={`${p.id}-${matches.length}`}
@@ -288,7 +289,7 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
           ))}
         </div>
 
-        <p className="mt-6 flex items-center gap-2.5 border-t border-forest-on/15 pt-4 text-xs text-forest-on/75">
+        <p className={`flex items-center gap-2.5 border-t border-forest-on/15 pt-4 text-xs text-forest-on/75 ${inline ? 'mt-auto pt-3 md:mt-6' : 'mt-6'}`}>
           <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-forest-on/10 text-[11px] font-bold ring-2 ring-brass">
             {advisorName.split(/\s+/).map((w) => w[0]).join('').slice(0, 2)}
           </span>
@@ -298,7 +299,7 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
         </p>
       </aside>
 
-      <div ref={body} className="relative flex min-w-0 flex-col p-5 sm:p-8">
+      <div ref={body} className={`relative flex min-w-0 flex-col ${inline ? 'p-5 sm:p-6' : 'p-5 sm:p-8'}`}>
         <div className="flex items-center gap-3">
           {current !== 'done' ? (
             <>
@@ -323,12 +324,12 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
           )}
         </div>
 
-        <div key={current} className={`mt-5 flex flex-1 flex-col ${dir === 1 ? 'step-in' : 'step-back'}`}>
+        <div key={current} className={`flex flex-1 flex-col ${inline ? 'mt-4' : 'mt-5'} ${dir === 1 ? 'step-in' : 'step-back'}`}>
           {current === 'goal' && (
             <>
               {heading(STEP_TITLE.goal)}
               <p className="mt-1.5 text-sm text-ink-muted">Pick one. About 20 seconds in all, no sign-up.</p>
-              <div className="stagger mt-5 grid gap-2.5 sm:grid-cols-2">
+              <div className={`stagger grid gap-2.5 sm:grid-cols-2 ${inline ? 'mt-4 xl:grid-cols-3' : 'mt-5'}`}>
                 {GOALS.map((g, i) => (
                   <Tile key={g.id} index={i} selected={answers.goal === g.id} onPick={() => pick('goal', g.id)} className={g.id === 'browsing' ? 'sm:col-span-2' : ''}>
                     <span className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl transition-colors duration-base ${answers.goal === g.id ? 'bg-accent text-accent-on' : 'bg-sand text-forest group-hover:bg-accent group-hover:text-accent-on dark:text-brass'}`}>
@@ -475,7 +476,7 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
         </div>
 
         {current !== 'done' && (
-          <div className="mt-6 flex items-center justify-between border-t border-line pt-4 text-sm">
+          <div className={`flex items-center justify-between border-t border-line text-sm ${inline ? 'mt-4 pt-3' : 'mt-6 pt-4'}`}>
             <button type="button" onClick={() => go(Math.max(0, step - 1))} disabled={step === 0} className="inline-flex min-h-[44px] items-center gap-1.5 font-semibold text-ink-muted transition-opacity hover:text-ink disabled:pointer-events-none disabled:opacity-0">
               <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back
             </button>
