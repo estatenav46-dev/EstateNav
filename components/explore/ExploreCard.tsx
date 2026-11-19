@@ -69,7 +69,7 @@ export function ExploreCard({ property, priority = false, reasons, sizes }: { pr
 
   return (
     <article className="cq group relative flex h-full flex-col overflow-hidden rounded-[24px] border border-line bg-surface transition-[transform,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] [@media(hover:hover)]:hover:-translate-y-1.5 [@media(hover:hover)]:hover:border-transparent [@media(hover:hover)]:hover:shadow-[0_30px_60px_-30px_rgb(var(--shadow)/0.55)]">
-      <div className="relative aspect-[4/3] overflow-hidden bg-surface-2">
+      <div className="relative aspect-[16/11] overflow-hidden bg-surface-2">
         <Image
           src={cover.url}
           alt=""

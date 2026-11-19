@@ -449,3 +449,16 @@ html { scroll-behavior: smooth; }
   .sc-hero-copy, .sc-hero-media, .sc-inset, .sc-rise, .sc-tilt { transform: none !important; opacity: 1 !important; }
   [data-parallax] { transform: none !important; }
 }
+
+/* ---------- Compact desktop ----------
+   Phones keep large touch targets; on desktop, buttons, chips and the fixed touch-size
+   heights used across components are trimmed so more of the page fits on screen. */
+@media (min-width: 1024px) {
+  .btn, .btn-primary, .btn-secondary, .btn-ghost { min-height: 40px; }
+  .chip { min-height: 34px; }
+  .icon-btn { height: 2.5rem; width: 2.5rem; }
+  html .min-h-\[60px\] { min-height: 46px; }
+  html .min-h-\[56px\], html .min-h-\[52px\], html .min-h-\[50px\] { min-height: 42px; }
+  html .min-h-\[48px\] { min-height: 40px; }
+  html .min-h-\[44px\] { min-height: 38px; }
+}

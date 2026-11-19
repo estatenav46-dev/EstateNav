@@ -33,7 +33,7 @@ export function NeedTiles({ properties }: { properties: Property[] }) {
       <ul className="no-scrollbar -mx-4 mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-hidden px-4 pb-2 sm:mx-0 sm:mt-8 sm:grid sm:grid-cols-3 sm:gap-5 sm:overflow-visible sm:p-0">
         {types.map((t, i) => (
           <Reveal as="li" key={t.id} index={i} variant="clip" className="w-[80%] shrink-0 snap-start sm:w-auto">
-            <Link href={t.href} className="group relative isolate block aspect-[16/11] overflow-hidden rounded-[22px] bg-forest sm:rounded-[28px]">
+            <Link href={t.href} className="group relative isolate block aspect-[16/10] overflow-hidden rounded-[18px] bg-forest sm:aspect-[16/9] sm:rounded-[22px] lg:aspect-[2/1]">
               {t.cover && (
                 <div data-parallax="0.06" className="absolute inset-0" style={{ transform: 'scale(1.14)' }}>
                   <Image src={t.cover.url} alt="" fill sizes="(min-width: 640px) 33vw, 80vw" quality={60} className="object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.08]" />

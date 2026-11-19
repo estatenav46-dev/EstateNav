@@ -77,7 +77,7 @@ export function HeroShowcase({ all, slides, index, dir, segLabel, duration, time
       <section
         aria-roledescription="carousel"
         aria-label={`Featured ${segLabel.toLowerCase()} projects`}
-        className="relative isolate aspect-[4/5] touch-pan-y overflow-hidden rounded-[24px] bg-forest shadow-[0_50px_100px_-50px_rgb(var(--shadow)/0.75)] sm:aspect-[16/11] lg:aspect-[5/4] xl:aspect-[4/3]"
+        className="relative isolate aspect-[4/5] touch-pan-y overflow-hidden rounded-[24px] bg-forest shadow-[0_50px_100px_-50px_rgb(var(--shadow)/0.75)] sm:aspect-[16/10] lg:aspect-[4/3] xl:aspect-[3/2]"
       >
         {all.map((p) => {
           const isActive = p.id === view.id;

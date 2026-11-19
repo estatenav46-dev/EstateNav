@@ -41,7 +41,7 @@ export function RegionTiles({ properties, advisorName, whatsapp }: { properties:
               href={`/properties?zone=${zone.id}`}
               data-track="region"
               data-track-zone={zone.id}
-              className="group relative isolate block aspect-[4/5] overflow-hidden rounded-[20px] bg-forest shadow-[0_24px_50px_-30px_rgb(var(--shadow)/0.6)] outline-offset-4 transition-[transform,box-shadow] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] [@media(hover:hover)]:hover:-translate-y-2 [@media(hover:hover)]:hover:shadow-[0_40px_70px_-34px_rgb(var(--shadow)/0.75)] sm:rounded-[28px]"
+              className="group relative isolate block aspect-[1/1] overflow-hidden rounded-[18px] lg:aspect-[4/3] bg-forest shadow-[0_24px_50px_-30px_rgb(var(--shadow)/0.6)] outline-offset-4 transition-[transform,box-shadow] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] [@media(hover:hover)]:hover:-translate-y-2 [@media(hover:hover)]:hover:shadow-[0_40px_70px_-34px_rgb(var(--shadow)/0.75)] sm:rounded-[28px]"
             >
               {cover && (
                 <div data-parallax="0.07" className="absolute inset-0" style={{ transform: 'scale(1.14)' }}>

@@ -532,7 +532,7 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
               </a>
             </div>
           ) : (
-            <ul key={`${state.zone}|${state.corridors.join()}|${state.loc}|${state.seg}`} className="stagger grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-3 2xl:grid-cols-4">
+            <ul key={`${state.zone}|${state.corridors.join()}|${state.loc}|${state.seg}`} className="stagger grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
               {shown.map((p, i) => (
                 <li key={p.id} style={{ '--i': Math.min(i, 8) } as React.CSSProperties}>
                   <ExploreCard property={p} priority={i < 2} />
