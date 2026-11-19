@@ -30,7 +30,7 @@ export default async function ContactPage({ searchParams }: { searchParams: { pr
       <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-16">
         <section aria-labelledby="contact-title">
           <p className="sheet-label">Sheet C-01 · Enquiry</p>
-          <h1 id="contact-title" className="mt-2 font-serif text-3xl sm:text-4xl">Talk to the advisor</h1>
+          <h1 id="contact-title" className="mt-2 font-serif text-2xl sm:text-3xl">Talk to the advisor</h1>
           <p className="mt-2 max-w-xl text-ink-muted">
             {property ? `About ${property.title}. ` : ''}Tell us what you need — a site visit, the developer’s price sheet or help with a home loan. {agent.name} replies personally.
           </p>

@@ -77,7 +77,7 @@ export function HeroShowcase({ all, slides, index, dir, segLabel, duration, time
       <section
         aria-roledescription="carousel"
         aria-label={`Featured ${segLabel.toLowerCase()} projects`}
-        className="relative isolate aspect-[4/5] touch-pan-y overflow-hidden rounded-[30px] bg-forest shadow-[0_50px_100px_-50px_rgb(var(--shadow)/0.75)] sm:aspect-[5/4] lg:aspect-[8/8.2] xl:aspect-[8/7.4]"
+        className="relative isolate aspect-[4/5] touch-pan-y overflow-hidden rounded-[24px] bg-forest shadow-[0_50px_100px_-50px_rgb(var(--shadow)/0.75)] sm:aspect-[16/11] lg:aspect-[5/4] xl:aspect-[4/3]"
       >
         {all.map((p) => {
           const isActive = p.id === view.id;
@@ -124,7 +124,7 @@ export function HeroShowcase({ all, slides, index, dir, segLabel, duration, time
               </span>
             ))}
           </div>
-          <h2 className="mt-3 max-w-[18ch] font-serif text-[1.75rem] leading-[1.02] tracking-[-0.03em] text-white sm:text-[2.6rem]">
+          <h2 className="mt-3 max-w-[18ch] font-serif text-[1.6rem] leading-[1.04] tracking-[-0.03em] text-white sm:text-[2.1rem]">
             <span className="word-mask">
               <span style={{ '--i': 3 } as CSSProperties}>{active.title}</span>
             </span>

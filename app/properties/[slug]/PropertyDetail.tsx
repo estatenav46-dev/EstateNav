@@ -26,9 +26,9 @@ import { Reveal, Words } from '@/components/Reveal';
 
 function Section({ id, title, sheet, children }: { id: string; title: string; sheet: string; children: React.ReactNode }) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-[136px] border-t border-line py-10 first:border-t-0">
+    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-[136px] border-t border-line py-8 first:border-t-0">
       <p className="sheet-label">{sheet}</p>
-      <h2 id={`${id}-title`} className="mt-1 font-serif text-2xl">{title}</h2>
+      <h2 id={`${id}-title`} className="mt-1 font-serif text-xl sm:text-2xl">{title}</h2>
       <div className="mt-5">{children}</div>
     </section>
   );
@@ -116,8 +116,9 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
       <TrackView property={property} />
       <Breadcrumbs items={crumbs} />
 
-      <header className="mt-3 flex flex-wrap items-end justify-between gap-4">
-        <div className="min-w-0">
+      {/* Top: key details on the left, a compact gallery on the right (stacked on phones). */}
+      <div className="mt-3 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-start lg:gap-10">
+        <header className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <StatusChip property={property} className="border border-line" />
             {offer && (
@@ -128,50 +129,62 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
               </span>
             )}
           </div>
-          <h1 className="mt-2 font-serif text-3xl leading-tight sm:text-4xl">{property.title}</h1>
-          <p className="mt-1 flex items-center gap-1.5 text-ink-muted">
-            <MapPin className="h-4 w-4 shrink-0 text-accent-ink" aria-hidden="true" />
-            {property.locality} · {property.corridorName} · by {property.developerName}
-          </p>
-          {property.tagline && <p className="mt-1 max-w-2xl text-sm text-ink-muted">{property.tagline}</p>}
-          <p className="mt-3 flex flex-wrap items-baseline gap-x-2">
-            <span className="tabular font-serif text-2xl sm:text-3xl">
-              {priceLabel(property)}
-              {!property.priceOnRequest && <sup className="ml-0.5 text-base text-brass">*</sup>}
+          <h1 className="mt-2 font-serif text-2xl leading-tight sm:text-3xl">{property.title}</h1>
+          <p className="mt-1.5 flex items-start gap-1.5 text-sm text-ink-muted">
+            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent-ink" aria-hidden="true" />
+            <span>
+              {property.locality} · {property.corridorName} · by {property.developerName}
             </span>
-            {rateLabel(property) && <span className="text-sm text-ink-muted">{rateLabel(property)}</span>}
-            {property.priceNote && !property.priceOnRequest && <span className="text-sm text-ink-muted">{property.priceNote}</span>}
           </p>
-          <p className="mt-1 max-w-xl text-xs text-ink-muted">
-            {property.priceOnRequest ? 'Prices are shared by the advisor with the current price sheet. ' : '*Approximate developer guide price; terms and conditions apply. The final price varies by unit, floor and current offers. '}
-            <Link href={`/contact?intent=price-sheet&property=${property.slug}`} className="font-semibold text-accent-ink hover:underline">
-              Contact us for the latest price sheet
-            </Link>
-            .
-          </p>
-        </div>
-        <ReraRow property={property} className="max-w-full rounded-full border border-line bg-surface px-3 py-1.5" />
-      </header>
+          {property.tagline && <p className="mt-2 max-w-xl text-sm text-ink-muted">{property.tagline}</p>}
 
-      <div className="mt-5">
+          <div className="mt-4 rounded-2xl border border-line bg-surface p-4">
+            <p className="flex flex-wrap items-baseline gap-x-2">
+              <span className="tabular font-serif text-xl sm:text-2xl">
+                {priceLabel(property)}
+                {!property.priceOnRequest && <sup className="ml-0.5 text-sm text-brass">*</sup>}
+              </span>
+              {rateLabel(property) && <span className="text-sm text-ink-muted">{rateLabel(property)}</span>}
+            </p>
+            {property.priceNote && !property.priceOnRequest && <p className="mt-0.5 text-xs text-ink-muted">{property.priceNote}</p>}
+            <dl className="mt-3 grid grid-cols-3 gap-2 border-t border-line pt-3 text-sm">
+              {[
+                ['Configurations', property.configurations.map((c) => c.label).join(', ') || '—'],
+                ['Size', sizeLabel(property) ?? 'Ask advisor'],
+                ['Possession', property.possession.label],
+              ].map(([label, value]) => (
+                <div key={label} className="min-w-0">
+                  <dt className="text-[11px] uppercase tracking-wide text-ink-muted">{label}</dt>
+                  <dd className="mt-0.5 line-clamp-2 font-medium leading-snug">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+          <p className="mt-2 max-w-xl text-2xs text-ink-muted">
+            {property.priceOnRequest ? 'Prices are shared by the advisor with the current price sheet. ' : '*Approximate developer guide price; T&C apply. Final price varies by unit, floor and offers. '}
+            <Link href={`/contact?intent=price-sheet&property=${property.slug}`} className="font-semibold text-accent-ink hover:underline">
+              Get the latest price sheet
+            </Link>
+          </p>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <ReraRow property={property} className="max-w-full rounded-full border border-line bg-surface px-3 py-1.5" />
+            {property.media.videoUrl && (
+              <a href={property.media.videoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-xs font-semibold hover:border-line-strong">
+                <PlayCircle className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Walkthrough
+              </a>
+            )}
+            {property.media.virtualTourUrl && (
+              <a href={property.media.virtualTourUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-xs font-semibold hover:border-line-strong">
+                <Rotate3d className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Virtual tour
+              </a>
+            )}
+          </div>
+        </header>
+
         <GalleryMosaic images={property.media.gallery} title={property.title} />
       </div>
-      {(property.media.videoUrl || property.media.virtualTourUrl) && (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {property.media.videoUrl && (
-            <a href={property.media.videoUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary min-h-[44px] px-4">
-              <PlayCircle className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Watch walkthrough
-            </a>
-          )}
-          {property.media.virtualTourUrl && (
-            <a href={property.media.virtualTourUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary min-h-[44px] px-4">
-              <Rotate3d className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Virtual tour
-            </a>
-          )}
-        </div>
-      )}
 
-      <div className="mt-6 grid grid-cols-1 gap-x-12 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="mt-8 grid grid-cols-1 gap-x-10 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0">
           {sections.length > 2 && <SectionNav sections={sections} />}
 
@@ -376,7 +389,7 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
               <p className="rw-fade flex items-center gap-3 text-sm font-medium text-ink-muted">
                 <span aria-hidden="true" className="rw-line h-px w-8 bg-brass/60" /> Similar homes
               </p>
-              <h2 id="similar-title" className="mt-2 font-serif text-[1.85rem] leading-tight tracking-[-0.025em] sm:text-[2.4rem]">
+              <h2 id="similar-title" className="mt-2 font-serif text-[1.6rem] leading-tight tracking-[-0.025em] sm:text-[2rem]">
                 <Words>
                   <>Also worth a look near <span className="text-accent-ink">{property.corridorName}</span></>
                 </Words>

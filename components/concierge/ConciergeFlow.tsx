@@ -258,7 +258,7 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
         </p>
 
         <div className="mt-5 flex items-end gap-3 md:mt-8">
-          <span className="font-serif text-[3.25rem] leading-none tracking-[-0.04em] text-forest-on sm:text-[4rem]">
+          <span className="font-serif text-[2.75rem] leading-none tracking-[-0.04em] text-forest-on sm:text-[3.25rem]">
             <NumberRoll value={matches.length} />
           </span>
           <span className="pb-1.5 text-sm text-forest-on/75" aria-live="polite">

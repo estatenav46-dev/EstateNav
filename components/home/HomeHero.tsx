@@ -188,7 +188,7 @@ export function HomeHero({ properties, corridors, partnerDeveloper }: { properti
           <div className="mt-4 grid [&>*]:[grid-area:1/1]">
             {SEG_IDS.map((id) =>
               id === seg ? (
-                <h1 key={seg} id="hero-title" className="font-serif text-[2.45rem] leading-[1.02] tracking-[-0.04em] sm:text-[3.3rem] lg:text-[3.55rem] xl:text-[3.9rem]">
+                <h1 key={seg} id="hero-title" className="font-serif text-[2.1rem] leading-[1.04] tracking-[-0.035em] sm:text-[2.6rem] lg:text-[2.8rem] xl:text-[3.1rem]">
                   {words.map((w, i) => (
                     <span key={`${seg}-${i}`}>
                       <span className="word-mask">
@@ -198,7 +198,7 @@ export function HomeHero({ properties, corridors, partnerDeveloper }: { properti
                   ))}
                 </h1>
               ) : (
-                <p key={id} aria-hidden="true" className="invisible font-serif text-[2.45rem] leading-[1.02] tracking-[-0.04em] sm:text-[3.3rem] lg:text-[3.55rem] xl:text-[3.9rem]">
+                <p key={id} aria-hidden="true" className="invisible font-serif text-[2.1rem] leading-[1.04] tracking-[-0.035em] sm:text-[2.6rem] lg:text-[2.8rem] xl:text-[3.1rem]">
                   {SEGMENTS[id].headline.join(' ')}
                 </p>
               ),
@@ -254,7 +254,7 @@ export function HomeHero({ properties, corridors, partnerDeveloper }: { properti
                     {seg === 'plot' ? <Ruler className="h-4 w-4" aria-hidden="true" /> : <IndianRupee className="h-4 w-4" aria-hidden="true" />}
                   </span>
                 }
-                className="min-h-[60px] rounded-[20px] border border-transparent bg-surface-2 px-3 text-[0.95rem] font-semibold hover:border-line data-[open=true]:border-accent-ink data-[open=true]:bg-surface"
+                className="min-h-[50px] rounded-[16px] border border-transparent bg-surface-2 px-3 text-[0.95rem] font-semibold hover:border-line data-[open=true]:border-accent-ink data-[open=true]:bg-surface"
               />
               <button
                 type="button"
@@ -262,7 +262,7 @@ export function HomeHero({ properties, corridors, partnerDeveloper }: { properti
                   startNavProgress();
                   router.push(`/properties?${serializeListingState(filters)}`);
                 }}
-                className="btn-primary min-h-[60px] rounded-[20px] px-7 text-[0.95rem]"
+                className="btn-primary min-h-[50px] rounded-[16px] px-7 text-[0.95rem]"
               >
                 Show {count} {count === 1 ? copy.noun[0] : copy.noun[1]}
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />

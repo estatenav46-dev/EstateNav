@@ -13,7 +13,7 @@ export function SectionHeading({ index, kicker, title, id, action, tone = 'defau
           <span aria-hidden="true" className="rw-line h-px w-10 bg-brass/70" />
           {kicker}
         </p>
-        <h2 id={id} className={`mt-3 font-serif text-[2.15rem] leading-[1.02] tracking-[-0.035em] sm:text-[3.1rem] lg:text-[3.4rem] ${tone === 'inverse' ? 'text-forest-on' : ''}`}>
+        <h2 id={id} className={`mt-3 font-serif text-[1.85rem] leading-[1.05] tracking-[-0.03em] sm:text-[2.4rem] lg:text-[2.6rem] ${tone === 'inverse' ? 'text-forest-on' : ''}`}>
           <Words>{title}</Words>
         </h2>
       </div>

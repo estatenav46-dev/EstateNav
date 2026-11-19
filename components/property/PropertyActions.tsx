@@ -28,7 +28,7 @@ export function PropertyActions({ property, settings, advisorCard }: Props) {
         <div className="sticky top-[88px] space-y-4">
           <div className="panel p-5">
             <p className="sheet-label">{property.transaction === 'rent' ? 'Monthly rent' : 'Price'}</p>
-            <p className={`tabular mt-1 font-serif leading-tight ${property.priceOnRequest ? 'text-2xl' : 'text-3xl'}`}>
+            <p className={`tabular mt-1 font-serif leading-tight ${property.priceOnRequest ? 'text-xl' : 'text-2xl'}`}>
               {priceLabel(property)}
               {!property.priceOnRequest && <sup className="ml-0.5 text-base text-brass">*</sup>}
             </p>

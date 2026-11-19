@@ -41,7 +41,7 @@ export function RegionTiles({ properties, advisorName, whatsapp }: { properties:
               href={`/properties?zone=${zone.id}`}
               data-track="region"
               data-track-zone={zone.id}
-              className="group relative isolate block aspect-[3/4] overflow-hidden rounded-[22px] bg-forest shadow-[0_24px_50px_-30px_rgb(var(--shadow)/0.6)] outline-offset-4 transition-[transform,box-shadow] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] [@media(hover:hover)]:hover:-translate-y-2 [@media(hover:hover)]:hover:shadow-[0_40px_70px_-34px_rgb(var(--shadow)/0.75)] sm:rounded-[28px]"
+              className="group relative isolate block aspect-[4/5] overflow-hidden rounded-[20px] bg-forest shadow-[0_24px_50px_-30px_rgb(var(--shadow)/0.6)] outline-offset-4 transition-[transform,box-shadow] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] [@media(hover:hover)]:hover:-translate-y-2 [@media(hover:hover)]:hover:shadow-[0_40px_70px_-34px_rgb(var(--shadow)/0.75)] sm:rounded-[28px]"
             >
               {cover && (
                 <div data-parallax="0.07" className="absolute inset-0" style={{ transform: 'scale(1.14)' }}>
@@ -54,7 +54,7 @@ export function RegionTiles({ properties, advisorName, whatsapp }: { properties:
               </span>
               <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-6">
                 <p className="text-xs text-white/70">Bengaluru</p>
-                <h3 className="mt-0.5 font-serif text-[1.65rem] leading-none tracking-[-0.02em] text-white sm:text-[2.4rem]">{zone.short}</h3>
+                <h3 className="mt-0.5 font-serif text-[1.5rem] leading-none tracking-[-0.02em] text-white sm:text-[1.9rem]">{zone.short}</h3>
                 <p className="mt-2 line-clamp-2 text-xs text-white/80 sm:text-sm">{zone.areas}</p>
                 <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold">
                   <span className="hidden sm:inline">Explore {zone.short}</span>
