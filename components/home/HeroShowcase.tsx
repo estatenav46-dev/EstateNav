@@ -51,6 +51,7 @@ export function HeroShowcase({ all, slides, index, dir, segLabel, duration, time
 
   const mounted = new Set([view.id, view.prev, ...preload].filter(Boolean) as string[]);
   const chips = [statusChip(active), active.rera.number ? 'K-RERA registered' : null].filter(Boolean) as string[];
+  const upNext = slides.length > 1 ? Array.from({ length: Math.min(3, slides.length - 1) }, (_, k) => (index + 1 + k) % slides.length).map((i) => ({ p: slides[i], i })) : [];
 
   return (
     <div
@@ -77,7 +78,7 @@ export function HeroShowcase({ all, slides, index, dir, segLabel, duration, time
       <section
         aria-roledescription="carousel"
         aria-label={`Featured ${segLabel.toLowerCase()} projects`}
-        className="relative isolate aspect-[4/5] touch-pan-y overflow-hidden rounded-[24px] bg-forest shadow-[0_50px_100px_-50px_rgb(var(--shadow)/0.75)] sm:aspect-[16/10] lg:aspect-[4/3] xl:aspect-[3/2]"
+        className="relative isolate aspect-[5/4] touch-pan-y overflow-hidden rounded-[22px] bg-forest shadow-[0_40px_80px_-50px_rgb(var(--shadow)/0.75)] sm:aspect-[16/10] lg:aspect-[16/11] xl:aspect-[16/10]"
       >
         {all.map((p) => {
           const isActive = p.id === view.id;
@@ -154,37 +155,44 @@ export function HeroShowcase({ all, slides, index, dir, segLabel, duration, time
             </a>
           </div>
         </div>
+        <span aria-hidden="true" className="absolute inset-x-0 bottom-0 z-40 h-[3px] bg-white/15">
+          <span
+            key={timerKey}
+            className={`block h-full bg-brass ${animate ? 'timer-fill' : ''}`}
+            style={{ '--dur': `${duration}ms`, animationPlayState: running ? 'running' : 'paused' } as CSSProperties}
+            onAnimationEnd={onAdvance}
+          />
+        </span>
       </section>
 
-      <div className="mt-4 flex items-center gap-3">
-        <ol className="flex min-w-0 flex-1 gap-1.5" aria-label="Projects in this segment">
-          {slides.map((p, i) => (
-            <li key={p.id} className="min-w-0 flex-1">
-              <button type="button" onClick={() => onPick(i)} aria-current={i === index ? 'true' : undefined} className="group block w-full py-3 text-left" aria-label={`Show ${p.title}`}>
-                <span className="block h-[3px] overflow-hidden rounded-full bg-line">
-                  {i < index && <span className="block h-full w-full bg-ink/70" />}
-                  {i === index && (
-                    <span
-                      key={timerKey}
-                      className={`block h-full bg-accent ${animate ? 'timer-fill' : ''}`}
-                      style={{ '--dur': `${duration}ms`, animationPlayState: running ? 'running' : 'paused' } as CSSProperties}
-                      onAnimationEnd={onAdvance}
-                    />
-                  )}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ol>
-        <div className="flex shrink-0 gap-1.5">
-          <button type="button" onClick={onTogglePause} className="icon-btn hidden h-11 w-11 sm:inline-flex" aria-label={paused ? 'Resume slideshow' : 'Pause slideshow'}>
-            {paused ? <Play className="h-4 w-4" aria-hidden="true" /> : <Pause className="h-4 w-4" aria-hidden="true" />}
+      {/* Up next: the following projects as a small playlist; the stage's bottom line shows the timer. */}
+      <div className="mt-3 flex items-center gap-2">
+        {upNext.length > 0 && (
+          <ol className="grid min-w-0 flex-1 grid-cols-2 gap-2 sm:grid-cols-3" aria-label="Up next">
+            {upNext.map(({ p, i }, k) => (
+              <li key={p.id} className={`min-w-0 ${k === 2 ? 'hidden sm:block' : ''}`}>
+                <button type="button" onClick={() => onPick(i)} className="group flex w-full items-center gap-2 rounded-xl border border-line bg-surface p-1.5 text-left transition-colors hover:border-accent/50" aria-label={`Show ${p.title}`}>
+                  <span className="relative h-10 w-12 shrink-0 overflow-hidden rounded-lg bg-surface-2">
+                    <Image src={p.media.cover.url} alt="" fill sizes="48px" quality={40} className="object-cover transition-transform duration-slow group-hover:scale-110" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-xs font-semibold">{p.title}</span>
+                    <span className="block truncate text-[11px] text-ink-muted">{fromLabel(p)}</span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ol>
+        )}
+        <div className="ml-auto flex shrink-0 gap-1">
+          <button type="button" onClick={onTogglePause} className="icon-btn hidden h-9 w-9 sm:inline-flex" aria-label={paused ? 'Resume slideshow' : 'Pause slideshow'}>
+            {paused ? <Play className="h-3.5 w-3.5" aria-hidden="true" /> : <Pause className="h-3.5 w-3.5" aria-hidden="true" />}
           </button>
-          <button type="button" onClick={() => onStep(-1)} className="icon-btn h-11 w-11" aria-label="Previous project">
-            <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+          <button type="button" onClick={() => onStep(-1)} className="icon-btn h-9 w-9" aria-label="Previous project">
+            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
           </button>
-          <button type="button" onClick={() => onStep(1)} className="icon-btn h-11 w-11 border-ink bg-ink text-bg hover:border-ink hover:bg-ink/85" aria-label="Next project">
-            <ChevronRight className="h-5 w-5" aria-hidden="true" />
+          <button type="button" onClick={() => onStep(1)} className="icon-btn h-9 w-9 border-ink bg-ink text-bg hover:border-ink hover:bg-ink/85" aria-label="Next project">
+            <ChevronRight className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       </div>
