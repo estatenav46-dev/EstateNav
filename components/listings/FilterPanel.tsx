@@ -4,6 +4,7 @@ import type { Corridor, Lens, Property, SearchSegment } from '@/lib/data/types';
 import { APPROVAL_OPTIONS, BHK_CHOICES, POSSESSION_OPTIONS, STATUS_OPTIONS, type ListingState } from '@/lib/listingFilters';
 import { bhkLabel, LENS_LABEL, SEGMENT_LABEL } from '@/lib/property';
 import { BudgetRange } from '@/components/search/BudgetRange';
+import { PROPERTY_TYPE_LABEL } from '@/lib/listingMeta';
 
 type Props = {
   state: ListingState;
@@ -38,6 +39,7 @@ function Check({ checked, onChange, label, hint }: { checked: boolean; onChange:
 
 export function FilterPanel({ state, update, corridors, properties, idPrefix }: Props) {
   const amenities = Array.from(new Set(properties.flatMap((p) => p.amenities))).sort();
+  const types = Array.from(new Set(properties.map((p) => p.propertyType))).map((t) => [t, properties.filter((p) => p.propertyType === t).length] as const);
   const builders = Array.from(new Map(properties.map((p) => [p.developerId, p.developerName])).entries())
     .map(([id, name]) => [id, name, properties.filter((p) => p.developerId === id).length] as const)
     .sort((a, b) => a[1].localeCompare(b[1]));
@@ -92,6 +94,18 @@ export function FilterPanel({ state, update, corridors, properties, idPrefix }: 
           </label>
         </div>
       </Section>
+
+      {types.length > 1 && (
+        <Section title="Property type">
+          <div className="flex flex-wrap gap-1.5">
+            {types.map(([type, count]) => (
+              <button key={type} type="button" aria-pressed={state.ptype.includes(type)} className="chip" onClick={() => update({ ptype: toggle(state.ptype, type) })}>
+                {PROPERTY_TYPE_LABEL[type]} <span className="ml-1 font-mono text-2xs text-ink-muted">{count}</span>
+              </button>
+            ))}
+          </div>
+        </Section>
+      )}
 
       {builders.length > 1 && (
         <Section title="Builder">

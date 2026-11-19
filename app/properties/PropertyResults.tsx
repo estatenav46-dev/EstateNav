@@ -24,6 +24,7 @@ import { bhkLabel, LENS_LABEL, SEGMENT_NOUN } from '@/lib/property';
 import { liveZones, comingSoonZones, zoneById, zoneOfCorridor, type Zone } from '@/lib/regions';
 import { SALE_BUDGET_CHOICES, TYPE_CHIPS } from '@/lib/categories';
 import { budgetSummary } from '@/components/search/BudgetRange';
+import { PROPERTY_TYPE_LABEL } from '@/lib/listingMeta';
 import { FilterPanel } from '@/components/listings/FilterPanel';
 import { ExploreCard } from '@/components/explore/ExploreCard';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -60,6 +61,7 @@ function extraChips(s: ListingState, builders: Map<string, string> = new Map()):
   if (s.verified) chips.push({ key: 'verified', label: 'K-RERA verified', patch: { verified: false } });
   s.lens.forEach((l) => chips.push({ key: `l-${l}`, label: LENS_LABEL[l], patch: { lens: s.lens.filter((x) => x !== l) } }));
   s.dev.forEach((d) => chips.push({ key: `d-${d}`, label: builders.get(d) ?? d, patch: { dev: s.dev.filter((x) => x !== d) } }));
+  s.ptype.forEach((t) => chips.push({ key: `t-${t}`, label: PROPERTY_TYPE_LABEL[t], patch: { ptype: s.ptype.filter((x) => x !== t) } }));
   return chips;
 }
 
