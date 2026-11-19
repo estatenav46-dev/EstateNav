@@ -7,8 +7,9 @@ import { ForYou } from '@/components/home/ForYou';
 import { SavedRail } from '@/components/home/SavedRail';
 import { PartnerShowcase } from '@/components/home/PartnerShowcase';
 import { AdvisoryBand } from '@/components/home/AdvisoryBand';
+import { FromTheBlog } from '@/components/home/FromTheBlog';
 import { JsonLd } from '@/components/ui/JsonLd';
-import { getCorridors, getDevelopers, getMarketSnapshots, getPublishedProperties, getSettings } from '@/lib/data/cached';
+import { getCorridors, getDevelopers, getMarketSnapshots, getPublishedBlogs, getPublishedProperties, getSettings } from '@/lib/data/cached';
 import { realEstateAgentJsonLd } from '@/lib/seo';
 
 export const revalidate = 300;
@@ -22,12 +23,13 @@ export const metadata: Metadata = {
 
 // Hero (auto-cycling segments) → market pulse → region → need → your brief / picks → partner → advisory.
 export default async function HomePage() {
-  const [properties, corridors, developers, snapshots, settings] = await Promise.all([
+  const [properties, corridors, developers, snapshots, settings, posts] = await Promise.all([
     getPublishedProperties(),
     getCorridors(),
     getDevelopers(),
     getMarketSnapshots(),
     getSettings(),
+    getPublishedBlogs(),
   ]);
   const partner = developers.find((d) => d.legalName === settings.partnerDeveloper) ?? developers[0];
 
@@ -43,6 +45,7 @@ export default async function HomePage() {
       {partner && (
         <PartnerShowcase developer={partner} legalName={settings.partnerDeveloper} projectCount={properties.filter((p) => p.developerId === partner.id).length} />
       )}
+      <FromTheBlog posts={posts} />
       <AdvisoryBand settings={settings} />
     </main>
   );

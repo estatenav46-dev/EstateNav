@@ -13,6 +13,12 @@ service cloud.firestore {
       allow create, update, delete: if isStaff();
     }
 
+    // Blog posts: the public reads published ones; written from the admin (Admin SDK).
+    match /blogs/{id} {
+      allow read: if resource.data.status == 'published' || isStaff();
+      allow write: if isStaff();
+    }
+
     match /developers/{id}       { allow read: if true; allow write: if isStaff(); }
     match /corridors/{id}        { allow read: if true; allow write: if isStaff(); }
     match /marketSnapshots/{id}  { allow read: if true; allow write: if isStaff(); }

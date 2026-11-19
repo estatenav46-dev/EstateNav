@@ -1,5 +1,6 @@
 import { getAdminFirestore } from './admin';
 import {
+  blogConverter,
   corridorConverter,
   developerConverter,
   enquiryConverter,
@@ -17,6 +18,7 @@ import {
   siteSettingsSchema,
 } from '../../schemas';
 import type {
+  BlogRepo,
   CorridorRepo,
   DeveloperRepo,
   LeadRepo,
@@ -344,7 +346,19 @@ const visitors: VisitorRepo = {
   },
 };
 
-export const firestoreRepos: Repos = { properties, leads, developers, corridors, settings, visitors };
+const blogs: BlogRepo = {
+  async listPublished() {
+    const snap = await getAdminFirestore().collection('blogs').where('status', '==', 'published').withConverter(blogConverter).get();
+    const now = new Date().toISOString();
+    // Posts with a future publish date stay hidden until that date.
+    return snap.docs
+      .map((d) => d.data())
+      .filter((p) => !p.publishedAt || p.publishedAt <= now)
+      .sort((a, b) => (b.publishedAt ?? b.updatedAt).localeCompare(a.publishedAt ?? a.updatedAt));
+  },
+};
+
+export const firestoreRepos: Repos = { blogs, properties, leads, developers, corridors, settings, visitors };
 
 // Fallback media repo if invoked on server; client uploads use Cloudinary or browser repo
 export const firestoreMediaRepo: MediaRepo = {

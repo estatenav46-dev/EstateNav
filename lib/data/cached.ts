@@ -35,4 +35,5 @@ export async function getPublishedProperty(slug: string) {
 export const getDevelopers = unstable_cache(() => getRepos().developers.list(), ['developers'], { tags: ['catalogue'], revalidate: REVALIDATE });
 export const getOfficeHubs = unstable_cache(() => getRepos().corridors.listOfficeHubs(), ['office-hubs'], { tags: ['catalogue'], revalidate: REVALIDATE });
 export const getMarketSnapshots = unstable_cache(() => getRepos().corridors.listMarketSnapshots(), ['market-snapshots'], { tags: ['catalogue'], revalidate: REVALIDATE });
+export const getPublishedBlogs = unstable_cache(() => getRepos().blogs.listPublished(), ['published-blogs'], { tags: ['blogs'], revalidate: REVALIDATE });
 export const getSettings = unstable_cache(() => getRepos().settings.get(), ['site-settings'], { tags: ['settings'], revalidate: REVALIDATE });

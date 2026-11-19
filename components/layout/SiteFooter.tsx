@@ -106,6 +106,9 @@ export function SiteFooter({ settings, corridors }: { settings: SiteSettings; co
                 <Link href="/shortlist" className={link}>Your wishlist</Link>
               </li>
               <li>
+                <Link href="/blogs" className={link}>Blog &amp; guides</Link>
+              </li>
+              <li>
                 <a href="/sitemap.xml" className={link}>Sitemap</a>
               </li>
               <li>

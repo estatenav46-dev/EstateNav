@@ -1,6 +1,6 @@
 import type { FirestoreDataConverter, QueryDocumentSnapshot, DocumentData } from 'firebase-admin/firestore';
-import { corridorSchema, developerSchema, enquirySchema, propertySchema, siteSettingsSchema, officeHubSchema, marketSnapshotSchema } from '../../schemas';
-import type { Corridor, Developer, Enquiry, OfficeHub, MarketSnapshot, Property, SiteSettings } from '../../types';
+import { blogPostSchema, corridorSchema, developerSchema, enquirySchema, propertySchema, siteSettingsSchema, officeHubSchema, marketSnapshotSchema } from '../../schemas';
+import type { BlogPost, Corridor, Developer, Enquiry, OfficeHub, MarketSnapshot, Property, SiteSettings } from '../../types';
 
 type TimestampLike = { toDate(): Date };
 
@@ -40,3 +40,5 @@ export const settingsConverter: FirestoreDataConverter<SiteSettings & { id: stri
   ...siteSettingsSchema.parse(input),
   id: 'site',
 }));
+
+export const blogConverter = makeConverter<BlogPost>((input) => blogPostSchema.parse(input));

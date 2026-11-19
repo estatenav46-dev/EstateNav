@@ -1,5 +1,5 @@
 import { corridorSchema, developerSchema, enquirySchema, marketSnapshotSchema, propertySchema, siteSettingsSchema } from '../../schemas';
-import type { CorridorRepo, DeveloperRepo, LeadRepo, PropertyRepo, Repos, SettingsRepo, VisitorRepo } from '../../repository';
+import type { BlogRepo, CorridorRepo, DeveloperRepo, LeadRepo, PropertyRepo, Repos, SettingsRepo, VisitorRepo } from '../../repository';
 import { interestDeltas } from '../../visitorSignals';
 import type { Corridor, Developer, Enquiry, MarketSnapshot, Property, SiteSettings } from '../../types';
 import { seedCorridors, seedDevelopers, seedEnquiries, seedOfficeHubs, seedProperties, seedSettings } from './seed';
@@ -205,4 +205,7 @@ const visitors: VisitorRepo = {
   },
 };
 
-export const mockRepos: Repos = { properties, leads, developers, corridors, settings, visitors };
+// Blog posts come from Firestore only; the mock catalogue has none.
+const blogs: BlogRepo = { listPublished: async () => [] };
+
+export const mockRepos: Repos = { blogs, properties, leads, developers, corridors, settings, visitors };

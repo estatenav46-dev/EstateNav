@@ -1,4 +1,5 @@
 import type {
+  BlogPost,
   Corridor,
   Developer,
   Enquiry,
@@ -90,7 +91,13 @@ export interface VisitorRepo {
   recordEvents(visitorId: string, events: VisitorEvent[]): Promise<void>;
 }
 
+/** Published blog posts, newest first (written in EstateNav-admin). */
+export interface BlogRepo {
+  listPublished(): Promise<BlogPost[]>;
+}
+
 export interface Repos {
+  blogs: BlogRepo;
   properties: PropertyRepo;
   leads: LeadRepo;
   developers: DeveloperRepo;

@@ -34,6 +34,7 @@ const NAV = [
   { label: 'Plots', href: '/properties?seg=plot' },
   { label: 'Offices', href: '/properties?seg=commercial' },
   { label: 'New launches', href: '/properties?status=pre-launch,new-launch', wide: true },
+  { label: 'Blog', href: '/blogs' },
 ];
 
 function Wordmark() {
