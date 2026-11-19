@@ -38,6 +38,9 @@ function Check({ checked, onChange, label, hint }: { checked: boolean; onChange:
 
 export function FilterPanel({ state, update, corridors, properties, idPrefix }: Props) {
   const amenities = Array.from(new Set(properties.flatMap((p) => p.amenities))).sort();
+  const builders = Array.from(new Map(properties.map((p) => [p.developerId, p.developerName])).entries())
+    .map(([id, name]) => [id, name, properties.filter((p) => p.developerId === id).length] as const)
+    .sort((a, b) => a[1].localeCompare(b[1]));
   const rent = state.seg === 'rent' || state.seg === 'commercial';
   const showBhk = state.seg === '' || state.seg === 'residential';
 
@@ -89,6 +92,14 @@ export function FilterPanel({ state, update, corridors, properties, idPrefix }: 
           </label>
         </div>
       </Section>
+
+      {builders.length > 1 && (
+        <Section title="Builder">
+          {builders.map(([id, name, count]) => (
+            <Check key={id} checked={state.dev.includes(id)} onChange={() => update({ dev: toggle(state.dev, id) })} label={name} hint={count} />
+          ))}
+        </Section>
+      )}
 
       <Section title="Possession">
         <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Possession">

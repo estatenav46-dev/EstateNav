@@ -46,7 +46,7 @@ const PAGE = 12;
 type RailItem = { key: string; label: string; sub?: string; count: number; active: boolean; visual: React.ReactNode; onSelect: () => void };
 
 // Filters the left rail and type chips don't already show, as removable chips.
-function extraChips(s: ListingState): { key: string; label: string; patch: Partial<ListingState> }[] {
+function extraChips(s: ListingState, builders: Map<string, string> = new Map()): { key: string; label: string; patch: Partial<ListingState> }[] {
   const chips: { key: string; label: string; patch: Partial<ListingState> }[] = [];
   if (s.q) chips.push({ key: 'q', label: `“${s.q}”`, patch: { q: '' } });
   s.bhk.forEach((b) => chips.push({ key: `b-${b}`, label: bhkLabel(b), patch: { bhk: s.bhk.filter((x) => x !== b) } }));
@@ -59,6 +59,7 @@ function extraChips(s: ListingState): { key: string; label: string; patch: Parti
   s.approvals.forEach((v) => chips.push({ key: `ap-${v}`, label: APPROVAL_OPTIONS.find((o) => o.value === v)!.label, patch: { approvals: s.approvals.filter((x) => x !== v) } }));
   if (s.verified) chips.push({ key: 'verified', label: 'K-RERA verified', patch: { verified: false } });
   s.lens.forEach((l) => chips.push({ key: `l-${l}`, label: LENS_LABEL[l], patch: { lens: s.lens.filter((x) => x !== l) } }));
+  s.dev.forEach((d) => chips.push({ key: `d-${d}`, label: builders.get(d) ?? d, patch: { dev: s.dev.filter((x) => x !== d) } }));
   return chips;
 }
 
@@ -266,7 +267,7 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
   const typeChips = TYPE_CHIPS.filter((t) => (t.seg === 'rent' ? hasHomeRentals : true)).map((t) => ({ ...t, count: countWith({ seg: t.seg }) }));
   const saleBudgets = state.seg === '' || state.seg === 'residential' || state.seg === 'plot';
   const budgetId = SALE_BUDGET_CHOICES.find((b) => b.min === state.min && b.max === state.max)?.id ?? 'custom';
-  const chips = extraChips(state).filter((c) => !c.key.startsWith('l-') || state.lens.length > 1);
+  const chips = extraChips(state, new Map(properties.map((p) => [p.developerId, p.developerName]))).filter((c) => !c.key.startsWith('l-') || state.lens.length > 1);
   const lensChips = LENSES.map((l) => ({ lens: l, count: countWith({ lens: [l] }) })).filter((l) => l.count > 0);
   const toggleApproval = (key: ListingState['approvals'][number]) =>
     update({ approvals: state.approvals.includes(key) ? state.approvals.filter((a) => a !== key) : [...state.approvals, key] });

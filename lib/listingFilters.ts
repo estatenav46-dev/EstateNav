@@ -30,13 +30,15 @@ export interface ListingState {
   approvals: ApprovalKey[];
   verified: boolean;
   lens: Lens[];
+  /** Builder (developer) ids. */
+  dev: string[];
   sort: ListingSort;
   view: ListingView;
 }
 
 export const DEFAULT_LISTING_STATE: ListingState = {
   seg: '', q: '', zone: '', corridors: [], loc: '', bhk: [], min: null, max: null, sizeMin: null, sizeMax: null,
-  possession: '', status: [], amenities: [], approvals: [], verified: false, lens: [], sort: 'relevance', view: 'grid',
+  possession: '', status: [], amenities: [], approvals: [], verified: false, lens: [], dev: [], sort: 'relevance', view: 'grid',
 };
 
 export const SALE_BUDGETS = [5_000_000, 7_500_000, 10_000_000, 12_500_000, 15_000_000, 20_000_000, 30_000_000, 50_000_000];
@@ -125,6 +127,7 @@ export function matchesListing(property: Property, s: ListingState): boolean {
   if (s.approvals.includes('bank') && property.bankApprovals.length === 0) return false;
   if (s.verified && !(property.rera.registered && property.rera.number)) return false;
   if (s.lens.length && !s.lens.some((l) => property.lenses.includes(l))) return false;
+  if (s.dev.length && !s.dev.includes(property.developerId)) return false;
   return true;
 }
 
@@ -172,6 +175,7 @@ export function relaxSuggestions(properties: Property[], s: ListingState) {
   if (s.amenities.length) candidates.push({ label: 'Drop amenity filters', patch: { amenities: [] } });
   if (s.approvals.length) candidates.push({ label: 'Drop approval filters', patch: { approvals: [] } });
   if (s.lens.length) candidates.push({ label: 'Any buyer lens', patch: { lens: [] } });
+  if (s.dev.length) candidates.push({ label: 'Any builder', patch: { dev: [] } });
   if (s.verified) candidates.push({ label: 'Include unverified listings', patch: { verified: false } });
   if (s.q) candidates.push({ label: `Clear “${s.q}”`, patch: { q: '' } });
   if (s.seg) candidates.push({ label: 'All property types', patch: { seg: '' } });
@@ -215,6 +219,7 @@ export function parseListingState(params: URLSearchParams): ListingState {
   s.approvals = list(params.get('appr')).filter((v): v is ApprovalKey => APPROVAL_OPTIONS.some((o) => o.value === v));
   s.verified = params.get('verified') === '1' || params.get('verifiedReraOnly') === '1';
   s.lens = list(params.get('lens')).filter((v): v is Lens => (LENSES as string[]).includes(v));
+  s.dev = list(params.get('dev')).map((d) => d.toLowerCase()).slice(0, 20);
   s.sort = oneOf(params.get('sort'), ['relevance', 'price-asc', 'price-desc', 'possession', 'newest'] as const) || 'relevance';
   s.view = oneOf(params.get('view'), ['grid', 'list'] as const) || 'grid';
 
@@ -259,6 +264,7 @@ export function serializeListingState(s: ListingState): string {
   if (s.approvals.length) params.set('appr', s.approvals.join(','));
   if (s.verified) params.set('verified', '1');
   if (s.lens.length) params.set('lens', s.lens.join(','));
+  if (s.dev.length) params.set('dev', s.dev.join(','));
   if (s.sort !== 'relevance') params.set('sort', s.sort);
   if (s.view !== 'grid') params.set('view', s.view);
   return params.toString();
