@@ -47,9 +47,6 @@ export function SiteFooter({ settings, corridors }: { settings: SiteSettings; co
                 <MessageCircle className="h-4 w-4 text-brass" aria-hidden="true" /> Connect with dedicated area advisor
               </a>
             </div>
-            <p className="text-[rgb(var(--on-night)/0.65)]">
-              Partner Developer: <span className="text-[rgb(var(--on-night))]">{settings.partnerDeveloper}</span>
-            </p>
           </div>
 
           <nav aria-label="Regions">

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
-import { ArrowDown, ArrowRight, Check, IndianRupee, Ruler, Sparkles } from 'lucide-react';
+import { ArrowRight, Check, IndianRupee, Ruler, Sparkles } from 'lucide-react';
 import type { Corridor, Property } from '@/lib/data/types';
 import { applyListing, DEFAULT_LISTING_STATE, serializeListingState, sortListings, type ListingState } from '@/lib/listingFilters';
 import { matchesSegment } from '@/lib/property';
@@ -67,7 +67,7 @@ const SEGMENTS: Record<Seg, { tab: string; icon: NeedIconName; noun: [string, st
 };
 const SEG_IDS = Object.keys(SEGMENTS) as Seg[];
 
-export function HomeHero({ properties, corridors, partnerDeveloper }: { properties: Property[]; corridors: Corridor[]; partnerDeveloper: string }) {
+export function HomeHero({ properties, corridors }: { properties: Property[]; corridors: Corridor[] }) {
   const router = useRouter();
   const reduced = useReducedMotionPreference();
   const [seg, setSeg] = useState<Seg>('residential');
@@ -289,10 +289,6 @@ export function HomeHero({ properties, corridors, partnerDeveloper }: { properti
               Get matched in 30 seconds
               <ArrowRight className="h-4 w-4 text-brass" aria-hidden="true" />
             </button>
-            <a href="#partner" className="group inline-flex min-h-[44px] items-center gap-2 text-sm text-ink-muted hover:text-ink">
-              Partner Developer: <strong className="font-semibold text-ink">{partnerDeveloper}</strong>
-              <ArrowDown className="h-4 w-4 shrink-0 text-accent-ink transition-transform group-hover:translate-y-0.5" aria-hidden="true" />
-            </a>
           </div>
         </div>
 

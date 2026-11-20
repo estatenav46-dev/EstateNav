@@ -15,12 +15,11 @@ export function AdvisorTitleBlock({ settings, compact = false }: { settings: Sit
     ['Role', agent.title],
     ['K-RERA reg.', agent.reraNumber],
     ['Validity', `${agent.validFrom} to ${agent.validTo}`],
-    ['Partner', settings.partnerDeveloper],
     ['Phone', contact.phoneDisplay],
   ];
   return (
     <div className={`grid border border-ink/70 bg-surface text-sm ${compact ? 'grid-cols-1' : 'grid-cols-[96px_minmax(0,1fr)] sm:grid-cols-[132px_minmax(0,1fr)]'}`}>
-      <div style={{ gridRow: 'span 6' }} className={`${compact ? 'hidden' : 'flex'} flex-col items-center justify-center gap-2 border-r border-ink/70 bg-surface-2 p-3 text-ink-muted`}>
+      <div style={{ gridRow: 'span 5' }} className={`${compact ? 'hidden' : 'flex'} flex-col items-center justify-center gap-2 border-r border-ink/70 bg-surface-2 p-3 text-ink-muted`}>
         <UserRound className="h-10 w-10" aria-hidden="true" />
         <span className="text-center font-mono text-[10px] uppercase tracking-wider">Photo</span>
       </div>

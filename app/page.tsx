@@ -5,11 +5,10 @@ import { RegionTiles } from '@/components/home/RegionTiles';
 import { NeedTiles } from '@/components/home/NeedTiles';
 import { ForYou } from '@/components/home/ForYou';
 import { SavedRail } from '@/components/home/SavedRail';
-import { PartnerShowcase } from '@/components/home/PartnerShowcase';
 import { AdvisoryBand } from '@/components/home/AdvisoryBand';
 import { FromTheBlog } from '@/components/home/FromTheBlog';
 import { JsonLd } from '@/components/ui/JsonLd';
-import { getCorridors, getDevelopers, getMarketSnapshots, getPublishedBlogs, getPublishedProperties, getSettings } from '@/lib/data/cached';
+import { getCorridors, getMarketSnapshots, getPublishedBlogs, getPublishedProperties, getSettings } from '@/lib/data/cached';
 import { realEstateAgentJsonLd } from '@/lib/seo';
 
 export const revalidate = 60;
@@ -21,30 +20,25 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
 };
 
-// Hero (auto-cycling segments) → market pulse → region → need → your brief / picks → partner → advisory.
+// Hero (auto-cycling segments) → market pulse → region → need → your brief / picks → blog → advisory.
 export default async function HomePage() {
-  const [properties, corridors, developers, snapshots, settings, posts] = await Promise.all([
+  const [properties, corridors, snapshots, settings, posts] = await Promise.all([
     getPublishedProperties(),
     getCorridors(),
-    getDevelopers(),
     getMarketSnapshots(),
     getSettings(),
     getPublishedBlogs(),
   ]);
-  const partner = developers.find((d) => d.legalName === settings.partnerDeveloper) ?? developers[0];
 
   return (
     <main id="main">
       <JsonLd data={realEstateAgentJsonLd(settings, corridors.map((c) => c.name))} />
-      <HomeHero properties={properties} corridors={corridors} partnerDeveloper={settings.partnerDeveloper} />
+      <HomeHero properties={properties} corridors={corridors} />
       <MarketTicker snapshots={snapshots} corridors={corridors} />
       <SavedRail properties={properties} />
       <RegionTiles properties={properties} advisorName={settings.agent.name} whatsapp={settings.contact.whatsapp} />
       <NeedTiles properties={properties} />
       <ForYou properties={properties} settings={settings} />
-      {partner && (
-        <PartnerShowcase developer={partner} legalName={settings.partnerDeveloper} projectCount={properties.filter((p) => p.developerId === partner.id).length} />
-      )}
       <FromTheBlog posts={posts} />
       <AdvisoryBand settings={settings} />
     </main>
