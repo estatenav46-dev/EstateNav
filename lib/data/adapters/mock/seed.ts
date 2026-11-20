@@ -488,7 +488,7 @@ export const seedOfficeHubs: OfficeHub[] = [
 ];
 
 export const CONSENT_TEXT =
-  'By submitting this form, you consent to registering your inquiry through SV Praveen, K-RERA registered agent and authorised channel partner for Abhee Ventures. Communication will be coordinated under direct-developer pricing terms.';
+  'By submitting this form, you consent to registering your inquiry through SV Praveen, K-RERA registered agent, an authorised channel partner of the developers listed on EstateNav. Communication will be coordinated under direct-developer pricing terms.';
 
 export const seedSettings: SiteSettings = {
   contact: {
