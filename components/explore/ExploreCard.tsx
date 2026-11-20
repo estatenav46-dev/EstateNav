@@ -6,8 +6,8 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowUpRight, BadgePercent, GitCompareArrows, Heart, Images, MapPin, Sparkles } from 'lucide-react';
 import type { Property } from '@/lib/data/types';
-import { formatINR } from '@/lib/price';
-import { activeOffer, scaleFacts, statusChip } from '@/lib/property';
+import { formatINR, formatSqftRange } from '@/lib/price';
+import { activeOffer, bhkLabel, rateLabel, statusChip } from '@/lib/property';
 import { compareStore, MAX_COMPARE, shortlistStore, toggleCompare } from '@/lib/ui/stores';
 import { toggleWishlist } from '@/lib/ui/wishlist';
 import { track } from '@/lib/ui/visitor';
@@ -64,8 +64,16 @@ export function ExploreCard({ property, priority = false, reasons, sizes }: { pr
   const { cover } = property.media;
   const photos = propertyPhotos(property);
   const offer = activeOffer(property);
-  const possession = property.possession.status === 'ready' ? 'Ready to move' : property.possession.status === 'pre-launch' ? 'Pre-launch' : `Possession ${property.possession.label}`;
-  const facts = [...scaleFacts(property).slice(0, 2), possession];
+  const rate = rateLabel(property);
+  const size = formatSqftRange(property.sizeMin, property.sizeMax);
+  const bhks = [...property.bhkOptions].filter((b) => b > 0).sort((a, b) => a - b);
+  const units = bhks.length ? Array.from(new Set(bhks.map(bhkLabel))) : [configSummary(property)];
+  const f = property.facts;
+  const stats: [string, string, boolean][] = [
+    ['Possession', property.possession.status === 'ready' ? 'Ready' : property.possession.status === 'pre-launch' ? 'Pre-launch' : property.possession.label, property.possession.status === 'ready'],
+    f.landAcres ? ['Land', `${Number(f.landAcres.toFixed(1))} acres`, false] : f.totalUnits ? ['Units', f.totalUnits.toLocaleString('en-IN'), false] : ['Type', TYPE_NOUN[property.propertyType], false],
+    ['K-RERA', property.rera.number ? 'Registered' : 'On request', Boolean(property.rera.number)],
+  ];
 
   return (
     <article className="cq group relative flex h-full flex-col overflow-hidden rounded-[24px] border border-line bg-surface transition-[transform,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] [@media(hover:hover)]:hover:-translate-y-1.5 [@media(hover:hover)]:hover:border-transparent [@media(hover:hover)]:hover:shadow-[0_30px_60px_-30px_rgb(var(--shadow)/0.55)]">
@@ -111,7 +119,7 @@ export function ExploreCard({ property, priority = false, reasons, sizes }: { pr
         </button>
       </div>
 
-      <div className="cq-pad flex flex-1 flex-col px-4 pb-4 pt-3.5">
+      <div className="cq-pad flex flex-1 flex-col px-4 pb-3.5 pt-3">
         <div className="flex items-baseline justify-between gap-3">
           <p className="tabular whitespace-nowrap text-[1.15rem] font-bold leading-tight tracking-[-0.01em]">
             {property.priceOnRequest ? (
@@ -124,24 +132,48 @@ export function ExploreCard({ property, priority = false, reasons, sizes }: { pr
               </>
             )}
           </p>
-          <p className="cq-wide truncate text-xs font-medium text-ink-muted">{configSummary(property)}</p>
+          {rate && <p className="cq-wide shrink-0 text-[11px] font-medium text-ink-muted">{rate}</p>}
         </div>
-        <h3 className="cq-title mt-1.5 line-clamp-1 text-[0.95rem] font-semibold leading-snug">
-          <a href={href} target="_blank" rel="noopener noreferrer" className="outline-none after:absolute after:inset-0 after:z-[1] after:rounded-[24px] after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-accent-ink">
-            {property.title}
-            <span className="sr-only"> (opens in a new tab)</span>
-          </a>
-        </h3>
-        <div className="mt-1 flex items-center justify-between gap-3">
-          <p className="flex min-w-0 items-center gap-1 text-xs text-ink-muted">
-            <MapPin className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
-            <span className="truncate">{property.locality}</span>
-          </p>
-          <span aria-hidden="true" className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-line text-ink transition-[transform,background-color,border-color,color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:rotate-45 group-hover:border-accent group-hover:bg-accent group-hover:text-accent-on">
-            <ArrowUpRight className="h-4 w-4" />
+        <div className="mt-1 flex items-start justify-between gap-2">
+          <h3 className="cq-title line-clamp-1 text-[0.95rem] font-semibold leading-snug">
+            <a href={href} target="_blank" rel="noopener noreferrer" className="outline-none after:absolute after:inset-0 after:z-[1] after:rounded-[24px] after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-accent-ink">
+              {property.title}
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+          </h3>
+          <span aria-hidden="true" className="cq-wide inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-line text-ink transition-[transform,background-color,border-color,color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:rotate-45 group-hover:border-accent group-hover:bg-accent group-hover:text-accent-on">
+            <ArrowUpRight className="h-3.5 w-3.5" />
           </span>
         </div>
-        {facts.length > 0 && <p className="cq-wide mt-2 truncate border-t border-line pt-2 text-[11px] font-medium text-ink-muted">{facts.join(' · ')}</p>}
+        <p className="mt-0.5 flex min-w-0 items-center gap-1 text-xs text-ink-muted">
+          <MapPin className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+          <span className="truncate">
+            {property.locality}
+            <span className="cq-wide"> · {property.corridorName}</span>
+          </span>
+        </p>
+        <p className="cq-wide mt-0.5 truncate text-[11px] text-ink-muted">
+          by <span className="font-medium text-ink">{property.developerName}</span>
+        </p>
+
+        <ul className="cq-wide mt-2.5 flex flex-wrap gap-1" aria-label="Unit types">
+          {units.slice(0, 4).map((u) => (
+            <li key={u} className="rounded-md bg-surface-2 px-1.5 py-0.5 text-[11px] font-semibold">
+              {u}
+            </li>
+          ))}
+          {units.length > 4 && <li className="rounded-md bg-surface-2 px-1.5 py-0.5 text-[11px] font-semibold text-ink-muted">+{units.length - 4}</li>}
+          {size && <li className="rounded-md border border-line px-1.5 py-0.5 text-[11px] text-ink-muted">{size}</li>}
+        </ul>
+
+        <dl className="cq-wide mt-auto grid grid-cols-3 gap-2 border-t border-line pt-2.5 text-[11px]">
+          {stats.map(([label, value, ok]) => (
+            <div key={label} className="min-w-0">
+              <dt className="text-ink-muted">{label}</dt>
+              <dd className={`truncate font-semibold ${ok ? 'text-accent-ink' : ''}`}>{value}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
 
       <div className="absolute right-3 top-3 z-[2] flex flex-col gap-2">
