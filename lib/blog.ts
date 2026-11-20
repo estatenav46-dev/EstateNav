@@ -6,6 +6,12 @@ export const blogDate = (iso: string | null) =>
 /** The post that leads the blog page: the newest featured one, otherwise the newest. */
 export const leadPost = (posts: BlogPost[]) => posts.find((p) => p.featured) ?? posts[0] ?? null;
 
+/** Posts for the lead carousel: every featured post (newest first, up to 6), or just the newest. */
+export const featuredPosts = (posts: BlogPost[], max = 6) => {
+  const starred = posts.filter((p) => p.featured).slice(0, max);
+  return starred.length ? starred : posts.slice(0, 1);
+};
+
 /** Other posts worth reading next: same category and shared tags first, then the newest. */
 export function suggestedPosts(current: BlogPost, all: BlogPost[], count = 4): BlogPost[] {
   const tags = new Set(current.tags.map((t) => t.toLowerCase()));

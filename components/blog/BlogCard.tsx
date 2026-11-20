@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowUpRight, Clock } from 'lucide-react';
+import { ArrowUpRight, Clock, Star } from 'lucide-react';
 import type { BlogPost } from '@/lib/data/types';
 import { blogDate } from '@/lib/blog';
 
@@ -24,12 +24,15 @@ export function BlogCard({ post, variant = 'grid', priority = false }: { post: B
 
   if (variant === 'lead') {
     return (
-      <Link href={href} className="group grid overflow-hidden rounded-[22px] border border-line bg-surface transition-shadow duration-base hover:shadow-[0_30px_60px_-40px_rgb(var(--shadow)/0.6)] md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
-        <div className="relative aspect-[16/10] bg-surface-2 md:aspect-auto md:min-h-[300px]">
+      <Link href={href} className="group grid h-full overflow-hidden rounded-[22px] border border-line bg-surface transition-shadow duration-base hover:shadow-[0_30px_60px_-40px_rgb(var(--shadow)/0.6)] md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
+        <div className="relative aspect-[16/10] bg-surface-2 md:aspect-auto md:min-h-[280px]">
           {post.cover && <Image src={post.cover.url} alt={post.cover.alt} fill priority={priority} sizes="(min-width: 768px) 55vw, 100vw" quality={70} className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.04]" />}
-          <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-neutral-900">{post.featured ? 'Featured' : 'Latest'}</span>
+          <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-neutral-900">
+            {post.featured && <Star className="h-3 w-3 fill-amber-400 text-amber-500" aria-hidden="true" />}
+            {post.featured ? 'Featured' : 'Latest'}
+          </span>
         </div>
-        <div className="flex flex-col justify-center gap-3 p-5 sm:p-7">
+        <div className="flex flex-col justify-center gap-2.5 p-5 sm:p-6">
           <Meta post={post} />
           <h2 className="font-serif text-2xl leading-tight tracking-[-0.02em] sm:text-[1.75rem]">{post.title}</h2>
           {post.excerpt && <p className="line-clamp-3 text-sm leading-relaxed text-ink-muted">{post.excerpt}</p>}

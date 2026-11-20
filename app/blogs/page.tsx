@@ -4,8 +4,9 @@ import { Newspaper } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { JsonLd } from '@/components/ui/JsonLd';
 import { BlogCard } from '@/components/blog/BlogCard';
+import { BlogCarousel } from '@/components/blog/BlogCarousel';
 import { getPublishedBlogs } from '@/lib/data/cached';
-import { leadPost } from '@/lib/blog';
+import { featuredPosts } from '@/lib/blog';
 import { breadcrumbJsonLd } from '@/lib/seo';
 import { absoluteUrl } from '@/lib/site';
 
@@ -19,15 +20,16 @@ export default async function BlogsPage({ searchParams }: { searchParams: { cate
   const posts = await getPublishedBlogs();
   const categories = Array.from(new Set(posts.map((p) => p.category))).map((c) => ({ name: c, count: posts.filter((p) => p.category === c).length }));
   const active = categories.some((c) => c.name === searchParams.category) ? searchParams.category! : '';
-  const lead = active ? null : leadPost(posts);
-  const rest = (active ? posts.filter((p) => p.category === active) : posts).filter((p) => p.id !== lead?.id);
+  const lead = active ? [] : featuredPosts(posts);
+  const leadIds = new Set(lead.map((p) => p.id));
+  const rest = (active ? posts.filter((p) => p.category === active) : posts).filter((p) => !leadIds.has(p.id));
   const crumbs = [
     { name: 'Home', path: '/' },
     { name: 'Blog', path: '/blogs' },
   ];
 
   return (
-    <main id="main" className="mx-auto max-w-container px-4 pb-20 pt-4 sm:px-6 lg:px-8">
+    <main id="main" className="mx-auto max-w-container px-4 pb-14 pt-4 sm:px-6 lg:px-8">
       <JsonLd data={breadcrumbJsonLd(crumbs)} />
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'Blog', name: 'EstateNav blog', url: absoluteUrl('/blogs') }} />
       <Breadcrumbs items={crumbs} />
@@ -50,14 +52,14 @@ export default async function BlogsPage({ searchParams }: { searchParams: { cate
         </div>
       ) : (
         <>
-          {lead && (
-            <div className="mt-8">
-              <BlogCard post={lead} variant="lead" priority />
+          {lead.length > 0 && (
+            <div className="mt-5">
+              <BlogCarousel posts={lead} priority />
             </div>
           )}
 
           {categories.length > 1 && (
-            <nav aria-label="Blog categories" className="no-scrollbar mt-8 flex gap-2 overflow-x-auto pb-1">
+            <nav aria-label="Blog categories" className="no-scrollbar mt-6 flex gap-2 overflow-x-auto pb-1">
               <Link href="/blogs" scroll={false} aria-current={!active ? 'page' : undefined} data-active={!active} className="chip shrink-0">
                 All <span className="font-mono text-2xs text-ink-muted">{posts.length}</span>
               </Link>
@@ -71,8 +73,8 @@ export default async function BlogsPage({ searchParams }: { searchParams: { cate
 
           {rest.length > 0 && (
             <section aria-label={active ? `${active} articles` : 'More articles'} className="mt-6">
-              {!active && <h2 className="mb-4 text-lg font-semibold">More to read</h2>}
-              <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {!active && <h2 className="mb-3 text-base font-semibold">More to read</h2>}
+              <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
                 {rest.map((p) => (
                   <li key={p.id}>
                     <BlogCard post={p} />
