@@ -19,6 +19,9 @@ export async function GET(request: NextRequest) {
   if (path) {
     revalidatePath(path);
   }
+  // Any admin change can show up on many pages (cards, home, project pages), so purge every
+  // page under the root layout as well; data caches above are refreshed by tag.
+  revalidatePath('/', 'layout');
 
   return NextResponse.json({
     revalidated: true,

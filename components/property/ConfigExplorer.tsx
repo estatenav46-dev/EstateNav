@@ -78,9 +78,9 @@ export function ConfigExplorer({ property }: { property: Property }) {
                 setG(i);
                 setV(0);
               }}
-              className={`min-w-[7.5rem] shrink-0 rounded-2xl border px-4 py-2.5 text-left transition-[background-color,border-color,box-shadow] duration-base ${active ? 'border-accent bg-accent text-accent-on shadow-[0_10px_24px_-14px_rgb(var(--accent)/0.9)]' : 'border-line bg-surface hover:border-line-strong'}`}
+              className={`min-w-[6.25rem] shrink-0 rounded-xl border px-3.5 py-2 text-left transition-[background-color,border-color,box-shadow] duration-base ${active ? 'border-accent bg-accent text-accent-on shadow-[0_10px_24px_-14px_rgb(var(--accent)/0.9)]' : 'border-line bg-surface hover:border-line-strong'}`}
             >
-              <span className="block text-[0.95rem] font-semibold">{item.label}</span>
+              <span className="block text-sm font-semibold">{item.label}</span>
               <span className={`block text-xs ${active ? 'text-accent-on/80' : 'text-ink-muted'}`}>
                 {from ?? `${item.items.length} ${item.items.length === 1 ? 'size' : 'sizes'}`}
               </span>
@@ -89,7 +89,7 @@ export function ConfigExplorer({ property }: { property: Property }) {
         })}
       </div>
 
-      <div role="tabpanel" aria-label={group.label} className="mt-4 overflow-hidden rounded-[22px] border border-line bg-surface">
+      <div role="tabpanel" aria-label={group.label} className="mt-3 overflow-hidden rounded-xl border border-line bg-surface">
         {group.items.length > 1 && (
           <div className="flex flex-wrap items-center gap-1.5 border-b border-line bg-surface-2/50 px-4 py-2.5">
             <span className="mr-1 text-xs text-ink-muted">{group.items.length} sizes:</span>
@@ -102,16 +102,16 @@ export function ConfigExplorer({ property }: { property: Property }) {
         )}
 
         <div className="grid gap-0 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-          <div className="p-5 sm:p-6">
+          <div className="p-4 sm:p-5">
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="font-serif text-2xl">{unit.label}</h3>
+              <h3 className="text-lg font-semibold">{unit.label}</h3>
               {status && <span className="rounded-full bg-amber-500/15 px-2.5 py-0.5 text-xs font-semibold text-amber-800 dark:text-amber-300">{status}</span>}
             </div>
             {unit.notes && <p className="mt-0.5 text-sm text-ink-muted">{unit.notes}</p>}
 
-            <p className="mt-4 text-xs text-ink-muted">{rent ? 'Monthly rent' : 'Price'}</p>
+            <p className="mt-3 text-xs text-ink-muted">{rent ? 'Monthly rent' : 'Price'}</p>
             {price ? (
-              <p className="tabular font-serif text-[1.75rem] leading-tight">
+              <p className="tabular font-serif text-[1.35rem] leading-tight">
                 {price}
                 <sup className="ml-0.5 text-sm text-brass">*</sup>
               </p>
@@ -119,9 +119,9 @@ export function ConfigExplorer({ property }: { property: Property }) {
               <p className="text-lg font-semibold">On request</p>
             )}
 
-            <dl className="mt-4 grid grid-cols-2 gap-2">
+            <dl className="mt-3 grid grid-cols-2 gap-2">
               {rows.map(({ icon: Icon, label, value }) => (
-                <div key={label} className="rounded-xl bg-surface-2/70 px-3 py-2.5">
+                <div key={label} className="rounded-lg bg-surface-2/70 px-3 py-2">
                   <dt className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-ink-muted">
                     <Icon className="h-3.5 w-3.5" aria-hidden="true" /> {label}
                   </dt>
@@ -130,11 +130,11 @@ export function ConfigExplorer({ property }: { property: Property }) {
               ))}
             </dl>
 
-            <div className="mt-5 grid gap-2 sm:grid-cols-2">
-              <button type="button" onClick={() => ask('price-sheet')} className="btn-primary min-h-[44px]">
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              <button type="button" onClick={() => ask('price-sheet')} className="btn-primary">
                 <FileText className="h-4 w-4" aria-hidden="true" /> {price ? 'Get price sheet' : 'Get the price'}
               </button>
-              <button type="button" onClick={() => ask('site-visit')} className="btn-secondary min-h-[44px]">
+              <button type="button" onClick={() => ask('site-visit')} className="btn-secondary">
                 <CalendarDays className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Book site visit
               </button>
             </div>
@@ -142,14 +142,14 @@ export function ConfigExplorer({ property }: { property: Property }) {
 
           <div className="border-t border-line bg-white p-3 md:border-l md:border-t-0">
             {plan ? (
-              <button type="button" onClick={() => setViewer(planIndex)} className="group relative block h-[200px] w-full overflow-hidden rounded-xl sm:h-[240px]" aria-label={`Open the ${unit.label} floor plan`}>
+              <button type="button" onClick={() => setViewer(planIndex)} className="group relative block h-[170px] w-full overflow-hidden rounded-lg sm:h-[200px]" aria-label={`Open the ${unit.label} floor plan`}>
                 <Image src={plan.url} alt={plan.alt} fill sizes="(min-width: 768px) 30vw, 100vw" className="object-contain" />
                 <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-full bg-black/65 px-2.5 py-1 text-xs font-semibold text-white">
                   <Maximize2 className="h-3.5 w-3.5" aria-hidden="true" /> Floor plan
                 </span>
               </button>
             ) : (
-              <div className="flex h-[200px] flex-col items-center justify-center gap-3 rounded-xl border border-dashed sm:h-[240px] border-line-strong bg-surface-2/50 p-6 text-center">
+              <div className="flex h-[170px] flex-col items-center justify-center gap-2 rounded-lg border border-dashed sm:h-[240px] border-line-strong bg-surface-2/50 p-6 text-center">
                 <svg viewBox="0 0 120 80" className="h-14 w-20 text-ink-muted" fill="none" stroke="currentColor" aria-hidden="true">
                   <path d="M6 6h108v68H6zM6 40h46M52 6v68M80 40h34M80 40v34M52 56h28" />
                 </svg>

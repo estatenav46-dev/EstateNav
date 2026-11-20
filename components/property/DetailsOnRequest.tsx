@@ -1,87 +1,61 @@
-import { Building2, Calculator, Layers, Lock, MapPinned, MessageCircle, Ruler, ShieldCheck } from 'lucide-react';
+'use client';
+
+import { FileText, MessageCircle } from 'lucide-react';
 import type { Property, SiteSettings } from '@/lib/data/types';
-import { LazyLeadForm } from '@/components/forms/LazyLeadForm';
 import { propertyWhatsApp } from '@/lib/contact';
 import { absoluteUrl } from '@/lib/site';
-import { Reveal } from '@/components/Reveal';
+import { openLeadSheet } from '@/lib/ui/stores';
 
-// Beyond the overview, project details are shared by the advisor: the visitor asks with a
-// short form or on WhatsApp.
+// A slim strip at the end of the details: what the advisor can still send, with two ways to ask.
+// The enquiry form itself opens in the side sheet (PropertyActions), not inline.
 export function DetailsOnRequest({ property, settings }: { property: Property; settings: SiteSettings }) {
-  const consent = { text: settings.consentText, version: settings.consentVersion, privacyNote: settings.privacyNote };
   const whatsapp = propertyWhatsApp({ title: property.title, url: absoluteUrl(`/properties/${property.slug}`) }, settings.contact.whatsapp);
-  const units = property.configurations.length;
-  const plans = property.media.floorPlans.length;
-  // Only what the page does not already show is listed as "on request".
   const items = [
-    { icon: Layers, label: 'Latest price sheet', hint: property.priceOnRequest ? 'Unit-wise prices and offers' : units ? `Current prices for ${units} ${units === 1 ? 'unit type' : 'unit types'}` : 'Current price sheet', show: true },
-    { icon: Ruler, label: 'Floor plans', hint: 'Unit layouts', show: plans === 0 },
-    { icon: ShieldCheck, label: 'Approvals and title', hint: 'Khata, plan sanction, title documents', show: true },
-    { icon: MapPinned, label: 'Location and commute', hint: 'Map, nearby schools, office drive times', show: property.nearby.length < 3 },
-    { icon: Calculator, label: 'Cost sheet and EMI', hint: 'Stamp duty, registration, loan EMI', show: true },
-    { icon: Building2, label: 'Availability and site visit', hint: 'Units left, floors, visit slots', show: true },
-  ].filter((item) => item.show);
+    'Latest price sheet',
+    property.media.floorPlans.length === 0 ? 'Floor plans' : null,
+    'Units available',
+    'Cost sheet & EMI',
+    'Approval documents',
+    property.nearby.length < 3 ? 'Nearby schools & offices' : null,
+  ].filter((i): i is string => Boolean(i));
 
   return (
-    <section id="details" aria-labelledby="details-title" className="scroll-mt-[96px] border-t border-line py-10">
-      <Reveal variant="zoom" className="overflow-hidden rounded-[28px] border border-line bg-surface">
-        <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <div className="relative isolate overflow-hidden bg-forest p-6 text-forest-on sm:p-8">
-            <div aria-hidden="true" className="absolute -right-20 -top-20 -z-10 h-64 w-64 rounded-full bg-brass/25 blur-3xl" />
-            <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-forest-on/70">
-              <span aria-hidden="true" className="h-px w-8 bg-brass" /> Full project details
-            </p>
-            <h2 id="details-title" className="mt-3 font-serif text-[1.7rem] leading-[1.08] tracking-[-0.02em] text-forest-on sm:text-[2rem]">
-              Everything else, <span className="text-brass">straight from the advisor.</span>
-            </h2>
-            <p className="mt-2 text-sm text-forest-on/75">
-              Prices and availability change often, so {settings.agent.name.split(' ')[0]} shares the latest documents for {property.title} directly.
-            </p>
-            <ul className="mt-6 grid gap-2 sm:grid-cols-2">
-              {items.map(({ icon: Icon, label, hint }) => (
-                <li key={label} className="flex items-start gap-3 rounded-2xl bg-forest-on/[0.07] p-3 ring-1 ring-forest-on/10">
-                  <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-forest-on/10 text-brass">
-                    <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="flex items-center gap-1.5 text-sm font-semibold">
-                      {label} <Lock className="h-3 w-3 text-forest-on/50" aria-label="On request" />
-                    </span>
-                    <span className="block text-xs text-forest-on/65">{hint}</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <a
-              href={whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-track="cta"
-              data-track-kind="whatsapp-details"
-              className="mt-6 inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-forest-on px-6 text-sm font-semibold text-forest transition-[transform,box-shadow] duration-base hover:shadow-[0_14px_30px_-12px_rgb(0_0_0/0.5)] active:scale-[0.97] sm:w-auto"
-            >
-              <MessageCircle className="h-4 w-4" aria-hidden="true" /> Ask on WhatsApp
-            </a>
-          </div>
-          <div className="p-6 sm:p-8">
-            <p className="text-sm font-semibold">Or leave your number</p>
-            <p className="mt-0.5 text-sm text-ink-muted">We send the full details on WhatsApp, usually the same day.</p>
-            <div className="mt-5">
-              <LazyLeadForm
-                consent={consent}
-                source="detail"
-                intent="price-sheet"
-                property={{ slug: property.slug, title: property.title }}
-                variant="compact"
-                whatsapp={settings.contact.whatsapp}
-                advisorName={settings.agent.name}
-                submitLabel="Send me the full details"
-                defaultMessage={`Please share the full details for ${property.title}: unit types and prices, floor plans, approvals, location and costs.`}
-              />
-            </div>
-          </div>
+    <section id="details" aria-labelledby="details-title" className="scroll-mt-32 overflow-hidden rounded-2xl bg-forest text-forest-on">
+      <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-forest-on/70">From the advisor</p>
+          <h2 id="details-title" className="mt-1 text-lg font-semibold leading-snug text-forest-on">
+            Get the full details for {property.title}
+          </h2>
+          <ul className="mt-3 flex flex-wrap gap-1.5">
+            {items.map((item) => (
+              <li key={item} className="rounded-full bg-forest-on/10 px-2.5 py-1 text-xs font-medium ring-1 ring-forest-on/15">
+                {item}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-xs text-forest-on/70">{settings.agent.name.split(' ')[0]} replies on WhatsApp, usually the same day.</p>
         </div>
-      </Reveal>
+        <div className="grid shrink-0 gap-2 sm:w-56">
+          <button
+            type="button"
+            onClick={() => openLeadSheet('price-sheet', `Please share the full details for ${property.title}: price sheet, floor plans, availability, approvals and costs.`)}
+            className="inline-flex min-h-[42px] items-center justify-center gap-2 rounded-full bg-forest-on px-4 text-sm font-semibold text-forest transition-transform active:scale-[0.97]"
+          >
+            <FileText className="h-4 w-4" aria-hidden="true" /> Send me the details
+          </button>
+          <a
+            href={whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track="cta"
+            data-track-kind="whatsapp-details"
+            className="inline-flex min-h-[42px] items-center justify-center gap-2 rounded-full px-4 text-sm font-semibold text-forest-on ring-1 ring-forest-on/30 hover:bg-forest-on/10"
+          >
+            <MessageCircle className="h-4 w-4" aria-hidden="true" /> Ask on WhatsApp
+          </a>
+        </div>
+      </div>
     </section>
   );
 }

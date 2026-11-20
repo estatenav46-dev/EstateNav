@@ -14,7 +14,7 @@ import { whatsAppLink } from '@/lib/contact';
 import { breadcrumbJsonLd } from '@/lib/seo';
 import { absoluteUrl } from '@/lib/site';
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 export async function generateStaticParams() {
   const posts = await getPublishedBlogs();

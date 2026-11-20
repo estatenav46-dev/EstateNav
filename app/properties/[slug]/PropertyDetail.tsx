@@ -3,7 +3,7 @@ import { ArrowRight, ArrowUpRight, BadgePercent, Check, Clock, MapPin } from 'lu
 import type { Corridor, Developer, NearbyPlace, OfficeHub, Property, SiteSettings } from '@/lib/data/types';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Markdown } from '@/components/ui/Markdown';
-import { MediaDock } from '@/components/property/MediaDock';
+import { GalleryMosaic } from '@/components/property/GalleryMosaic';
 import { PropertyActions } from '@/components/property/PropertyActions';
 import { ReraRow, StatusChip } from '@/components/property/PropertyCard';
 import { zoneById, zoneOfCorridor } from '@/lib/regions';
@@ -23,12 +23,17 @@ import { VerificationLedger } from '@/components/property/VerificationLedger';
 import { CommuteRadar } from '@/components/property/CommuteRadar';
 import { Reveal, Words } from '@/components/Reveal';
 
-function Section({ id, title, sheet, children }: { id: string; title: string; sheet: string; children: React.ReactNode }) {
+/** One content card on the project page. */
+function Section({ id, title, children, aside }: { id: string; title: string; children: React.ReactNode; aside?: React.ReactNode }) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-[136px] border-t border-line py-8 first:border-t-0">
-      <p className="sheet-label">{sheet}</p>
-      <h2 id={`${id}-title`} className="mt-1 font-serif text-xl sm:text-2xl">{title}</h2>
-      <div className="mt-5">{children}</div>
+    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-32 rounded-2xl border border-line bg-surface p-4 sm:p-5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 id={`${id}-title`} className="text-lg font-semibold tracking-[-0.01em]">
+          {title}
+        </h2>
+        {aside}
+      </div>
+      <div className="mt-4">{children}</div>
     </section>
   );
 }
@@ -107,267 +112,269 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
     extraGroups.length > 0 && { id: 'more', label: 'More details' },
     developer && (developer.about || developerFacts.length > 0) && { id: 'developer', label: 'Developer' },
   ].filter((s): s is { id: string; label: string } => Boolean(s));
-  let sheet = 0;
-  const nextSheet = () => `D-${String(++sheet).padStart(2, '0')}`;
+  const keyFacts = [
+    ['Configurations', property.configurations.map((c) => c.label).join(', ') || null],
+    ['Size', sizeLabel(property)],
+    ['Rate', rateLabel(property)],
+    ['Possession', property.possession.label],
+    ['Land', f.landAcres ? `${Number(f.landAcres.toFixed(2))} acres` : null],
+    ['Units', f.totalUnits ? f.totalUnits.toLocaleString('en-IN') : null],
+    ['Towers', f.towers ? String(f.towers) : null],
+    ['Area', property.corridorName],
+  ].filter((x): x is [string, string] => Boolean(x[1])).slice(0, 6);
+  const plans = [...(property.media.masterPlan ? [property.media.masterPlan] : []), ...property.media.floorPlans];
+  const photos = property.media.gallery.length ? property.media.gallery : [property.media.cover];
+  const rate = rateLabel(property);
 
   return (
-    <main id="main" className="mx-auto max-w-container px-4 pb-32 pt-4 sm:px-6 lg:px-8 lg:pb-16">
+    <main id="main" className="mx-auto max-w-container px-4 pb-28 pt-3 sm:px-6 lg:px-8 lg:pb-16">
       <TrackView property={property} />
       <Breadcrumbs items={crumbs} />
 
-      {/* Split view: media and actions stay in view on the left while the details scroll on the right (stacked on phones). */}
-      <div className="mt-3 grid gap-6 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-10">
-        <aside className="min-w-0 lg:sticky lg:top-[84px] lg:self-start" aria-label="Photos and plans">
-          <MediaDock property={property} />
-          <PropertyActions property={property} settings={settings} layout="dock" />
-        </aside>
-
+      <header className="mt-3 flex flex-col gap-3 md:flex-row md:items-end md:justify-between md:gap-8">
         <div className="min-w-0">
-          <header className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <StatusChip property={property} className="border border-line" />
-              {offer && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-brass/15 px-2.5 py-1 text-2xs font-semibold text-ink">
-                  <BadgePercent className="h-3.5 w-3.5 text-brass" aria-hidden="true" />
-                  {offer.text}
-                  {offer.validUntil && <span className="font-normal text-ink-muted">· till {new Date(`${offer.validUntil}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>}
-                </span>
-              )}
-            </div>
-            <h1 className="mt-2 font-serif text-2xl leading-tight sm:text-3xl">{property.title}</h1>
-            <p className="mt-1.5 flex items-start gap-1.5 text-sm text-ink-muted">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent-ink" aria-hidden="true" />
-              <span>
-                {property.locality} · {property.corridorName} · by {property.developerName}
+          <div className="flex flex-wrap items-center gap-2">
+            <StatusChip property={property} className="border border-line" />
+            {offer && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-brass/15 px-2.5 py-1 text-2xs font-semibold text-ink">
+                <BadgePercent className="h-3.5 w-3.5 text-brass" aria-hidden="true" />
+                {offer.text}
+                {offer.validUntil && <span className="font-normal text-ink-muted">· till {new Date(`${offer.validUntil}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>}
               </span>
-            </p>
-            {property.tagline && <p className="mt-2 max-w-xl text-sm text-ink-muted">{property.tagline}</p>}
-
-            <div className="mt-4 rounded-2xl border border-line bg-surface p-4">
-              <p className="flex flex-wrap items-baseline gap-x-2">
-                <span className="tabular font-serif text-xl sm:text-2xl">
-                  {priceLabel(property)}
-                  {!property.priceOnRequest && <sup className="ml-0.5 text-sm text-brass">*</sup>}
-                </span>
-                {rateLabel(property) && <span className="text-sm text-ink-muted">{rateLabel(property)}</span>}
-              </p>
-              {property.priceNote && !property.priceOnRequest && <p className="mt-0.5 text-xs text-ink-muted">{property.priceNote}</p>}
-              <dl className="mt-3 grid grid-cols-3 gap-2 border-t border-line pt-3 text-sm">
-                {[
-                  ['Configurations', property.configurations.map((c) => c.label).join(', ') || '—'],
-                  ['Size', sizeLabel(property) ?? 'Ask advisor'],
-                  ['Possession', property.possession.label],
-                ].map(([label, value]) => (
-                  <div key={label} className="min-w-0">
-                    <dt className="text-[11px] uppercase tracking-wide text-ink-muted">{label}</dt>
-                    <dd className="mt-0.5 line-clamp-2 font-medium leading-snug">{value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-            <p className="mt-2 max-w-xl text-2xs text-ink-muted">
-              {property.priceOnRequest ? 'Prices are shared by the advisor with the current price sheet. ' : '*Approximate developer guide price; T&C apply. Final price varies by unit, floor and offers. '}
-              <Link href={`/contact?intent=price-sheet&property=${property.slug}`} className="font-semibold text-accent-ink hover:underline">
-                Get the latest price sheet
-              </Link>
-            </p>
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <ReraRow property={property} className="max-w-full rounded-full border border-line bg-surface px-3 py-1.5" />
-            </div>
-          </header>
-
-            {sections.length > 2 && <SectionNav sections={sections} />}
-
-            <Section id="overview" title="Overview" sheet={nextSheet()}>
-              <dl className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 xl:grid-cols-4">
-                {facts.map(([label, value]) => (
-                  <div key={label} className="min-w-0 rounded-2xl border border-line bg-surface px-4 py-3">
-                    <dt className="text-[11px] font-medium uppercase tracking-wide text-ink-muted">{label}</dt>
-                    <dd className="mt-1 text-[0.95rem] font-semibold leading-snug">{value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </Section>
-
-            {property.configurations.length > 0 && (
-              <Section id="units" title={property.segment === 'plot' ? 'Plot sizes & prices' : 'Configurations & prices'} sheet={nextSheet()}>
-                <ConfigExplorer property={property} />
-              </Section>
             )}
+          </div>
+          <h1 className="mt-2 font-serif text-[1.55rem] leading-tight tracking-[-0.02em] sm:text-[1.85rem]">{property.title}</h1>
+          <p className="mt-1 flex items-start gap-1.5 text-sm text-ink-muted">
+            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent-ink" aria-hidden="true" />
+            <span>
+              {property.locality} · {property.corridorName} · by {property.developerName}
+            </span>
+          </p>
+        </div>
+        <div className="shrink-0 md:text-right">
+          <p className="tabular font-serif text-[1.35rem] leading-tight sm:text-[1.5rem]">
+            {priceLabel(property)}
+            {!property.priceOnRequest && <sup className="ml-0.5 text-xs text-brass">*</sup>}
+          </p>
+          {(rate || (property.priceNote && !property.priceOnRequest)) && (
+            <p className="mt-0.5 text-xs text-ink-muted">{[rate, property.priceOnRequest ? null : property.priceNote].filter(Boolean).join(' · ')}</p>
+          )}
+          <ReraRow property={property} className="mt-1.5 md:justify-end" />
+        </div>
+      </header>
 
-            {(property.description || property.highlights.length > 0) && (
-            <Section id="about" title="About the project" sheet={nextSheet()}>
-              {property.description && <Markdown source={property.description} className="max-w-2xl text-base leading-relaxed text-ink-muted" />}
-              {property.highlights.length > 0 && (
-                <>
-                  <ul className="mt-6 grid gap-2 sm:grid-cols-2">
-                    {property.highlights.map((h) => (
-                      <li key={h} className="flex gap-2 text-sm">
-                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent-ink" aria-hidden="true" />
-                        {h}
+      <div className="mt-4">
+        <GalleryMosaic images={photos} title={property.title} plans={plans} />
+      </div>
+
+      <dl className="mt-3 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-3 lg:grid-cols-6">
+        {keyFacts.map(([label, value]) => (
+          <div key={label} className="min-w-0 bg-surface px-4 py-3">
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-ink-muted">{label}</dt>
+            <dd className="mt-0.5 truncate text-sm font-semibold" title={value}>
+              {value}
+            </dd>
+          </div>
+        ))}
+      </dl>
+
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8">
+        <div className="min-w-0 space-y-4">
+          {sections.length > 2 && <SectionNav sections={sections} />}
+
+        <Section id="overview" title="Project facts">
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3">
+            {facts.map(([label, value]) => (
+              <div key={label} className="min-w-0 border-t border-line pt-2">
+                <dt className="text-[11px] font-medium uppercase tracking-wide text-ink-muted">{label}</dt>
+                <dd className="mt-0.5 text-sm font-medium leading-snug">{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </Section>
+
+        {property.configurations.length > 0 && (
+          <Section id="units" title={property.segment === 'plot' ? 'Plot sizes & prices' : 'Configurations & prices'}>
+            <ConfigExplorer property={property} />
+          </Section>
+        )}
+
+        {(property.description || property.highlights.length > 0) && (
+        <Section id="about" title="About the project">
+          {property.description && <Markdown source={property.description} className="max-w-2xl text-base leading-relaxed text-ink-muted" />}
+          {property.highlights.length > 0 && (
+            <>
+              <ul className="mt-6 grid gap-2 sm:grid-cols-2">
+                {property.highlights.map((h) => (
+                  <li key={h} className="flex gap-2 text-sm">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent-ink" aria-hidden="true" />
+                    {h}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-3 text-2xs text-ink-muted">Highlights are as stated by the developer.</p>
+            </>
+          )}
+        </Section>
+        )}
+
+        {plansCount > 0 && (
+          <Section id="plans" title={property.media.masterPlan ? 'Master plan & floor plans' : 'Floor plans'}>
+            <PlanGallery property={property} />
+          </Section>
+        )}
+
+        {amenityGroups.length > 0 && (
+          <Section id="amenities" title="Amenities">
+            <div className="grid gap-6 sm:grid-cols-2">
+              {amenityGroups.map((g) => (
+                <div key={g.id}>
+                  <h3 className="text-sm font-semibold">{g.label}</h3>
+                  <ul className="mt-2 flex flex-wrap gap-1.5">
+                    {g.items.map((a) => (
+                      <li key={a} className="rounded-full border border-line bg-surface px-3 py-1 text-sm">
+                        {a}
                       </li>
                     ))}
                   </ul>
-                  <p className="mt-3 text-2xs text-ink-muted">Highlights are as stated by the developer.</p>
-                </>
+                </div>
+              ))}
+            </div>
+          </Section>
+        )}
+
+        {property.specifications.length > 0 && (
+          <Section id="specifications" title="Specifications">
+            <dl className="divide-y divide-line rounded-card border border-line bg-surface">
+              {property.specifications.map((spec) => (
+                <div key={spec.id} className="grid gap-1 px-4 py-3 sm:grid-cols-[13rem_minmax(0,1fr)] sm:gap-4">
+                  <dt className="text-sm font-medium">{spec.category}</dt>
+                  <dd className="text-sm text-ink-muted">{spec.detail}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="mt-2 text-2xs text-ink-muted">As per the developer&apos;s brochure; specifications can change. Confirm with the agreement of sale.</p>
+          </Section>
+        )}
+
+        <Section id="location" title="Location & connectivity">
+          <div className="panel flex flex-wrap items-start justify-between gap-4 p-5">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted">{zone?.name ?? 'Bengaluru'}</p>
+              <p className="mt-1 text-lg font-semibold">{property.locality}</p>
+              <p className="text-sm text-ink-muted">{property.corridorName}, Bengaluru, Karnataka</p>
+              {property.address && (
+                <p className="mt-3 flex gap-2 text-sm">
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent-ink" aria-hidden="true" />
+                  <span>{property.address}</span>
+                </p>
               )}
-            </Section>
-            )}
-
-            {plansCount > 0 && (
-              <Section id="plans" title={property.media.masterPlan ? 'Master plan & floor plans' : 'Floor plans'} sheet={nextSheet()}>
-                <PlanGallery property={property} />
-              </Section>
-            )}
-
-            {amenityGroups.length > 0 && (
-              <Section id="amenities" title="Amenities" sheet={nextSheet()}>
-                <div className="grid gap-6 sm:grid-cols-2">
-                  {amenityGroups.map((g) => (
-                    <div key={g.id}>
-                      <h3 className="text-sm font-semibold">{g.label}</h3>
-                      <ul className="mt-2 flex flex-wrap gap-1.5">
-                        {g.items.map((a) => (
-                          <li key={a} className="rounded-full border border-line bg-surface px-3 py-1 text-sm">
-                            {a}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
+            </div>
+            <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary min-h-[44px] px-4">
+              Open in Google Maps <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+            </a>
+          </div>
+          {nearbyGroups.length > 0 ? (
+            <div className="mt-6 grid gap-6 sm:grid-cols-2">
+              {nearbyGroups.map((g) => (
+                <div key={g.id}>
+                  <h3 className="text-sm font-semibold">{g.label}</h3>
+                  <ul className="mt-2 divide-y divide-line rounded-card border border-line bg-surface">
+                    {g.items.map((n) => (
+                      <li key={n.id} className="flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm">
+                        <span className="min-w-0">
+                          <span className="block truncate">{n.name}</span>
+                          <span className="text-xs text-ink-muted">{NEARBY_CATEGORY_LABEL[n.category]}</span>
+                        </span>
+                        {distance(n) && (
+                          <span className="inline-flex shrink-0 items-center gap-1 font-mono text-xs text-ink-muted">
+                            <Clock className="h-3 w-3" aria-hidden="true" /> {distance(n)}
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              </Section>
-            )}
-
-            {property.specifications.length > 0 && (
-              <Section id="specifications" title="Specifications" sheet={nextSheet()}>
-                <dl className="divide-y divide-line rounded-card border border-line bg-surface">
-                  {property.specifications.map((spec) => (
-                    <div key={spec.id} className="grid gap-1 px-4 py-3 sm:grid-cols-[13rem_minmax(0,1fr)] sm:gap-4">
-                      <dt className="text-sm font-medium">{spec.category}</dt>
-                      <dd className="text-sm text-ink-muted">{spec.detail}</dd>
-                    </div>
-                  ))}
-                </dl>
-                <p className="mt-2 text-2xs text-ink-muted">As per the developer&apos;s brochure; specifications can change. Confirm with the agreement of sale.</p>
-              </Section>
-            )}
-
-            <Section id="location" title="Location & connectivity" sheet={nextSheet()}>
-              <div className="panel flex flex-wrap items-start justify-between gap-4 p-5">
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted">{zone?.name ?? 'Bengaluru'}</p>
-                  <p className="mt-1 text-lg font-semibold">{property.locality}</p>
-                  <p className="text-sm text-ink-muted">{property.corridorName}, Bengaluru, Karnataka</p>
-                  {property.address && (
-                    <p className="mt-3 flex gap-2 text-sm">
-                      <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent-ink" aria-hidden="true" />
-                      <span>{property.address}</span>
-                    </p>
-                  )}
-                </div>
-                <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary min-h-[44px] px-4">
-                  Open in Google Maps <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-                </a>
+              ))}
+              <p className="text-2xs text-ink-muted sm:col-span-2">Approximate distances and drive times by road; they vary with route and traffic.</p>
+            </div>
+          ) : (
+            <p className="mt-4 text-sm text-ink-muted">Ask the advisor for schools, hospitals, metro and office commutes near {property.locality}.</p>
+          )}
+          {commuteHubs.length > 0 && (
+            <div className="mt-8">
+              <h3 className="text-lg font-medium">Commute radar</h3>
+              <div className="mt-4">
+                <CommuteRadar property={property} hubs={commuteHubs} disclaimer={settings.disclaimers.commute} />
               </div>
-              {nearbyGroups.length > 0 ? (
-                <div className="mt-6 grid gap-6 sm:grid-cols-2">
-                  {nearbyGroups.map((g) => (
-                    <div key={g.id}>
-                      <h3 className="text-sm font-semibold">{g.label}</h3>
-                      <ul className="mt-2 divide-y divide-line rounded-card border border-line bg-surface">
-                        {g.items.map((n) => (
-                          <li key={n.id} className="flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm">
-                            <span className="min-w-0">
-                              <span className="block truncate">{n.name}</span>
-                              <span className="text-xs text-ink-muted">{NEARBY_CATEGORY_LABEL[n.category]}</span>
-                            </span>
-                            {distance(n) && (
-                              <span className="inline-flex shrink-0 items-center gap-1 font-mono text-xs text-ink-muted">
-                                <Clock className="h-3 w-3" aria-hidden="true" /> {distance(n)}
-                              </span>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                  <p className="text-2xs text-ink-muted sm:col-span-2">Approximate distances and drive times by road; they vary with route and traffic.</p>
-                </div>
-              ) : (
-                <p className="mt-4 text-sm text-ink-muted">Ask the advisor for schools, hospitals, metro and office commutes near {property.locality}.</p>
-              )}
-              {commuteHubs.length > 0 && (
-                <div className="mt-8">
-                  <h3 className="text-lg font-medium">Commute radar</h3>
-                  <div className="mt-4">
-                    <CommuteRadar property={property} hubs={commuteHubs} disclaimer={settings.disclaimers.commute} />
-                  </div>
-                </div>
-              )}
-              {zone && (
-                <Link href={`/properties?zone=${zoneOfCorridor(property.corridorId)}&corridor=${property.corridorId}`} className="mt-5 inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold text-accent-ink hover:underline">
-                  More homes in {property.corridorName} <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-              )}
-            </Section>
+            </div>
+          )}
+          {zone && (
+            <Link href={`/properties?zone=${zoneOfCorridor(property.corridorId)}&corridor=${property.corridorId}`} className="mt-5 inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold text-accent-ink hover:underline">
+              More homes in {property.corridorName} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          )}
+        </Section>
 
-            {hasVerification && (
-              <Section id="verification" title="RERA & approvals" sheet={nextSheet()}>
-                <VerificationLedger property={property} />
-              </Section>
-            )}
+        {hasVerification && (
+          <Section id="verification" title="RERA & approvals">
+            <VerificationLedger property={property} />
+          </Section>
+        )}
 
-            {property.documents.length > 0 && (
-              <Section id="documents" title="Brochure & documents" sheet={nextSheet()}>
-                <DocumentList property={property} />
-              </Section>
-            )}
+        {property.documents.length > 0 && (
+          <Section id="documents" title="Brochure & documents">
+            <DocumentList property={property} />
+          </Section>
+        )}
 
-            {extraGroups.length > 0 && (
-              <Section id="more" title="More details" sheet={nextSheet()}>
-                <div className="space-y-6">
-                  {extraGroups.map(({ group, items }) => (
-                    <div key={group}>
-                      {extraGroups.length > 1 && <h3 className="mb-2 text-sm font-semibold">{group}</h3>}
-                      <dl className="divide-y divide-line rounded-card border border-line bg-surface">
-                        {items.map((x) => (
-                          <div key={x.id} className="grid gap-1 px-4 py-3 sm:grid-cols-[13rem_minmax(0,1fr)] sm:gap-4">
-                            <dt className="text-sm font-medium">{x.label}</dt>
-                            <dd className="text-sm text-ink-muted">{x.value}</dd>
-                          </div>
-                        ))}
-                      </dl>
-                    </div>
-                  ))}
-                </div>
-              </Section>
-            )}
-
-            {developer && (developer.about || developerFacts.length > 0) && (
-              <Section id="developer" title={`About ${developer.name}`} sheet={nextSheet()}>
-                {developer.about && <p className="max-w-2xl leading-relaxed text-ink-muted">{developer.about}</p>}
-                {developerFacts.length > 0 && (
-                  <dl className="mt-5 grid gap-4 sm:grid-cols-3">
-                    {developerFacts.map((x) => (
-                      <div key={x.label} className="border-t border-line pt-2">
-                        <dt className="text-2xs text-ink-muted">{x.label}</dt>
-                        <dd className="font-serif text-xl">{x.value}</dd>
-                        <dd className="text-2xs text-ink-muted">
-                          Source: {x.source!.label} · as of {x.source!.asOf}
-                        </dd>
+        {extraGroups.length > 0 && (
+          <Section id="more" title="More details">
+            <div className="space-y-6">
+              {extraGroups.map(({ group, items }) => (
+                <div key={group}>
+                  {extraGroups.length > 1 && <h3 className="mb-2 text-sm font-semibold">{group}</h3>}
+                  <dl className="divide-y divide-line rounded-card border border-line bg-surface">
+                    {items.map((x) => (
+                      <div key={x.id} className="grid gap-1 px-4 py-3 sm:grid-cols-[13rem_minmax(0,1fr)] sm:gap-4">
+                        <dt className="text-sm font-medium">{x.label}</dt>
+                        <dd className="text-sm text-ink-muted">{x.value}</dd>
                       </div>
                     ))}
                   </dl>
-                )}
-                <Link href={`/properties?q=${encodeURIComponent(property.developerName)}`} className="mt-4 inline-flex min-h-[48px] items-center gap-1.5 text-sm text-accent-ink hover:underline">
-                  More from {property.developerName} <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-              </Section>
-            )}
+                </div>
+              ))}
+            </div>
+          </Section>
+        )}
 
-            <DetailsOnRequest property={property} settings={settings} />
+        {developer && (developer.about || developerFacts.length > 0) && (
+          <Section id="developer" title={`About ${developer.name}`}>
+            {developer.about && <p className="max-w-2xl leading-relaxed text-ink-muted">{developer.about}</p>}
+            {developerFacts.length > 0 && (
+              <dl className="mt-5 grid gap-4 sm:grid-cols-3">
+                {developerFacts.map((x) => (
+                  <div key={x.label} className="border-t border-line pt-2">
+                    <dt className="text-2xs text-ink-muted">{x.label}</dt>
+                    <dd className="font-serif text-xl">{x.value}</dd>
+                    <dd className="text-2xs text-ink-muted">
+                      Source: {x.source!.label} · as of {x.source!.asOf}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+            <Link href={`/properties?q=${encodeURIComponent(property.developerName)}`} className="mt-4 inline-flex min-h-[48px] items-center gap-1.5 text-sm text-accent-ink hover:underline">
+              More from {property.developerName} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </Section>
+        )}
+
+
+          <DetailsOnRequest property={property} settings={settings} />
         </div>
+
+        <PropertyActions property={property} settings={settings} />
       </div>
 
       {similar.length > 0 && (

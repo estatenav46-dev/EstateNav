@@ -38,29 +38,30 @@ export function PropertyActions({ property, settings, advisorCard, layout = 'sid
         </div>
       ) : (
       <div className="hidden lg:block">
-        <div className="sticky top-[88px] space-y-4">
-          <div className="panel p-5">
-            <p className="sheet-label">{property.transaction === 'rent' ? 'Monthly rent' : 'Price'}</p>
-            <p className={`tabular mt-1 font-serif leading-tight ${property.priceOnRequest ? 'text-xl' : 'text-2xl'}`}>
+        <div className="sticky top-24 space-y-3">
+          <div className="rounded-2xl border border-line bg-surface p-4 shadow-[0_20px_40px_-32px_rgb(var(--shadow)/0.5)]">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-muted">{property.transaction === 'rent' ? 'Monthly rent' : 'Price'}</p>
+            <p className="tabular mt-0.5 font-serif text-[1.45rem] leading-tight">
               {priceLabel(property)}
-              {!property.priceOnRequest && <sup className="ml-0.5 text-base text-brass">*</sup>}
+              {!property.priceOnRequest && <sup className="ml-0.5 text-xs text-brass">*</sup>}
             </p>
-            {rate && <p className="mt-1 text-sm text-ink-muted">{rate}{property.transaction === 'sale' ? ' from' : ''}</p>}
-            {property.priceNote && !property.priceOnRequest && <p className="mt-1 text-sm text-ink-muted">{property.priceNote}</p>}
-            <p className="mt-1 text-2xs text-ink-muted">
-              {property.priceOnRequest ? 'Get the current price sheet from the advisor. Zero buyer brokerage.' : '*Approximate developer guide price; T&C apply. Varies by unit and offers. Zero buyer brokerage.'}
-            </p>
-            <div className="mt-5 grid gap-2">
-              <button type="button" onClick={() => openLeadSheet('site-visit')} className="btn-primary">
-                <CalendarDays className="h-4 w-4" aria-hidden="true" /> Schedule guided VIP site visit
+            {(rate || property.priceNote) && (
+              <p className="mt-0.5 text-xs text-ink-muted">{[rate, property.priceOnRequest ? null : property.priceNote].filter(Boolean).join(' · ')}</p>
+            )}
+            <div className="mt-4 grid gap-2">
+              <button type="button" onClick={() => openLeadSheet('site-visit')} className="btn-primary w-full">
+                <CalendarDays className="h-4 w-4" aria-hidden="true" /> Book a site visit
               </button>
-              <button type="button" onClick={() => openLeadSheet('price-sheet')} className="btn-secondary">
-                <FileText className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Unlock direct developer pricing sheet
+              <button type="button" onClick={() => openLeadSheet('price-sheet')} className="btn-secondary w-full">
+                <FileText className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Get the price sheet
               </button>
-              <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="btn-ghost">
-                <MessageCircle className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Connect with dedicated area advisor
+              <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="btn-ghost w-full text-sm">
+                <MessageCircle className="h-4 w-4 text-accent-ink" aria-hidden="true" /> WhatsApp the advisor
               </a>
             </div>
+            <p className="mt-3 border-t border-line pt-3 text-[11px] leading-relaxed text-ink-muted">
+              {property.priceOnRequest ? 'Prices on request. ' : '*Approximate developer guide price; T&C apply. '}Zero buyer brokerage · {settings.agent.name}, K-RERA registered agent.
+            </p>
           </div>
           {advisorCard}
         </div>

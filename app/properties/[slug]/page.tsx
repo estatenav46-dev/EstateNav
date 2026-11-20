@@ -6,7 +6,7 @@ import { getCorridors, getDevelopers, getOfficeHubs, getPublishedProperties, get
 import { breadcrumbJsonLd, propertyBreadcrumbs, propertyJsonLd } from '@/lib/seo';
 import { similarProperties } from '@/lib/similar';
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 export async function generateStaticParams() {
   const properties = await getPublishedProperties();

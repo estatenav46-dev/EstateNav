@@ -75,13 +75,15 @@
     scroll-behavior: smooth;
   }
 
-  /* Type and spacing scale with the root size: comfortable on phones, compact on desktops,
-     a touch larger again on very wide screens. */
+  /* Type and spacing scale with the root size, as a percentage of the visitor's own browser /
+     system text size (so accessibility settings are respected): full size on phones and
+     tablets, compact on laptops and desktops, a touch larger on very wide screens. */
+  html { font-size: 100%; }
   @media (min-width: 1024px) {
-    html { font-size: 14px; }
+    html { font-size: 87.5%; }
   }
   @media (min-width: 2200px) {
-    html { font-size: 15px; }
+    html { font-size: 93.75%; }
   }
 
   body {

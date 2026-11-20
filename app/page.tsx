@@ -12,7 +12,7 @@ import { JsonLd } from '@/components/ui/JsonLd';
 import { getCorridors, getDevelopers, getMarketSnapshots, getPublishedBlogs, getPublishedProperties, getSettings } from '@/lib/data/cached';
 import { realEstateAgentJsonLd } from '@/lib/seo';
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: { absolute: 'EstateNav | Verified Bengaluru homes, plots & workspaces' },

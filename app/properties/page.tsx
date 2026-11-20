@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import PropertyResults from './PropertyResults';
 import { getCorridors, getMarketSnapshots, getPublishedProperties, getSettings } from '@/lib/data/cached';
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'Bengaluru property listings',

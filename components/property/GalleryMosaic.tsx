@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useState } from 'react';
-import { Images } from 'lucide-react';
+import { Images, LayoutGrid } from 'lucide-react';
 import type { ImageRef } from '@/lib/data/types';
 
 const Lightbox = dynamic(() => import('./Lightbox'), { ssr: false });
@@ -12,39 +12,70 @@ export const isPlaceholder = (images: ImageRef[]) => images.some((img) => img.cr
 
 const blur = (img: ImageRef) => (img.blurDataURL ? { placeholder: 'blur' as const, blurDataURL: img.blurDataURL } : { placeholder: 'empty' as const });
 
-// Main photo with a strip of up to four thumbnails underneath; the last one shows "+N".
-// Any photo opens the full-screen viewer.
-export function GalleryMosaic({ images, title }: { images: ImageRef[]; title: string }) {
-  const [open, setOpen] = useState<number | null>(null);
+// Desktop grid per number of small photos, so there is never an empty cell.
+const LAYOUT: Record<number, { grid: string; main: string }> = {
+  0: { grid: '', main: '' },
+  1: { grid: 'sm:grid-cols-3', main: 'sm:col-span-2' },
+  2: { grid: 'sm:grid-cols-3 sm:grid-rows-2', main: 'sm:col-span-2 sm:row-span-2' },
+  3: { grid: 'sm:grid-cols-4 sm:grid-rows-2', main: 'sm:col-span-2 sm:row-span-2' },
+  4: { grid: 'sm:grid-cols-4 sm:grid-rows-2', main: 'sm:col-span-2 sm:row-span-2' },
+};
+
+// Compact photo mosaic: one large photo and up to four small ones (desktop), one photo plus a
+// thumbnail strip (phones). Buttons open every photo or the floor plans full screen.
+export function GalleryMosaic({ images, title, plans = [] }: { images: ImageRef[]; title: string; plans?: ImageRef[] }) {
+  const [open, setOpen] = useState<{ set: 'photos' | 'plans'; start: number } | null>(null);
   const [main, ...rest] = images;
   if (!main) return null;
-  const strip = rest.slice(0, 4);
-  const more = images.length - 1 - strip.length;
+  const thumbs = rest.slice(0, 4);
+  const layout = LAYOUT[thumbs.length];
+  const show = (start: number) => setOpen({ set: 'photos', start });
 
   return (
     <div className="min-w-0">
-      <button type="button" onClick={() => setOpen(0)} className="group relative block aspect-[16/10] w-full overflow-hidden rounded-card bg-surface-2 lg:aspect-[16/9]" aria-label={`Open photo 1 of ${images.length}`}>
-        <Image src={main.url} alt={main.alt} fill priority quality={70} sizes="(min-width: 1024px) 46vw, 100vw" {...blur(main)} className="object-cover transition-transform duration-slow ease-out group-hover:scale-[1.02]" />
-        {images.length > 1 && (
-          <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1.5 rounded-full bg-surface/95 px-2.5 py-1 text-xs font-semibold text-ink shadow-sm">
-            <Images className="h-3.5 w-3.5" aria-hidden="true" /> View all {images.length}
-          </span>
-        )}
-      </button>
-      {strip.length > 0 && (
-        <div className="mt-2 grid grid-cols-4 gap-2">
-          {strip.map((img, i) => (
-            <button key={img.id} type="button" onClick={() => setOpen(i + 1)} className="group relative aspect-[16/11] overflow-hidden rounded-xl bg-surface-2" aria-label={`Open photo ${i + 2} of ${images.length}`}>
-              <Image src={img.url} alt={img.alt} fill quality={55} sizes="(min-width: 1024px) 11vw, 24vw" {...blur(img)} className="object-cover transition-transform duration-slow ease-out group-hover:scale-[1.05]" />
-              {i === strip.length - 1 && more > 0 && (
-                <span className="absolute inset-0 flex items-center justify-center bg-black/50 text-sm font-semibold text-white">+{more}</span>
-              )}
+      <div className={`relative grid gap-2 sm:h-[clamp(14rem,24vw,22.5rem)] ${layout.grid}`}>
+        <button type="button" onClick={() => show(0)} className={`group relative aspect-[16/10] overflow-hidden rounded-2xl bg-surface-2 sm:aspect-auto ${layout.main}`} aria-label={`Open photo 1 of ${images.length}`}>
+          <Image src={main.url} alt={main.alt} fill priority quality={70} sizes="(min-width: 640px) 50vw, 100vw" {...blur(main)} className="object-cover transition-transform duration-slow ease-out group-hover:scale-[1.02]" />
+        </button>
+        {thumbs.map((img, i) => (
+          <button
+            key={img.id}
+            type="button"
+            onClick={() => show(i + 1)}
+            className={`group relative hidden overflow-hidden rounded-2xl bg-surface-2 sm:block ${thumbs.length === 3 && i === 2 ? 'sm:col-span-2' : ''}`}
+            aria-label={`Open photo ${i + 2} of ${images.length}`}
+          >
+            <Image src={img.url} alt={img.alt} fill quality={55} sizes="25vw" {...blur(img)} className="object-cover transition-transform duration-slow ease-out group-hover:scale-[1.04]" />
+          </button>
+        ))}
+
+        <div className="pointer-events-none absolute bottom-2.5 right-2.5 flex gap-1.5">
+          {images.length > 1 && (
+            <button type="button" onClick={() => show(0)} className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-surface/95 px-3 py-1.5 text-xs font-semibold text-ink shadow-sm hover:bg-surface">
+              <Images className="h-3.5 w-3.5" aria-hidden="true" /> All photos ({images.length})
             </button>
-          ))}
+          )}
+          {plans.length > 0 && (
+            <button type="button" onClick={() => setOpen({ set: 'plans', start: 0 })} className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-surface/95 px-3 py-1.5 text-xs font-semibold text-ink shadow-sm hover:bg-surface">
+              <LayoutGrid className="h-3.5 w-3.5" aria-hidden="true" /> Floor plans ({plans.length})
+            </button>
+          )}
         </div>
+      </div>
+
+      {rest.length > 0 && (
+        <ul className="no-scrollbar mt-2 flex gap-2 overflow-x-auto sm:hidden" aria-label="More photos">
+          {rest.map((img, i) => (
+            <li key={img.id} className="shrink-0">
+              <button type="button" onClick={() => show(i + 1)} className="relative block h-14 w-20 overflow-hidden rounded-lg bg-surface-2" aria-label={`Open photo ${i + 2}`}>
+                <Image src={img.url} alt="" fill sizes="80px" quality={45} className="object-cover" />
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
       {isPlaceholder(images) && <p className="mt-2 text-2xs text-ink-muted">Representative images. Project photos and renders will be added from the developer.</p>}
-      {open !== null && <Lightbox images={images} start={open} title={title} onClose={() => setOpen(null)} />}
+      {open && <Lightbox images={open.set === 'plans' ? plans : images} start={open.start} title={`${title} · ${open.set === 'plans' ? 'Floor plans' : 'Photos'}`} onClose={() => setOpen(null)} />}
     </div>
   );
 }
