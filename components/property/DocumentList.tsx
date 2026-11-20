@@ -12,17 +12,17 @@ const size = (bytes: number | null) => (!bytes ? null : bytes >= 1048576 ? `${(b
 // reach the browser — see lib/data/publicView.ts).
 export function DocumentList({ property }: { property: Property }) {
   return (
-    <ul className="grid gap-3 sm:grid-cols-2">
+    <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
       {property.documents.map((doc) => {
         const open = doc.access === 'public';
         const meta = [DOCUMENT_KIND_LABEL[doc.kind], doc.format === 'pdf' ? 'PDF' : doc.format === 'image' ? 'Image' : null, size(doc.sizeBytes)].filter(Boolean).join(' · ');
         const body = (
           <>
-            <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent-ink">
-              <FileText className="h-5 w-5" aria-hidden="true" />
+            <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent-ink">
+              <FileText className="h-4 w-4" aria-hidden="true" />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate font-semibold">{doc.label}</span>
+              <span className="block truncate text-sm font-semibold">{doc.label}</span>
               <span className="block text-xs text-ink-muted">{meta}</span>
             </span>
             <span className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-accent-ink">
@@ -44,7 +44,7 @@ export function DocumentList({ property }: { property: Property }) {
             </span>
           </>
         );
-        const className = 'flex w-full items-center gap-3 rounded-card border border-line bg-surface p-3.5 text-left transition-colors hover:border-line-strong hover:bg-surface-2/50';
+        const className = 'flex w-full items-center gap-3 rounded-xl border border-line bg-surface p-2.5 text-left transition-colors hover:border-line-strong hover:bg-surface-2/50';
         return (
           <li key={doc.id}>
             {open ? (

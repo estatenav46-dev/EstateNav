@@ -178,7 +178,7 @@ export function HomeHero({ properties, corridors, partnerDeveloper }: { properti
   return (
     <section ref={sectionRef} aria-labelledby="hero-title" data-scrub="exit" data-scrub-span="0.8" className="relative isolate z-10 overflow-x-clip">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_6%_0%,rgb(var(--accent-soft))_0%,transparent_70%),radial-gradient(45%_50%_at_100%_0%,rgb(var(--sand))_0%,transparent_70%)]" />
-      <div className="mx-auto grid max-w-container gap-8 px-4 pb-2 pt-6 sm:px-6 lg:grid-cols-[minmax(0,5.2fr)_minmax(0,6.8fr)] lg:items-center lg:gap-14 lg:px-8 lg:pb-4 lg:pt-10">
+      <div className="mx-auto grid max-w-container gap-6 px-4 pb-2 pt-4 sm:px-6 lg:grid-cols-[minmax(0,5.2fr)_minmax(0,6.8fr)] lg:items-center lg:gap-10 lg:px-8 lg:pb-2 lg:pt-6">
         <div className="sc-hero-copy relative z-20 min-w-0">
           <p className="rise-in flex items-center gap-3 text-sm font-medium text-ink-muted">
             <span aria-hidden="true" className="h-px w-8 bg-brass" /> Bengaluru&apos;s verified property desk

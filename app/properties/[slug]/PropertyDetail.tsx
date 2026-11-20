@@ -26,14 +26,14 @@ import { Reveal, Words } from '@/components/Reveal';
 /** One content card on the project page. */
 function Section({ id, title, children, aside }: { id: string; title: string; children: React.ReactNode; aside?: React.ReactNode }) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-32 rounded-2xl border border-line bg-surface p-4 sm:p-5">
+    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-28 rounded-2xl border border-line bg-surface p-3.5 sm:p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 id={`${id}-title`} className="text-lg font-semibold tracking-[-0.01em]">
+        <h2 id={`${id}-title`} className="text-base font-semibold tracking-[-0.01em] sm:text-[1.05rem]">
           {title}
         </h2>
         {aside}
       </div>
-      <div className="mt-4">{children}</div>
+      <div className="mt-2.5">{children}</div>
     </section>
   );
 }
@@ -117,17 +117,19 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
     ['Size', sizeLabel(property)],
     ['Rate', rateLabel(property)],
     ['Possession', property.possession.label],
-    ['Land', f.landAcres ? `${Number(f.landAcres.toFixed(2))} acres` : null],
+    ['Land area', f.landAcres ? `${Number(f.landAcres.toFixed(2))} acres` : null],
     ['Units', f.totalUnits ? f.totalUnits.toLocaleString('en-IN') : null],
     ['Towers', f.towers ? String(f.towers) : null],
     ['Area', property.corridorName],
   ].filter((x): x is [string, string] => Boolean(x[1])).slice(0, 6);
+  const inStrip = new Set(keyFacts.map(([label]) => label));
+  const moreFacts = facts.filter(([label]) => !inStrip.has(label));
   const plans = [...(property.media.masterPlan ? [property.media.masterPlan] : []), ...property.media.floorPlans];
   const photos = property.media.gallery.length ? property.media.gallery : [property.media.cover];
   const rate = rateLabel(property);
 
   return (
-    <main id="main" className="mx-auto max-w-container px-4 pb-28 pt-3 sm:px-6 lg:px-8 lg:pb-16">
+    <main id="main" className="mx-auto max-w-container px-4 pb-24 pt-3 sm:px-6 lg:px-8 lg:pb-10">
       <TrackView property={property} />
       <Breadcrumbs items={crumbs} />
 
@@ -163,13 +165,13 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
         </div>
       </header>
 
-      <div className="mt-4">
+      <div className="mt-3">
         <GalleryMosaic images={photos} title={property.title} plans={plans} />
       </div>
 
       <dl className="mt-3 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-3 lg:grid-cols-6">
         {keyFacts.map(([label, value]) => (
-          <div key={label} className="min-w-0 bg-surface px-4 py-3">
+          <div key={label} className="min-w-0 bg-surface px-3 py-2">
             <dt className="text-[11px] font-medium uppercase tracking-wide text-ink-muted">{label}</dt>
             <dd className="mt-0.5 truncate text-sm font-semibold" title={value}>
               {value}
@@ -178,14 +180,14 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
         ))}
       </dl>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8">
-        <div className="min-w-0 space-y-4">
+      <div className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-5">
+        <div className="min-w-0 space-y-3">
           {sections.length > 2 && <SectionNav sections={sections} />}
 
         <Section id="overview" title="Project facts">
-          <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3">
-            {facts.map(([label, value]) => (
-              <div key={label} className="min-w-0 border-t border-line pt-2">
+          <dl className="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3 xl:grid-cols-4">
+            {(moreFacts.length >= 2 ? moreFacts : facts).map(([label, value]) => (
+              <div key={label} className="min-w-0 border-t border-line pt-1.5">
                 <dt className="text-[11px] font-medium uppercase tracking-wide text-ink-muted">{label}</dt>
                 <dd className="mt-0.5 text-sm font-medium leading-snug">{value}</dd>
               </div>
@@ -201,10 +203,10 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
 
         {(property.description || property.highlights.length > 0) && (
         <Section id="about" title="About the project">
-          {property.description && <Markdown source={property.description} className="max-w-2xl text-base leading-relaxed text-ink-muted" />}
+          {property.description && <Markdown source={property.description} className="max-w-3xl text-sm leading-relaxed text-ink-muted sm:text-[0.95rem]" />}
           {property.highlights.length > 0 && (
             <>
-              <ul className="mt-6 grid gap-2 sm:grid-cols-2">
+              <ul className="mt-3 grid gap-x-4 gap-y-1.5 sm:grid-cols-2 xl:grid-cols-3">
                 {property.highlights.map((h) => (
                   <li key={h} className="flex gap-2 text-sm">
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent-ink" aria-hidden="true" />
@@ -212,7 +214,7 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
                   </li>
                 ))}
               </ul>
-              <p className="mt-3 text-2xs text-ink-muted">Highlights are as stated by the developer.</p>
+              <p className="mt-2 text-2xs text-ink-muted">Highlights are as stated by the developer.</p>
             </>
           )}
         </Section>
@@ -226,13 +228,13 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
 
         {amenityGroups.length > 0 && (
           <Section id="amenities" title="Amenities">
-            <div className="grid gap-6 sm:grid-cols-2">
+            <div className="grid gap-x-5 gap-y-3 sm:grid-cols-2">
               {amenityGroups.map((g) => (
                 <div key={g.id}>
                   <h3 className="text-sm font-semibold">{g.label}</h3>
-                  <ul className="mt-2 flex flex-wrap gap-1.5">
+                  <ul className="mt-1.5 flex flex-wrap gap-1">
                     {g.items.map((a) => (
-                      <li key={a} className="rounded-full border border-line bg-surface px-3 py-1 text-sm">
+                      <li key={a} className="rounded-full border border-line bg-surface-2/60 px-2.5 py-0.5 text-xs">
                         {a}
                       </li>
                     ))}
@@ -247,7 +249,7 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
           <Section id="specifications" title="Specifications">
             <dl className="divide-y divide-line rounded-card border border-line bg-surface">
               {property.specifications.map((spec) => (
-                <div key={spec.id} className="grid gap-1 px-4 py-3 sm:grid-cols-[13rem_minmax(0,1fr)] sm:gap-4">
+                <div key={spec.id} className="grid gap-0.5 px-3 py-2 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-3">
                   <dt className="text-sm font-medium">{spec.category}</dt>
                   <dd className="text-sm text-ink-muted">{spec.detail}</dd>
                 </div>
@@ -258,30 +260,30 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
         )}
 
         <Section id="location" title="Location & connectivity">
-          <div className="panel flex flex-wrap items-start justify-between gap-4 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-surface-2/50 px-3.5 py-3">
             <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted">{zone?.name ?? 'Bengaluru'}</p>
-              <p className="mt-1 text-lg font-semibold">{property.locality}</p>
+              <p className="mt-0.5 text-base font-semibold">{property.locality}</p>
               <p className="text-sm text-ink-muted">{property.corridorName}, Bengaluru, Karnataka</p>
               {property.address && (
-                <p className="mt-3 flex gap-2 text-sm">
+                <p className="mt-1.5 flex gap-2 text-sm">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent-ink" aria-hidden="true" />
                   <span>{property.address}</span>
                 </p>
               )}
             </div>
-            <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary min-h-[44px] px-4">
+            <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary min-h-[36px] px-3 text-xs">
               Open in Google Maps <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
             </a>
           </div>
           {nearbyGroups.length > 0 ? (
-            <div className="mt-6 grid gap-6 sm:grid-cols-2">
+            <div className="mt-3 grid gap-x-4 gap-y-3 sm:grid-cols-2 xl:grid-cols-3">
               {nearbyGroups.map((g) => (
                 <div key={g.id}>
                   <h3 className="text-sm font-semibold">{g.label}</h3>
-                  <ul className="mt-2 divide-y divide-line rounded-card border border-line bg-surface">
+                  <ul className="mt-1.5 divide-y divide-line rounded-xl border border-line bg-surface">
                     {g.items.map((n) => (
-                      <li key={n.id} className="flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm">
+                      <li key={n.id} className="flex items-center justify-between gap-3 px-3 py-1.5 text-sm">
                         <span className="min-w-0">
                           <span className="block truncate">{n.name}</span>
                           <span className="text-xs text-ink-muted">{NEARBY_CATEGORY_LABEL[n.category]}</span>
@@ -296,21 +298,21 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
                   </ul>
                 </div>
               ))}
-              <p className="text-2xs text-ink-muted sm:col-span-2">Approximate distances and drive times by road; they vary with route and traffic.</p>
+              <p className="text-2xs text-ink-muted sm:col-span-2 xl:col-span-3">Approximate distances and drive times by road; they vary with route and traffic.</p>
             </div>
           ) : (
-            <p className="mt-4 text-sm text-ink-muted">Ask the advisor for schools, hospitals, metro and office commutes near {property.locality}.</p>
+            <p className="mt-3 text-sm text-ink-muted">Ask the advisor for schools, hospitals, metro and office commutes near {property.locality}.</p>
           )}
           {commuteHubs.length > 0 && (
-            <div className="mt-8">
-              <h3 className="text-lg font-medium">Commute radar</h3>
-              <div className="mt-4">
+            <div className="mt-4">
+              <h3 className="text-sm font-semibold">Commute radar</h3>
+              <div className="mt-2">
                 <CommuteRadar property={property} hubs={commuteHubs} disclaimer={settings.disclaimers.commute} />
               </div>
             </div>
           )}
           {zone && (
-            <Link href={`/properties?zone=${zoneOfCorridor(property.corridorId)}&corridor=${property.corridorId}`} className="mt-5 inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold text-accent-ink hover:underline">
+            <Link href={`/properties?zone=${zoneOfCorridor(property.corridorId)}&corridor=${property.corridorId}`} className="mt-2 inline-flex min-h-[32px] items-center gap-1.5 text-sm font-semibold text-accent-ink hover:underline">
               More homes in {property.corridorName} <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           )}
@@ -330,13 +332,13 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
 
         {extraGroups.length > 0 && (
           <Section id="more" title="More details">
-            <div className="space-y-6">
+            <div className="space-y-3">
               {extraGroups.map(({ group, items }) => (
                 <div key={group}>
                   {extraGroups.length > 1 && <h3 className="mb-2 text-sm font-semibold">{group}</h3>}
                   <dl className="divide-y divide-line rounded-card border border-line bg-surface">
                     {items.map((x) => (
-                      <div key={x.id} className="grid gap-1 px-4 py-3 sm:grid-cols-[13rem_minmax(0,1fr)] sm:gap-4">
+                      <div key={x.id} className="grid gap-0.5 px-3 py-2 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-3">
                         <dt className="text-sm font-medium">{x.label}</dt>
                         <dd className="text-sm text-ink-muted">{x.value}</dd>
                       </div>
@@ -350,13 +352,13 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
 
         {developer && (developer.about || developerFacts.length > 0) && (
           <Section id="developer" title={`About ${developer.name}`}>
-            {developer.about && <p className="max-w-2xl leading-relaxed text-ink-muted">{developer.about}</p>}
+            {developer.about && <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">{developer.about}</p>}
             {developerFacts.length > 0 && (
-              <dl className="mt-5 grid gap-4 sm:grid-cols-3">
+              <dl className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {developerFacts.map((x) => (
                   <div key={x.label} className="border-t border-line pt-2">
                     <dt className="text-2xs text-ink-muted">{x.label}</dt>
-                    <dd className="font-serif text-xl">{x.value}</dd>
+                    <dd className="font-serif text-lg leading-tight">{x.value}</dd>
                     <dd className="text-2xs text-ink-muted">
                       Source: {x.source!.label} · as of {x.source!.asOf}
                     </dd>
@@ -364,7 +366,7 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
                 ))}
               </dl>
             )}
-            <Link href={`/properties?q=${encodeURIComponent(property.developerName)}`} className="mt-4 inline-flex min-h-[48px] items-center gap-1.5 text-sm text-accent-ink hover:underline">
+            <Link href={`/properties?q=${encodeURIComponent(property.developerName)}`} className="mt-2 inline-flex min-h-[32px] items-center gap-1.5 text-sm font-semibold text-accent-ink hover:underline">
               More from {property.developerName} <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </Section>
@@ -378,7 +380,7 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
       </div>
 
       {similar.length > 0 && (
-        <section aria-labelledby="similar-title" className="mt-14 border-t border-line pt-10">
+        <section aria-labelledby="similar-title" className="mt-8 border-t border-line pt-6">
           <Reveal variant="words" className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="rw-fade flex items-center gap-3 text-sm font-medium text-ink-muted">
@@ -396,7 +398,7 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
             </Link>
           </Reveal>
           {/* Phones swipe sideways (no vertical play); larger screens get a fixed grid, no scrolling. */}
-          <ul className="no-scrollbar -mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden px-4 pb-3 pt-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:p-0 lg:grid-cols-4">
+          <ul className="no-scrollbar -mx-4 mt-4 flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden px-4 pb-3 pt-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:p-0 lg:grid-cols-4">
             {similar.slice(0, 4).map(({ property: p, reasons }, i) => (
               <Reveal as="li" key={p.id} index={i} variant="zoom" className="w-[80%] shrink-0 snap-start sm:w-auto">
                 <ExploreCard property={p} reasons={reasons} sizes="(min-width: 1024px) 24vw, (min-width: 640px) 46vw, 80vw" />

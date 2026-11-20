@@ -38,8 +38,8 @@ export function PropertyActions({ property, settings, advisorCard, layout = 'sid
         </div>
       ) : (
       <div className="hidden lg:block">
-        <div className="sticky top-24 space-y-3">
-          <div className="rounded-2xl border border-line bg-surface p-4 shadow-[0_20px_40px_-32px_rgb(var(--shadow)/0.5)]">
+        <div className="sticky top-20 space-y-3">
+          <div className="rounded-2xl border border-line bg-surface p-3.5 shadow-[0_20px_40px_-32px_rgb(var(--shadow)/0.5)]">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-muted">{property.transaction === 'rent' ? 'Monthly rent' : 'Price'}</p>
             <p className="tabular mt-0.5 font-serif text-[1.45rem] leading-tight">
               {priceLabel(property)}
@@ -48,18 +48,18 @@ export function PropertyActions({ property, settings, advisorCard, layout = 'sid
             {(rate || property.priceNote) && (
               <p className="mt-0.5 text-xs text-ink-muted">{[rate, property.priceOnRequest ? null : property.priceNote].filter(Boolean).join(' · ')}</p>
             )}
-            <div className="mt-4 grid gap-2">
-              <button type="button" onClick={() => openLeadSheet('site-visit')} className="btn-primary w-full">
+            <div className="mt-3 grid gap-1.5">
+              <button type="button" onClick={() => openLeadSheet('site-visit')} className="btn-primary min-h-[40px] w-full">
                 <CalendarDays className="h-4 w-4" aria-hidden="true" /> Book a site visit
               </button>
-              <button type="button" onClick={() => openLeadSheet('price-sheet')} className="btn-secondary w-full">
+              <button type="button" onClick={() => openLeadSheet('price-sheet')} className="btn-secondary min-h-[40px] w-full">
                 <FileText className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Get the price sheet
               </button>
-              <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="btn-ghost w-full text-sm">
+              <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="btn-ghost min-h-[34px] w-full text-sm">
                 <MessageCircle className="h-4 w-4 text-accent-ink" aria-hidden="true" /> WhatsApp the advisor
               </a>
             </div>
-            <p className="mt-3 border-t border-line pt-3 text-[11px] leading-relaxed text-ink-muted">
+            <p className="mt-2.5 border-t border-line pt-2.5 text-[11px] leading-relaxed text-ink-muted">
               {property.priceOnRequest ? 'Prices on request. ' : '*Approximate developer guide price; T&C apply. '}Zero buyer brokerage · {settings.agent.name}, K-RERA registered agent.
             </p>
           </div>

@@ -19,7 +19,7 @@ export function SavedRail({ properties }: { properties: Property[] }) {
   const first = (user.displayName || '').trim().split(/\s+/)[0];
 
   return (
-    <section aria-labelledby="saved-title" className="mx-auto max-w-container px-4 pt-12 sm:px-6 sm:pt-14 lg:px-8">
+    <section aria-labelledby="saved-title" className="mx-auto max-w-container px-4 pt-8 sm:px-6 sm:pt-10 lg:px-8">
       <SectionHeading
         kicker={first ? `Welcome back, ${first}` : 'Welcome back'}
         id="saved-title"
@@ -30,7 +30,7 @@ export function SavedRail({ properties }: { properties: Property[] }) {
           </Link>
         }
       />
-      <ul className="no-scrollbar -mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden px-4 pb-3 pt-2 sm:mx-0 sm:mt-8 sm:grid sm:grid-cols-2 sm:overflow-visible sm:p-0 lg:grid-cols-4">
+      <ul className="no-scrollbar -mx-4 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-hidden px-4 pb-3 pt-1 sm:mx-0 sm:mt-5 sm:grid sm:grid-cols-2 sm:overflow-visible sm:p-0 lg:grid-cols-4">
         {saved.slice(0, 4).map((p, i) => (
           <Reveal as="li" key={p.id} index={i} variant="zoom" className="w-[80%] shrink-0 snap-start sm:w-auto">
             <ExploreCard property={p} sizes="(min-width: 1024px) 24vw, (min-width: 640px) 46vw, 80vw" />

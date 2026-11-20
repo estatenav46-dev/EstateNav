@@ -12,7 +12,7 @@ export function FromTheBlog({ posts }: { posts: BlogPost[] }) {
   const rest = posts.filter((p) => p.id !== lead.id).slice(0, 3);
 
   return (
-    <section aria-labelledby="blog-title" className="mx-auto max-w-container px-4 pt-12 sm:px-6 sm:pt-16 lg:px-8">
+    <section aria-labelledby="blog-title" className="mx-auto max-w-container px-4 pt-8 sm:px-6 sm:pt-10 lg:px-8">
       <SectionHeading
         index="04"
         kicker="From the blog"
@@ -27,7 +27,7 @@ export function FromTheBlog({ posts }: { posts: BlogPost[] }) {
           </Link>
         }
       />
-      <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+      <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <BlogCard post={lead} variant="lead" />
         {rest.length > 0 && (
           <ul className="space-y-1 rounded-[22px] border border-line bg-surface p-3">

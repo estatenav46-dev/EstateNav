@@ -14,8 +14,8 @@ export function CommuteRadar({ property, hubs, disclaimer }: { property: Propert
   const radius = (mins: number) => (Math.min(mins, 60) / 60) * 84;
 
   return (
-    <div className="grid gap-6 md:grid-cols-[220px_minmax(0,1fr)] md:items-center">
-      <svg viewBox="-100 -100 200 200" className="mx-auto h-52 w-52" role="img" aria-label={record ? `Drive time to ${hub?.name}: ${record.offPeakMins} minutes off-peak, ${record.peakMins} minutes at peak` : `No measured drive time to ${hub?.name} yet`}>
+    <div className="grid gap-4 md:grid-cols-[170px_minmax(0,1fr)] md:items-center">
+      <svg viewBox="-100 -100 200 200" className="mx-auto h-40 w-40" role="img" aria-label={record ? `Drive time to ${hub?.name}: ${record.offPeakMins} minutes off-peak, ${record.peakMins} minutes at peak` : `No measured drive time to ${hub?.name} yet`}>
         {RINGS.map((m) => (
           <g key={m}>
             <circle r={radius(m)} fill="none" stroke="rgb(var(--line-strong))" strokeDasharray={m === 60 ? undefined : '2 3'} />
@@ -40,23 +40,23 @@ export function CommuteRadar({ property, hubs, disclaimer }: { property: Propert
           ))}
         </div>
         {record ? (
-          <dl className="mt-4 grid grid-cols-2 gap-4">
+          <dl className="mt-3 grid grid-cols-2 gap-3">
             <div>
               <dt className="text-sm text-ink-muted">Off-peak</dt>
-              <dd className="font-serif text-2xl">{record.offPeakMins} min</dd>
+              <dd className="font-serif text-xl">{record.offPeakMins} min</dd>
             </div>
             <div>
               <dt className="text-sm text-ink-muted">Peak</dt>
-              <dd className="font-serif text-2xl">{record.peakMins} min</dd>
+              <dd className="font-serif text-xl">{record.peakMins} min</dd>
             </div>
           </dl>
         ) : null}
         {record ? (
           <p className="mt-2 text-2xs text-ink-muted">Source: {record.source} · as of {record.asOf}</p>
         ) : (
-          <p className="mt-4 text-ink-muted">We haven’t published a measured drive time from {property.title} to {hub?.name} yet. Ask the advisor for a timed route.</p>
+          <p className="mt-3 text-sm text-ink-muted">We haven’t published a measured drive time from {property.title} to {hub?.name} yet. Ask the advisor for a timed route.</p>
         )}
-        <p className="mt-3 text-2xs text-ink-muted">{disclaimer}</p>
+        <p className="mt-2 text-2xs text-ink-muted">{disclaimer}</p>
       </div>
     </div>
   );

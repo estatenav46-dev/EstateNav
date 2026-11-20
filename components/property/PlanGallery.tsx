@@ -21,7 +21,7 @@ export function PlanGallery({ property }: { property: Property }) {
 
   return (
     <>
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {items.map(({ image, caption }, i) => (
           <li key={image.id}>
             <button type="button" onClick={() => setViewer(i)} className="group block w-full text-left" aria-label={`Open ${caption}`}>
@@ -31,7 +31,7 @@ export function PlanGallery({ property }: { property: Property }) {
                   <Maximize2 className="h-3.5 w-3.5" aria-hidden="true" />
                 </span>
               </span>
-              <span className="mt-1.5 block truncate text-sm font-medium">{caption}</span>
+              <span className="mt-1 block truncate text-xs font-medium">{caption}</span>
             </button>
           </li>
         ))}

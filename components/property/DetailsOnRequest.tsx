@@ -21,15 +21,15 @@ export function DetailsOnRequest({ property, settings }: { property: Property; s
 
   return (
     <section id="details" aria-labelledby="details-title" className="scroll-mt-32 overflow-hidden rounded-2xl bg-forest text-forest-on">
-      <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+      <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-forest-on/70">From the advisor</p>
-          <h2 id="details-title" className="mt-1 text-lg font-semibold leading-snug text-forest-on">
+          <h2 id="details-title" className="mt-1 text-base font-semibold leading-snug text-forest-on">
             Get the full details for {property.title}
           </h2>
-          <ul className="mt-3 flex flex-wrap gap-1.5">
+          <ul className="mt-2 flex flex-wrap gap-1">
             {items.map((item) => (
-              <li key={item} className="rounded-full bg-forest-on/10 px-2.5 py-1 text-xs font-medium ring-1 ring-forest-on/15">
+              <li key={item} className="rounded-full bg-forest-on/10 px-2 py-0.5 text-xs font-medium ring-1 ring-forest-on/15">
                 {item}
               </li>
             ))}

@@ -27,10 +27,10 @@ export function NeedTiles({ properties }: { properties: Property[] }) {
   if (!tiles.length) return null;
 
   return (
-    <section aria-labelledby="needs-title" className="mx-auto max-w-container px-4 pt-14 sm:px-6 sm:pt-20 lg:px-8">
+    <section aria-labelledby="needs-title" className="mx-auto max-w-container px-4 pt-8 sm:px-6 sm:pt-10 lg:px-8">
       <SectionHeading index="02" kicker="Browse by need" id="needs-title" title={<>What are you <span className="text-accent-ink">looking for?</span></>} />
 
-      <ul className="mt-6 grid gap-2.5 sm:mt-8 sm:grid-cols-3 sm:gap-3">
+      <ul className="mt-4 grid gap-2.5 sm:mt-5 sm:grid-cols-3 sm:gap-3">
         {types.map((t, i) => (
           <Reveal as="li" key={t.id} index={i} variant="zoom">
             <Link

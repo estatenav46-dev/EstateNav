@@ -54,9 +54,9 @@ export function ForYou({ properties, settings }: { properties: Property[]; setti
 
   if (!prefs || justDone) {
     return (
-      <section id="brief" aria-labelledby="brief-title" className="mx-auto max-w-container scroll-mt-24 px-4 pt-14 sm:px-6 sm:pt-20 lg:px-8">
+      <section id="brief" aria-labelledby="brief-title" className="mx-auto max-w-container scroll-mt-24 px-4 pt-8 sm:px-6 sm:pt-10 lg:px-8">
         <SectionHeading index="03" kicker="Your brief" id="brief-title" title={<>Thirty seconds, <span className="text-accent-ink">then we shortlist.</span></>} />
-        <Reveal variant="zoom" className="mt-6 sm:mt-8">
+        <Reveal variant="zoom" className="mt-4 sm:mt-5">
           <ConciergeCard variant="inline" titleId="brief-step-title" consent={{ text: settings.consentText, version: settings.consentVersion, privacyNote: settings.privacyNote }} advisorName={settings.agent.name} catalogue={catalogue} onDone={() => setJustDone(true)} onFinish={() => setJustDone(false)} />
         </Reveal>
         {result.viewed.length > 0 && (
@@ -77,7 +77,7 @@ export function ForYou({ properties, settings }: { properties: Property[]; setti
   if (!rail.length) return null;
 
   return (
-    <section id="brief" aria-labelledby="for-you-title" className="mx-auto max-w-container scroll-mt-24 px-4 pt-14 sm:px-6 sm:pt-20 lg:px-8">
+    <section id="brief" aria-labelledby="for-you-title" className="mx-auto max-w-container scroll-mt-24 px-4 pt-8 sm:px-6 sm:pt-10 lg:px-8">
       <SectionHeading
         index="03"
         kicker={prefs?.name ? `For you, ${prefs.name}` : 'For you'}
@@ -96,7 +96,7 @@ export function ForYou({ properties, settings }: { properties: Property[]; setti
           </div>
         }
       />
-      <ul className="no-scrollbar -mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden px-4 pb-3 pt-2 sm:mx-0 sm:mt-8 sm:grid sm:grid-cols-2 sm:overflow-visible sm:p-0 lg:grid-cols-4">
+      <ul className="no-scrollbar -mx-4 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-hidden px-4 pb-3 pt-1 sm:mx-0 sm:mt-5 sm:grid sm:grid-cols-2 sm:overflow-visible sm:p-0 lg:grid-cols-4">
         {rail.map((p, i) => (
           <Reveal as="li" key={p.id} index={i} variant="zoom" className="w-[80%] shrink-0 snap-start sm:w-auto">
             <ExploreCard property={p} sizes="(min-width: 1024px) 24vw, (min-width: 640px) 46vw, 80vw" />

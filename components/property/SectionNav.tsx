@@ -34,7 +34,7 @@ export function SectionNav({ sections }: { sections: { id: string; label: string
                 document.getElementById(s.id)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
                 history.replaceState(null, '', `#${s.id}`);
               }}
-              className={`relative inline-flex min-h-[48px] items-center whitespace-nowrap px-3 text-sm transition-colors duration-fast ${active === s.id ? 'text-ink' : 'text-ink-muted hover:text-ink'}`}
+              className={`relative inline-flex min-h-[40px] items-center whitespace-nowrap px-2.5 text-sm transition-colors duration-fast ${active === s.id ? 'text-ink' : 'text-ink-muted hover:text-ink'}`}
             >
               {s.label}
               <span aria-hidden="true" className="absolute inset-x-3 bottom-0 h-0.5 origin-left bg-accent transition-transform duration-base" style={{ transform: active === s.id ? 'scaleX(1)' : 'scaleX(0)' }} />

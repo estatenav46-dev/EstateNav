@@ -40,7 +40,7 @@ export function RegionTiles({ properties, advisorName, whatsapp }: { properties:
   const areas = new Set(properties.map((p) => p.corridorId)).size;
 
   return (
-    <section id="regions" aria-labelledby="regions-title" className="mx-auto max-w-container scroll-mt-24 px-4 pt-12 sm:px-6 sm:pt-16 lg:px-8">
+    <section id="regions" aria-labelledby="regions-title" className="mx-auto max-w-container scroll-mt-24 px-4 pt-8 sm:px-6 sm:pt-10 lg:px-8">
       <SectionHeading
         index="01"
         kicker="Explore by region"
@@ -56,7 +56,7 @@ export function RegionTiles({ properties, advisorName, whatsapp }: { properties:
         }
       />
 
-      <ul className="mt-6 grid grid-cols-2 gap-2.5 sm:mt-8 sm:grid-cols-3 lg:auto-rows-[8.75rem] lg:gap-3">
+      <ul className="mt-4 grid grid-cols-2 gap-2.5 sm:mt-5 sm:grid-cols-3 lg:auto-rows-[8.25rem] lg:gap-3">
         {/* Compass legend (top-left corner on desktop). */}
         <li className="col-span-2 sm:col-span-3 lg:col-span-1 lg:col-start-1 lg:row-start-1">
           <div className="flex h-full items-center gap-4 rounded-2xl border border-line bg-surface p-4">
