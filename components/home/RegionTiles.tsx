@@ -1,43 +1,39 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, ArrowUp, Bell, MessageCircle } from 'lucide-react';
+import { ArrowRight, ArrowUp, MessageCircle } from 'lucide-react';
 import type { Property } from '@/lib/data/types';
-import { ZONES, comingSoonZones, liveZones, zoneOfCorridor, type Zone } from '@/lib/regions';
+import { liveZones, zoneOfCorridor, type Zone } from '@/lib/regions';
 import { sortListings } from '@/lib/listingFilters';
+import { formatINR } from '@/lib/price';
 import { whatsAppLink } from '@/lib/contact';
 import { Reveal } from '@/components/Reveal';
 import { SectionHeading } from './SectionHeading';
 
-// Where each region sits on the desktop compass (3 × 3 grid, north at the top).
-const PLACE: Record<string, string> = {
-  north: 'lg:col-start-2 lg:row-start-1',
-  west: 'lg:col-start-1 lg:row-start-2',
-  central: 'lg:col-start-2 lg:row-start-2',
-  east: 'lg:col-start-3 lg:row-start-2',
-  south: 'lg:col-start-2 lg:row-start-3',
-  'south-east': 'lg:col-start-3 lg:row-start-3',
-  other: 'lg:col-start-1 lg:row-start-3',
-};
+// Columns on large screens, by how many regions have projects (Tailwind needs whole class names).
+const LG_COLS: Record<number, string> = { 1: 'lg:grid-cols-1', 2: 'lg:grid-cols-2', 3: 'lg:grid-cols-3', 4: 'lg:grid-cols-4' };
 
-function Heading({ zone, light }: { zone: Zone; light: boolean }) {
+function Direction({ zone }: { zone: Zone }) {
   return (
-    <span className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${light ? 'bg-white/90 text-forest' : 'bg-surface text-ink-muted ring-1 ring-line'}`} aria-hidden="true">
+    <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/90 text-forest" aria-hidden="true">
       {zone.heading == null ? <span className="h-2 w-2 rounded-full bg-current" /> : <ArrowUp className="h-3.5 w-3.5" style={{ transform: `rotate(${zone.heading}deg)` }} />}
     </span>
   );
 }
 
-// Step 1: pick a part of the city. On desktop the regions sit where they are on a compass;
-// open regions are photo tiles from their own projects, the rest are "coming soon".
+// Step 1: pick a part of the city. Only regions with live projects are shown, each with its
+// best project's photo, the entry price and the projects to look at first.
 export function RegionTiles({ properties, advisorName, whatsapp }: { properties: Property[]; advisorName: string; whatsapp: string }) {
   const ranked = sortListings(properties, 'relevance');
-  const soonIds = new Set(comingSoonZones(properties).map((z) => z.id));
-  const other = liveZones(properties).find((z) => z.id === 'other');
-  const tiles = [...ZONES, ...(other ? [other] : [])].map((zone) => {
-    const list = ranked.filter((p) => zoneOfCorridor(p.corridorId) === zone.id);
-    return { zone, count: list.length, cover: list[0]?.media.cover, soon: soonIds.has(zone.id) };
-  });
-  const areas = new Set(properties.map((p) => p.corridorId)).size;
+  const tiles = liveZones(properties)
+    .map((zone) => {
+      const list = ranked.filter((p) => zoneOfCorridor(p.corridorId) === zone.id);
+      const prices = list.filter((p) => !p.priceOnRequest && p.transaction !== 'rent' && p.priceMin > 0).map((p) => p.priceMin);
+      return { zone, list, from: prices.length ? Math.min(...prices) : null, areas: new Set(list.map((p) => p.corridorName)).size };
+    })
+    .filter((t) => t.list.length > 0)
+    .sort((a, b) => b.list.length - a.list.length);
+  if (!tiles.length) return null;
+  const lgCols = LG_COLS[tiles.length] ?? 'lg:grid-cols-3 xl:grid-cols-5';
 
   return (
     <section id="regions" aria-labelledby="regions-title" className="mx-auto max-w-container scroll-mt-24 px-4 pt-8 sm:px-6 sm:pt-10 lg:px-8">
@@ -56,101 +52,70 @@ export function RegionTiles({ properties, advisorName, whatsapp }: { properties:
         }
       />
 
-      <ul className="mt-4 grid grid-cols-2 gap-2.5 sm:mt-5 sm:grid-cols-3 lg:auto-rows-[8.25rem] lg:gap-3">
-        {/* Compass legend (top-left corner on desktop). */}
-        <li className="col-span-2 sm:col-span-3 lg:col-span-1 lg:col-start-1 lg:row-start-1">
-          <div className="flex h-full items-center gap-4 rounded-2xl border border-line bg-surface p-4">
-            <svg viewBox="0 0 64 64" className="h-14 w-14 shrink-0 text-ink" aria-hidden="true">
-              <circle cx="32" cy="32" r="28" fill="none" stroke="currentColor" strokeOpacity="0.2" />
-              <circle cx="32" cy="32" r="20" fill="none" stroke="currentColor" strokeOpacity="0.12" strokeDasharray="2 3" />
-              <path d="M32 8 L37 32 L32 28 L27 32 Z" fill="rgb(var(--accent))" />
-              <path d="M32 56 L27 32 L32 36 L37 32 Z" fill="currentColor" fillOpacity="0.35" />
-              <text x="32" y="6.5" textAnchor="middle" fontSize="7" fontWeight="700" fill="currentColor">N</text>
-            </svg>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold">Bengaluru by direction</p>
-              <p className="mt-0.5 text-xs text-ink-muted">
-                {properties.length} verified projects across {areas} areas. Pick a side of the city.
-              </p>
-            </div>
-          </div>
-        </li>
-
-        {tiles.map(({ zone, count, cover, soon }, i) => (
-          <Reveal as="li" key={zone.id} index={i} variant="zoom" className={PLACE[zone.id] ?? ''}>
-            {soon ? (
-              <div className="flex h-32 flex-col justify-between rounded-2xl border border-dashed border-line-strong bg-sand/50 p-3.5 lg:h-full">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <h3 className="font-serif text-lg leading-tight">{zone.short}</h3>
-                    <p className="mt-0.5 line-clamp-1 text-xs text-ink-muted">{zone.areas}</p>
-                  </div>
-                  <Heading zone={zone} light={false} />
-                </div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-muted">Coming soon</span>
-                  <a
-                    href={whatsAppLink(`Hi ${advisorName}, please tell me when you list projects in ${zone.name}.`, whatsapp)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 rounded-full bg-surface px-2.5 py-1 text-xs font-semibold ring-1 ring-line hover:ring-line-strong"
-                  >
-                    <Bell className="h-3 w-3 text-brass" aria-hidden="true" /> Notify me
-                  </a>
-                </div>
-              </div>
-            ) : (
-              <Link
-                href={`/properties?zone=${zone.id}`}
-                data-track="region"
-                data-track-zone={zone.id}
-                className="group relative isolate flex h-32 flex-col justify-end overflow-hidden rounded-2xl bg-forest p-3.5 text-white outline-offset-4 transition-[transform,box-shadow] duration-base [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:shadow-[0_20px_40px_-24px_rgb(var(--shadow)/0.7)] lg:h-full"
-              >
-                {cover && <Image src={cover.url} alt="" fill sizes="(min-width: 1024px) 26vw, 45vw" quality={55} className="-z-10 object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.06]" />}
-                <span aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-black/85 via-black/35 to-black/10" />
-                <span className="absolute left-3 top-3 rounded-full bg-black/45 px-2 py-0.5 text-[11px] font-semibold ring-1 ring-white/20">
-                  {count} {count === 1 ? 'project' : 'projects'}
+      <ul className={`mt-4 grid grid-cols-1 gap-3 sm:mt-5 sm:grid-cols-2 ${lgCols}`}>
+        {tiles.map(({ zone, list, from, areas }, i) => (
+          <Reveal as="li" key={zone.id} index={i} variant="zoom">
+            <Link
+              href={`/properties?zone=${zone.id}`}
+              data-track="region"
+              data-track-zone={zone.id}
+              className="group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface outline-offset-4 transition-[transform,box-shadow,border-color] duration-base hover:border-line-strong [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:shadow-[0_22px_44px_-30px_rgb(var(--shadow)/0.7)]"
+            >
+              <span className="relative block h-36 overflow-hidden bg-forest sm:h-40">
+                {list[0]?.media.cover && (
+                  <Image src={list[0].media.cover.url} alt="" fill sizes="(min-width: 1024px) 24vw, (min-width: 640px) 46vw, 100vw" quality={55} className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.06]" />
+                )}
+                <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/20" />
+                <span className="absolute left-3 top-3 rounded-full bg-black/50 px-2 py-0.5 text-[11px] font-semibold text-white ring-1 ring-white/20">
+                  {list.length} {list.length === 1 ? 'project' : 'projects'}
                 </span>
                 <span className="absolute right-3 top-3">
-                  <Heading zone={zone} light />
+                  <Direction zone={zone} />
                 </span>
-                <h3 className="font-serif text-lg leading-tight text-white sm:text-xl">{zone.short}</h3>
-                <p className="mt-0.5 line-clamp-1 text-xs text-white/80">{zone.areas}</p>
-              </Link>
-            )}
-          </Reveal>
-        ))}
-
-        {/* Advisor (top-right corner on desktop). */}
-        <li className="hidden lg:col-start-3 lg:row-start-1 lg:block">
-          <a
-            href={whatsAppLink(`Hi ${advisorName}, I'm not sure which part of Bengaluru suits me. Can you help?`, whatsapp)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group flex h-full flex-col justify-between rounded-2xl bg-forest p-4 text-forest-on"
-          >
-            <p className="text-sm font-semibold">Not sure which side of the city?</p>
-            <p className="text-xs text-forest-on/75">Tell {advisorName.split(' ')[0]} your office, school and budget; get the right areas in one message.</p>
-            <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-brass">
-              <MessageCircle className="h-4 w-4" aria-hidden="true" /> Ask on WhatsApp
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
-            </span>
-          </a>
-        </li>
-
-        {/* All of Bengaluru (bottom-left corner when no "other" tile uses it). */}
-        {!other && (
-          <li className="hidden lg:col-start-1 lg:row-start-3 lg:block">
-            <Link href="/properties" className="group flex h-full flex-col justify-between rounded-2xl border border-line bg-surface p-4 hover:border-line-strong">
-              <p className="text-sm font-semibold">See every project</p>
-              <p className="text-xs text-ink-muted">Filter by area, budget, BHK, builder and possession.</p>
-              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent-ink">
-                Explore all {properties.length} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                <span className="absolute inset-x-3 bottom-2.5 flex items-end justify-between gap-2 text-white">
+                  <span className="font-serif text-xl leading-tight">{zone.short}</span>
+                  {from && (
+                    <span className="text-right text-[11px] leading-tight text-white/80">
+                      from <span className="block font-serif text-base text-white">{formatINR(from)}</span>
+                    </span>
+                  )}
+                </span>
+              </span>
+              <span className="flex flex-1 flex-col gap-2 p-3">
+                <span className="line-clamp-1 text-xs text-ink-muted">{zone.areas}</span>
+                <span className="flex flex-wrap gap-1">
+                  {list.slice(0, 2).map((p) => (
+                    <span key={p.id} className="max-w-full truncate rounded-md bg-surface-2 px-1.5 py-0.5 text-[11px] font-medium">
+                      {p.title}
+                    </span>
+                  ))}
+                  {list.length > 2 && <span className="rounded-md px-1 py-0.5 text-[11px] text-ink-muted">+{list.length - 2} more</span>}
+                </span>
+                <span className="mt-auto flex items-center justify-between pt-1 text-xs">
+                  <span className="text-ink-muted">
+                    {areas} {areas === 1 ? 'area' : 'areas'}
+                  </span>
+                  <span className="inline-flex items-center gap-1 font-semibold text-accent-ink">
+                    Explore {zone.short} <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                  </span>
+                </span>
               </span>
             </Link>
-          </li>
-        )}
+          </Reveal>
+        ))}
       </ul>
+
+      <p className="mt-3 flex flex-wrap items-center justify-end gap-x-1.5 text-xs text-ink-muted">
+        Not sure which side of the city suits you?
+        <a
+          href={whatsAppLink(`Hi ${advisorName}, I'm not sure which part of Bengaluru suits me. Can you help?`, whatsapp)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 font-semibold text-accent-ink hover:underline"
+        >
+          <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" /> Ask {advisorName.split(' ')[0]} on WhatsApp
+        </a>
+      </p>
     </section>
   );
 }

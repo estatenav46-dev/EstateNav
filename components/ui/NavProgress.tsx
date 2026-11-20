@@ -18,6 +18,8 @@ function Bar() {
   const bar = useRef<HTMLDivElement>(null);
   const running = useRef(false);
   const safety = useRef<ReturnType<typeof setTimeout>>();
+  const pill = useRef<HTMLDivElement>(null);
+  const pillTimer = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     const el = bar.current;
@@ -31,6 +33,9 @@ function Bar() {
       void el.offsetWidth;
       el.style.transition = 'transform 6s cubic-bezier(0.08, 0.82, 0.17, 1)';
       el.style.transform = 'scaleX(0.86)';
+      clearTimeout(pillTimer.current);
+      // A visible "Loading" pill if the next page takes longer than a blink.
+      pillTimer.current = setTimeout(() => running.current && pill.current && (pill.current.dataset.show = 'true'), 300);
       safety.current = setTimeout(finish, 12_000);
     };
     begin = start;
@@ -54,6 +59,8 @@ function Bar() {
 
   function finish() {
     const el = bar.current;
+    clearTimeout(pillTimer.current);
+    if (pill.current) pill.current.dataset.show = 'false';
     if (!el || !running.current) return;
     running.current = false;
     clearTimeout(safety.current);
@@ -64,7 +71,14 @@ function Bar() {
 
   useEffect(finish, [pathname, search]);
 
-  return <div ref={bar} aria-hidden="true" className="nav-progress" style={{ opacity: 0, transform: 'scaleX(0)' }} />;
+  return (
+    <>
+      <div ref={bar} aria-hidden="true" className="nav-progress" style={{ opacity: 0, transform: 'scaleX(0)' }} />
+      <div ref={pill} aria-hidden="true" data-show="false" className="nav-pill">
+        <span className="nav-spinner" /> Loading…
+      </div>
+    </>
+  );
 }
 
 export function NavProgress() {

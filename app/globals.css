@@ -354,6 +354,10 @@ html { scroll-behavior: smooth; }
 .wipe-prev { animation: wipe-prev 1100ms var(--ease-expo) both; }
 @keyframes wipe-next { from { clip-path: inset(0 0 0 100%); } to { clip-path: inset(0 0 0 0); } }
 @keyframes wipe-prev { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+.card-in-next { animation: card-in-next 640ms var(--ease-expo) backwards; animation-delay: var(--d, 0ms); }
+.card-in-prev { animation: card-in-prev 640ms var(--ease-expo) backwards; animation-delay: var(--d, 0ms); }
+@keyframes card-in-next { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
+@keyframes card-in-prev { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: none; } }
 
 /* Timed progress (hero tabs and showcase); paused through animation-play-state. */
 .timer-fill { transform-origin: left; animation: progress var(--dur, 6000ms) linear both; }
@@ -364,6 +368,10 @@ html { scroll-behavior: smooth; }
 
 /* Navigation progress bar (components/ui/NavProgress.tsx). */
 .nav-progress { position: fixed; inset: 0 0 auto 0; z-index: 120; height: 3px; pointer-events: none; transform-origin: left; background: linear-gradient(90deg, rgb(var(--accent)), rgb(var(--brass))); box-shadow: 0 0 12px rgb(var(--accent) / 0.6); }
+.nav-pill { position: fixed; top: 0.75rem; left: 50%; z-index: 120; display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.85rem; border-radius: 9999px; border: 1px solid rgb(var(--line)); background: rgb(var(--surface)); color: rgb(var(--ink)); font-size: 0.75rem; font-weight: 600; pointer-events: none; box-shadow: 0 12px 30px -14px rgb(var(--shadow) / 0.55); transform: translate(-50%, 0); opacity: 1; transition: opacity 200ms ease, transform 200ms ease; }
+.nav-pill[data-show='false'] { opacity: 0; transform: translate(-50%, -8px); }
+.nav-spinner { width: 0.85rem; height: 0.85rem; border-radius: 9999px; border: 2px solid rgb(var(--accent) / 0.25); border-top-color: rgb(var(--accent)); animation: nav-spin 700ms linear infinite; }
+@keyframes nav-spin { to { transform: rotate(360deg); } }
 
 /* Press ripple on buttons and chips (spans added by components/ui/Interactions.tsx). */
 .btn, .btn-primary, .btn-secondary, .btn-ghost, .chip, [data-ripple] { position: relative; overflow: hidden; isolation: isolate; }

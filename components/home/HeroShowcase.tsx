@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useRef, useState, type CSSProperties } from 'react';
+import { useRef, type CSSProperties } from 'react';
 import { ArrowUpRight, ChevronLeft, ChevronRight, Pause, Play, ShieldCheck } from 'lucide-react';
 import type { Property } from '@/lib/data/types';
 import { configLabels, priceLabel, statusChip } from '@/lib/property';
@@ -20,7 +20,7 @@ function fromLabel(property: Property) {
 }
 
 type Props = {
-  /** Every featured project across segments; only the active, previous and next photos load. */
+  /** Every featured project across segments (kept for the caller; cards load lazily). */
   all: Property[];
   /** Projects of the segment on show, in order. */
   slides: Property[];
@@ -40,18 +40,14 @@ type Props = {
   onTogglePause: () => void;
 };
 
-// The hero spotlight: stacked photos that wipe in from the side they come from, a slow Ken
-// Burns on the active one, and the project plate rising in over a deep gradient.
-export function HeroShowcase({ all, slides, index, dir, segLabel, duration, timerKey, running, animate, paused, preload, onAdvance, onStep, onPick, onHold, onTogglePause }: Props) {
-  const active = slides[index];
-  const [view, setView] = useState({ id: active?.id ?? '', prev: null as string | null, dir });
-  if (active && view.id !== active.id) setView({ id: active.id, prev: view.id, dir });
+// The hero spotlight as a card rail: several featured projects side by side (one and a peek on
+// phones, two on tablets and the two-column hero, three on wide screens). Every few seconds the
+// rail moves on by one project; cards slide in from the side they come from.
+export function HeroShowcase({ all, slides, index, dir, segLabel, duration, timerKey, running, animate, paused, onAdvance, onStep, onHold, onTogglePause }: Props) {
   const swipe = useRef<{ x: number; y: number } | null>(null);
-  if (!active) return null;
-
-  const mounted = new Set([view.id, view.prev, ...preload].filter(Boolean) as string[]);
-  const chips = [statusChip(active), active.rera.number ? 'K-RERA registered' : null].filter(Boolean) as string[];
-  const upNext = slides.length > 1 ? Array.from({ length: Math.min(3, slides.length - 1) }, (_, k) => (index + 1 + k) % slides.length).map((i) => ({ p: slides[i], i })) : [];
+  if (!slides.length) return null;
+  const order = slides.map((_, k) => slides[(index + k) % slides.length]);
+  const firstId = all[0]?.id;
 
   return (
     <div
@@ -75,123 +71,96 @@ export function HeroShowcase({ all, slides, index, dir, segLabel, duration, time
         if (e.key === 'ArrowLeft') onStep(-1);
       }}
     >
-      <section
-        aria-roledescription="carousel"
-        aria-label={`Featured ${segLabel.toLowerCase()} projects`}
-        className="relative isolate aspect-[5/4] touch-pan-y overflow-hidden rounded-[22px] bg-forest shadow-[0_40px_80px_-50px_rgb(var(--shadow)/0.75)] sm:aspect-[16/10] lg:aspect-[16/11] xl:aspect-[16/10]"
-      >
-        {all.map((p) => {
-          const isActive = p.id === view.id;
-          const isPrev = p.id === view.prev;
-          if (!mounted.has(p.id)) return null;
-          const wipe = isActive && view.prev && animate ? (view.dir === 1 ? 'wipe-next' : 'wipe-prev') : '';
-          return (
-            <div
-              key={p.id}
-              aria-hidden={!isActive}
-              className={`absolute inset-0 ${isActive ? `z-20 ${wipe}` : isPrev ? 'z-10' : 'z-0 opacity-0'}`}
-            >
-              <Image
-                src={p.media.cover.url}
-                alt={isActive ? p.media.cover.alt : ''}
-                fill
-                priority={p.id === all[0]?.id}
-                quality={70}
-                placeholder={p.media.cover.blurDataURL ? 'blur' : 'empty'}
-                blurDataURL={p.media.cover.blurDataURL}
-                sizes="(min-width: 1024px) 56vw, 100vw"
-                className={`object-cover ${isActive && animate ? 'kenburns' : ''}`}
-              />
-            </div>
-          );
-        })}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 bg-[linear-gradient(180deg,rgb(0_0_0/0.38)_0%,transparent_22%,transparent_42%,rgb(0_0_0/0.55)_68%,rgb(0_0_0/0.86)_100%)]" />
+      <div className="mb-2.5 flex items-center justify-between gap-3">
+        <span className="inline-flex items-center gap-2 rounded-full bg-surface px-3 py-1 text-xs font-semibold ring-1 ring-line">
+          <span className="h-1.5 w-1.5 rounded-full bg-brass" aria-hidden="true" /> Featured · {segLabel}
+        </span>
+        <span className="tabular font-mono text-xs text-ink-muted">
+          {String(index + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
+        </span>
+      </div>
 
-        <div className="absolute inset-x-0 top-0 z-30 flex items-center justify-between gap-3 p-4 sm:p-5">
-          <span className="inline-flex items-center gap-2 rounded-full bg-black/40 px-3 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20">
-            <span className="h-1.5 w-1.5 rounded-full bg-brass" aria-hidden="true" /> Featured · {segLabel}
-          </span>
-          <span className="tabular rounded-full bg-black/45 px-3 py-1.5 font-mono text-xs text-white/90 ring-1 ring-white/15">
-            {String(index + 1).padStart(2, '0')} <span className="text-white/50">/ {String(slides.length).padStart(2, '0')}</span>
-          </span>
-        </div>
+      <section aria-roledescription="carousel" aria-label={`Featured ${segLabel.toLowerCase()} projects`} className="touch-pan-y">
+        <ul className="flex gap-3 overflow-hidden">
+          {order.map((p, k) => {
+            const chip = statusChip(p);
+            return (
+              <li
+                key={`${timerKey}-${p.id}`}
+                aria-roledescription="slide"
+                aria-label={`${((index + k) % slides.length) + 1} of ${slides.length}: ${p.title}`}
+                className={`h-[19rem] shrink-0 grow basis-[84%] sm:h-[20rem] sm:basis-[calc((100%-0.75rem)/2)] md:basis-[calc((100%-1.5rem)/3)] lg:basis-[calc((100%-0.75rem)/2)] xl:h-[21rem] xl:basis-[calc((100%-1.5rem)/3)] ${animate ? (dir === 1 ? 'card-in-next' : 'card-in-prev') : ''}`}
+                style={{ '--d': `${k * 70}ms` } as CSSProperties}
+              >
+                <a
+                  href={`/properties/${p.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative isolate flex h-full flex-col justify-end overflow-hidden rounded-2xl bg-forest p-3.5 text-white shadow-[0_24px_50px_-34px_rgb(var(--shadow)/0.8)]"
+                >
+                  <Image
+                    src={p.media.cover.url}
+                    alt={p.media.cover.alt}
+                    fill
+                    priority={k === 0 && p.id === firstId}
+                    quality={65}
+                    placeholder={p.media.cover.blurDataURL ? 'blur' : 'empty'}
+                    blurDataURL={p.media.cover.blurDataURL}
+                    sizes="(min-width: 1280px) 19vw, (min-width: 1024px) 27vw, (min-width: 768px) 31vw, (min-width: 640px) 47vw, 84vw"
+                    className="-z-10 object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.06]"
+                  />
+                  <span aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(0_0_0/0.35)_0%,transparent_26%,transparent_40%,rgb(0_0_0/0.6)_66%,rgb(0_0_0/0.9)_100%)]" />
 
-        <div key={active.id} className="absolute inset-x-0 bottom-0 z-30 p-4 text-white sm:p-7">
-          <div className="flex flex-wrap gap-1.5 rise-in" style={{ '--d': '250ms' } as CSSProperties}>
-            {chips.map((chip, i) => (
-              <span key={chip} className="inline-flex items-center gap-1.5 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-semibold ring-1 ring-white/20">
-                {i === 0 ? <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[statusChip(active)]}`} aria-hidden="true" /> : <ShieldCheck className="h-3 w-3" aria-hidden="true" />}
-                {chip}
-              </span>
-            ))}
-          </div>
-          <h2 className="mt-3 max-w-[18ch] font-serif text-[1.6rem] leading-[1.04] tracking-[-0.03em] text-white sm:text-[2.1rem]">
-            <span className="word-mask">
-              <span style={{ '--i': 3 } as CSSProperties}>{active.title}</span>
-            </span>
-          </h2>
-          <p className="mt-2 text-sm text-white/75 rise-in" style={{ '--d': '380ms' } as CSSProperties}>
-            {active.locality} · {active.corridorName}
-          </p>
-          <div className="mt-4 flex flex-wrap items-end justify-between gap-3 rise-in" style={{ '--d': '460ms' } as CSSProperties}>
-            <div className="min-w-0">
-              <p className="truncate text-xs text-white/70">{configLabels(active).slice(0, 3).join(' · ')}</p>
-              <p className="tabular mt-0.5 whitespace-nowrap font-serif text-2xl text-white sm:text-[1.75rem]">
-                {fromLabel(active)}
-                <sup className="ml-0.5 text-sm text-brass">*</sup>
-              </p>
-            </div>
-            <a
-              href={`/properties/${active.slug}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="arrow-host group inline-flex min-h-[48px] items-center gap-2 rounded-full bg-white py-1.5 pl-5 pr-1.5 text-sm font-semibold text-ink shadow-[0_12px_30px_-12px_rgb(0_0_0/0.6)] transition-transform duration-base active:scale-[0.97]"
-            >
-              View project
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-forest text-forest-on transition-transform duration-slow ease-out group-hover:rotate-45">
-                <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-              </span>
-              <span className="sr-only"> (opens in a new tab)</span>
-            </a>
-          </div>
-        </div>
-        <span aria-hidden="true" className="absolute inset-x-0 bottom-0 z-40 h-[3px] bg-white/15">
+                  <span className="absolute inset-x-3 top-3 flex items-start justify-between gap-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-black/45 px-2 py-0.5 text-[11px] font-semibold ring-1 ring-white/20">
+                      <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[chip]}`} aria-hidden="true" /> {chip}
+                    </span>
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white text-ink transition-transform duration-slow ease-out group-hover:rotate-45" aria-hidden="true">
+                      <ArrowUpRight className="h-4 w-4" />
+                    </span>
+                  </span>
+
+                  <h2 className="line-clamp-2 font-serif text-[1.2rem] leading-[1.1] tracking-[-0.02em] text-white">{p.title}</h2>
+                  <p className="mt-1 truncate text-xs text-white/75">
+                    {p.locality} · {p.corridorName}
+                  </p>
+                  <p className="mt-2 truncate text-[11px] text-white/70">{configLabels(p).slice(0, 3).join(' · ')}</p>
+                  <div className="mt-0.5 flex items-end justify-between gap-2">
+                    <p className="tabular truncate font-serif text-[1.3rem] leading-tight text-white">
+                      {fromLabel(p)}
+                      <sup className="ml-0.5 text-xs text-brass">*</sup>
+                    </p>
+                    {p.rera.number && (
+                      <span className="inline-flex shrink-0 items-center gap-1 text-[10px] font-semibold text-white/80" title="K-RERA registered">
+                        <ShieldCheck className="h-3 w-3" aria-hidden="true" /> K-RERA
+                      </span>
+                    )}
+                  </div>
+                  <span className="sr-only"> (opens in a new tab)</span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      <div className="mt-3 flex items-center gap-3">
+        <span aria-hidden="true" className="h-[3px] flex-1 overflow-hidden rounded-full bg-line">
           <span
             key={timerKey}
-            className={`block h-full bg-brass ${animate ? 'timer-fill' : ''}`}
+            className={`block h-full origin-left bg-brass ${animate ? 'timer-fill' : ''}`}
             style={{ '--dur': `${duration}ms`, animationPlayState: running ? 'running' : 'paused' } as CSSProperties}
             onAnimationEnd={onAdvance}
           />
         </span>
-      </section>
-
-      {/* Up next: the following projects as a small playlist; the stage's bottom line shows the timer. */}
-      <div className="mt-3 flex items-center gap-2">
-        {upNext.length > 0 && (
-          <ol className="grid min-w-0 flex-1 grid-cols-2 gap-2 sm:grid-cols-3" aria-label="Up next">
-            {upNext.map(({ p, i }, k) => (
-              <li key={p.id} className={`min-w-0 ${k === 2 ? 'hidden sm:block' : ''}`}>
-                <button type="button" onClick={() => onPick(i)} className="group flex w-full items-center gap-2 rounded-xl border border-line bg-surface p-1.5 text-left transition-colors hover:border-accent/50" aria-label={`Show ${p.title}`}>
-                  <span className="relative h-10 w-12 shrink-0 overflow-hidden rounded-lg bg-surface-2">
-                    <Image src={p.media.cover.url} alt="" fill sizes="48px" quality={40} className="object-cover transition-transform duration-slow group-hover:scale-110" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block truncate text-xs font-semibold">{p.title}</span>
-                    <span className="block truncate text-[11px] text-ink-muted">{fromLabel(p)}</span>
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ol>
-        )}
-        <div className="ml-auto flex shrink-0 gap-1">
-          <button type="button" onClick={onTogglePause} className="icon-btn hidden h-9 w-9 sm:inline-flex" aria-label={paused ? 'Resume slideshow' : 'Pause slideshow'}>
+        <div className="flex shrink-0 gap-1">
+          <button type="button" onClick={onTogglePause} className="hidden h-9 w-9 items-center justify-center rounded-full border border-line bg-surface hover:bg-surface-2 sm:inline-flex" aria-label={paused ? 'Resume slideshow' : 'Pause slideshow'}>
             {paused ? <Play className="h-3.5 w-3.5" aria-hidden="true" /> : <Pause className="h-3.5 w-3.5" aria-hidden="true" />}
           </button>
-          <button type="button" onClick={() => onStep(-1)} className="icon-btn h-9 w-9" aria-label="Previous project">
+          <button type="button" onClick={() => onStep(-1)} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line bg-surface hover:bg-surface-2" aria-label="Previous project">
             <ChevronLeft className="h-4 w-4" aria-hidden="true" />
           </button>
-          <button type="button" onClick={() => onStep(1)} className="icon-btn h-9 w-9 border-ink bg-ink text-bg hover:border-ink hover:bg-ink/85" aria-label="Next project">
+          <button type="button" onClick={() => onStep(1)} className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-ink text-bg hover:bg-ink/85" aria-label="Next project">
             <ChevronRight className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
