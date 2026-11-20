@@ -85,9 +85,9 @@ export function PropertyActions({ property, settings, advisorCard, layout = 'sid
         open={lead.open}
         onOpenChange={(open) => leadSheetStore.set((s) => ({ ...s, open }))}
         direction={desktop ? 'right' : 'bottom'}
-        title={lead.intent === 'site-visit' ? 'Schedule a guided VIP site visit' : 'Unlock the direct developer pricing sheet'}
+        title={lead.intent === 'site-visit' ? 'Book a site visit' : 'Get the price sheet'}
         description={property.title}
-        className="lg:max-w-[480px]"
+        compact={desktop}
       >
         <LeadForm
           key={`${lead.intent}-${lead.message}`}
