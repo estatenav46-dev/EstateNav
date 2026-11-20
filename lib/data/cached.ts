@@ -5,7 +5,9 @@ import { toPublicProperty } from './publicView';
 
 // Cached reads for public pages (ISR on Vercel). Admin publish actions call
 // revalidateTag('properties' | 'catalogue' | 'settings') to refresh them immediately.
-const REVALIDATE = process.env.NODE_ENV === 'development' ? 1 : 60;
+// Development keeps data for 30s (admin saves still refresh instantly by tag) instead of refetching
+// Firestore on every request.
+const REVALIDATE = process.env.NODE_ENV === 'development' ? 30 : 60;
 
 const cachedProperties = unstable_cache(
   async () => (await getRepos().properties.list({ status: 'published' })).map(toPublicProperty),
