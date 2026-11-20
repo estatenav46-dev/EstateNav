@@ -4,7 +4,7 @@ import { enquiryInputSchema } from '@/lib/data/schemas';
 import { getRepos } from '@/lib/data';
 import { sendEnquiryEmailNotification } from '@/lib/email/emailjs';
 import type { Property } from '@/lib/data/types';
-import { toPublicProperty } from '@/lib/data/publicView';
+import { getPublishedProperties } from '@/lib/data/cached';
 
 export type EnquiryResult =
   | { ok: true; id: string }
@@ -55,9 +55,7 @@ export async function submitEnquiry(input: unknown): Promise<EnquiryResult> {
 /** Compare and shortlist views fetch full records for the ids kept in the browser. */
 export async function getPropertiesByIds(ids: string[]): Promise<Property[]> {
   const wanted = ids.slice(0, 24);
-  const all = await getRepos().properties.list({ status: 'published' });
-  return wanted
-    .map((id) => all.find((p) => p.id === id))
-    .filter((p): p is Property => Boolean(p))
-    .map(toPublicProperty);
+  // Same visibility rules as every public page (hidden listings and partners left out).
+  const all = await getPublishedProperties();
+  return wanted.map((id) => all.find((p) => p.id === id)).filter((p): p is Property => Boolean(p));
 }

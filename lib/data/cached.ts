@@ -9,10 +9,16 @@ import { toPublicProperty } from './publicView';
 // Firestore on every request.
 const REVALIDATE = process.env.NODE_ENV === 'development' ? 30 : 60;
 
+// Published listings that are not hidden and whose partner is not hidden (both set in the admin).
 const cachedProperties = unstable_cache(
-  async () => (await getRepos().properties.list({ status: 'published' })).map(toPublicProperty),
-  ['published-properties'],
-  { tags: ['properties'], revalidate: REVALIDATE },
+  async () => {
+    const repos = getRepos();
+    const [properties, developers] = await Promise.all([repos.properties.list({ status: 'published' }), repos.developers.list()]);
+    const hiddenPartners = new Set(developers.filter((d) => d.hidden).map((d) => d.id));
+    return properties.filter((p) => !p.hidden && !hiddenPartners.has(p.developerId)).map(toPublicProperty);
+  },
+  ['published-properties-v2'],
+  { tags: ['properties', 'catalogue'], revalidate: REVALIDATE },
 );
 const cachedCorridors = unstable_cache(() => getRepos().corridors.list(), ['corridors'], { tags: ['catalogue'], revalidate: REVALIDATE });
 
@@ -34,7 +40,8 @@ export async function getPublishedProperty(slug: string) {
   return all.find((property) => property.slug === slug) ?? null;
 }
 
-export const getDevelopers = unstable_cache(() => getRepos().developers.list(), ['developers'], { tags: ['catalogue'], revalidate: REVALIDATE });
+/** Partners shown on the website (hidden ones are left out). */
+export const getDevelopers = unstable_cache(async () => (await getRepos().developers.list()).filter((d) => !d.hidden), ['developers-visible'], { tags: ['catalogue'], revalidate: REVALIDATE });
 export const getOfficeHubs = unstable_cache(() => getRepos().corridors.listOfficeHubs(), ['office-hubs'], { tags: ['catalogue'], revalidate: REVALIDATE });
 export const getMarketSnapshots = unstable_cache(() => getRepos().corridors.listMarketSnapshots(), ['market-snapshots'], { tags: ['catalogue'], revalidate: REVALIDATE });
 export const getPublishedBlogs = unstable_cache(() => getRepos().blogs.listPublished(), ['published-blogs'], { tags: ['blogs'], revalidate: REVALIDATE });
