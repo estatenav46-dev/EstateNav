@@ -34,8 +34,9 @@ export function RegionTiles({ properties, advisorName, whatsapp }: { properties:
     .sort((a, b) => b.list.length - a.list.length);
   if (!tiles.length) return null;
   const lgCols = LG_COLS[tiles.length] ?? 'lg:grid-cols-3 xl:grid-cols-5';
-  // With one or two regions the tiles span the row, so their photos turn landscape.
-  const photoRatio = tiles.length === 1 ? 'aspect-[4/3] sm:aspect-[21/9]' : tiles.length === 2 ? 'aspect-[4/3] sm:aspect-[16/10] lg:aspect-[16/9]' : 'aspect-[4/3]';
+  // One or two regions: a compact card with a modest photo beside the details, so a lone
+  // region never turns into a full-width poster.
+  const compact = tiles.length <= 2;
 
   return (
     <section id="regions" aria-labelledby="regions-title" className="mx-auto max-w-container scroll-mt-24 px-4 pt-12 sm:px-6 sm:pt-14 lg:px-8 lg:pt-16">
@@ -61,11 +62,11 @@ export function RegionTiles({ properties, advisorName, whatsapp }: { properties:
               href={`/properties?zone=${zone.id}`}
               data-track="region"
               data-track-zone={zone.id}
-              className="group flex h-full flex-col rounded-card outline-offset-4"
+              className={`group flex h-full flex-col rounded-card outline-offset-4 ${compact ? 'sm:flex-row sm:items-stretch sm:gap-6 sm:rounded-card sm:border sm:border-line sm:bg-surface sm:p-3 sm:pr-6' : ''}`}
             >
-              <span className={`relative block overflow-hidden rounded-card bg-forest ${photoRatio}`}>
+              <span className={`relative block overflow-hidden rounded-card bg-forest ${compact ? 'aspect-[16/10] sm:aspect-auto sm:h-52 sm:w-[min(42%,20rem)] sm:shrink-0 sm:rounded-[14px]' : 'aspect-[4/3]'}`}>
                 {list[0]?.media.cover && (
-                  <Image src={list[0].media.cover.url} alt="" fill sizes="(min-width: 1024px) 24vw, (min-width: 640px) 46vw, 100vw" quality={60} className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]" />
+                  <Image src={list[0].media.cover.url} alt="" fill sizes={compact ? '(min-width: 640px) 320px, 100vw' : '(min-width: 1024px) 24vw, (min-width: 640px) 46vw, 100vw'} quality={60} className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]" />
                 )}
                 <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-transparent" />
                 <span className="absolute left-3.5 top-3.5 rounded-full bg-black/45 px-2.5 py-1 text-[11px] font-semibold text-white ring-1 ring-white/20 backdrop-blur-sm">
@@ -75,7 +76,7 @@ export function RegionTiles({ properties, advisorName, whatsapp }: { properties:
                   <Direction zone={zone} />
                 </span>
               </span>
-              <span className="flex flex-1 flex-col pt-4">
+              <span className={`flex min-w-0 flex-1 flex-col pt-4 ${compact ? 'sm:justify-center sm:py-2' : ''}`}>
                 <span className="flex items-baseline justify-between gap-3">
                   <span className="font-serif text-[1.6rem] leading-tight transition-colors group-hover:text-accent-ink">{zone.short}</span>
                   {from && (

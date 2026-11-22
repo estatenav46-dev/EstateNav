@@ -32,13 +32,13 @@ export function NeedTiles({ properties }: { properties: Property[] }) {
     <section aria-labelledby="needs-title" className="mx-auto max-w-container px-4 pt-12 sm:px-6 sm:pt-14 lg:px-8 lg:pt-16">
       <SectionHeading index="02" kicker="Browse by need" id="needs-title" title={<>What are you <span className="text-accent-ink">looking for?</span></>} />
 
-      <ul className="no-scrollbar -mx-4 mt-6 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:mt-7 sm:grid ${TYPE_COLS[types.length] ?? 'sm:grid-cols-3'} sm:gap-5 sm:overflow-visible sm:px-0 sm:pb-0">
+      <ul className={`no-scrollbar -mx-4 mt-6 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:mt-7 sm:grid ${TYPE_COLS[types.length] ?? 'sm:grid-cols-3'} sm:gap-5 sm:overflow-visible sm:px-0 sm:pb-0`}>
         {types.map((t, i) => (
           <Reveal as="li" key={t.id} index={i} variant="zoom" className={`${types.length === 1 ? 'w-full' : 'w-[82%]'} shrink-0 snap-start sm:w-auto`}>
             <Link
               href={t.href}
               data-ripple
-              className={`group relative isolate flex aspect-[4/3] h-full flex-col justify-end overflow-hidden rounded-card bg-forest p-5 text-white ${types.length === 1 ? 'sm:aspect-[21/8]' : types.length === 2 ? 'sm:aspect-[16/9]' : 'sm:aspect-[3/4] lg:aspect-[4/3.4]'}`}
+              className={`group relative isolate flex aspect-[4/3] h-full flex-col justify-end overflow-hidden rounded-card bg-forest p-5 text-white ${types.length <= 2 ? 'sm:aspect-auto sm:h-64' : 'sm:aspect-[3/4] lg:aspect-[4/3.4]'}`}
             >
               {t.cover && <Image src={t.cover.url} alt="" fill sizes="(min-width: 640px) 31vw, 100vw" quality={60} className="-z-10 object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]" />}
               <span aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
