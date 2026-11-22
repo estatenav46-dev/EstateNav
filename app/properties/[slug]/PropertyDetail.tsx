@@ -21,6 +21,7 @@ import { PlanGallery } from '@/components/property/PlanGallery';
 import { DocumentList } from '@/components/property/DocumentList';
 import { VerificationLedger } from '@/components/property/VerificationLedger';
 import { CommuteRadar } from '@/components/property/CommuteRadar';
+import { ChargesTable, PaymentPlan } from '@/components/property/CostBreakdown';
 import { Reveal, Words } from '@/components/Reveal';
 
 /** One content card on the project page. */
@@ -70,7 +71,9 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
     ['Towers', f.towers ? String(f.towers) : null],
     ['Floors', f.floors],
     ['Open space', f.openSpacePct != null ? `${f.openSpacePct}%` : null],
-    ['Clubhouse', f.clubhouseSqft ? `${f.clubhouseSqft.toLocaleString('en-IN')} sq.ft` : null],
+    ['Clubhouse', [f.clubhouseSqft ? `${f.clubhouseSqft.toLocaleString('en-IN')} sq.ft` : null, f.clubhouseDetails].filter(Boolean).join(' · ') || null],
+    ['Facing', f.facing],
+    ['Phase', property.phase || null],
     ['Launched', monthYear(f.launchDate)],
     ['Possession', property.possession.label],
     ['RERA completion', monthYear(property.possession.reraDate)],
@@ -102,6 +105,8 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
   const sections = [
     { id: 'overview', label: 'Overview' },
     property.configurations.length > 0 && { id: 'units', label: property.segment === 'plot' ? 'Plots & prices' : 'Configurations' },
+    property.charges.length > 0 && { id: 'charges', label: 'Price breakdown' },
+    (property.paymentPlan.stages.length > 0 || Boolean(property.paymentPlan.type)) && { id: 'payment', label: 'Payment plan' },
     (property.description || property.highlights.length > 0) && { id: 'about', label: 'About' },
     plansCount > 0 && { id: 'plans', label: 'Floor plans' },
     amenityGroups.length > 0 && { id: 'amenities', label: 'Amenities' },
@@ -198,6 +203,18 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
         {property.configurations.length > 0 && (
           <Section id="units" title={property.segment === 'plot' ? 'Plot sizes & prices' : 'Configurations & prices'}>
             <ConfigExplorer property={property} />
+          </Section>
+        )}
+
+        {property.charges.length > 0 && (
+          <Section id="charges" title="Price breakdown & other charges">
+            <ChargesTable property={property} />
+          </Section>
+        )}
+
+        {(property.paymentPlan.stages.length > 0 || Boolean(property.paymentPlan.type)) && (
+          <Section id="payment" title="Payment plan">
+            <PaymentPlan property={property} />
           </Section>
         )}
 

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Check } from 'lucide-react';
 import type { Property } from '@/lib/data/types';
+import { PLAN_AUTHORITY_LABEL } from '@/lib/property';
 
 type Row = { label: string; value: React.ReactNode; ok: boolean };
 
@@ -28,7 +29,7 @@ export function ledgerRows(property: Property, summary = false): Row[] {
     },
     { label: 'Title / Kaveri check', ok: approvals.titleCheck === 'clear', value: approvals.titleCheck === 'clear' ? 'Clear' : approvals.titleCheck === 'pending' ? <span className="text-ink-muted">In progress</span> : ask },
     { label: 'Khata type', ok: Boolean(approvals.khata), value: approvals.khata ? `${approvals.khata}-Khata` : ask },
-    { label: 'Plan sanction', ok: Boolean(approvals.planAuthority), value: approvals.planAuthority ? `${approvals.planAuthority} sanctioned plan` : ask },
+    { label: 'Plan sanction', ok: Boolean(approvals.planAuthority), value: approvals.planAuthority ? `${PLAN_AUTHORITY_LABEL[approvals.planAuthority] ?? approvals.planAuthority} sanctioned plan` : ask },
     {
       label: 'Bank approvals',
       ok: bankApprovals.length > 0,
@@ -43,6 +44,15 @@ export function ledgerRows(property: Property, summary = false): Row[] {
       ),
     },
     { label: 'Possession', ok: possession.status === 'ready' || Boolean(possession.date), value: possession.label },
+    ...(approvals.oc
+      ? [
+          {
+            label: 'Occupancy certificate',
+            ok: approvals.oc === 'received',
+            value: approvals.oc === 'received' ? 'Received' : approvals.oc === 'applied' ? <span className="text-ink-muted">Applied for</span> : <span className="text-ink-muted">Not yet</span>,
+          },
+        ]
+      : []),
   ];
   return summary ? [rows[0], rows[3], rows[4]] : rows;
 }

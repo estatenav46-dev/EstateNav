@@ -1,7 +1,7 @@
 import { unstable_cache } from 'next/cache';
 import { getRepos } from '.';
 import { registerCorridorZones } from '@/lib/regions';
-import { toPublicProperty } from './publicView';
+import { toCardView, toPublicProperty } from './publicView';
 
 // Cached reads for public pages (ISR on Vercel). Admin publish actions call
 // revalidateTag('properties' | 'catalogue' | 'settings') to refresh them immediately.
@@ -33,6 +33,11 @@ export async function getCorridors() {
 export async function getPublishedProperties() {
   const [properties] = await Promise.all([cachedProperties(), getCorridors()]);
   return properties;
+}
+
+/** Published listings for cards, search and compare (lighter than the full records). */
+export async function getListingCards() {
+  return (await getPublishedProperties()).map(toCardView);
 }
 
 export async function getPublishedProperty(slug: string) {

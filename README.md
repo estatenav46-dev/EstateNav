@@ -79,7 +79,9 @@ Listings are created in the separate admin app (`EstateNav-admin`, see its READM
 | Section | Data (in `lib/data/schemas.ts`) |
 | --- | --- |
 | Overview | type, configurations, size, rate, `facts` (acres, units, towers, floors, open space, clubhouse, launch), possession and RERA completion dates |
-| Unit types & prices | `configurations` with carpet / super built-up area, bathrooms, dimensions, availability, note and the linked floor plan (`components/property/UnitTable.tsx`) |
+| Unit types & prices | `configurations` with carpet / super built-up area, bathrooms, dimensions, availability, note and the linked floor plan, plus unit type, balcony, terrace, UDS, rate, all-inclusive price, car parks, facing, tower and unit count when set. Grouped by BHK and unit type, so 4 BHK row houses and 4 BHK apartments stay apart (`components/property/ConfigExplorer.tsx`, `UnitTable.tsx`) |
+| Price breakdown | `charges`: each cost-sheet line with amount and basis (`components/property/CostBreakdown.tsx`) |
+| Payment plan | `paymentPlan`: type, booking % and stages |
 | Floor plans | `media.masterPlan` and `media.floorPlans`, opened in the photo viewer (`PlanGallery.tsx`) |
 | Amenities | `amenities`, grouped by `lib/listingMeta.ts` |
 | Specifications | `specifications` (category and detail) |
@@ -89,7 +91,7 @@ Listings are created in the separate admin app (`EstateNav-admin`, see its READM
 | More details | `extraDetails` label and value rows, grouped |
 | Developer | partner profile and sourced track record |
 
-`priceOnRequest` shows "Price on request" everywhere a price would appear (cards, header, compare, JSON-LD); `priceMin` still drives budget filters. An active `offer` shows as a badge on the card and the project page. Every new field has a schema default, so listings saved before these fields existed still load.
+`priceOnRequest` shows "Price on request" everywhere a price would appear (cards, header, compare, JSON-LD); `priceMin` still drives budget filters. An active `offer` shows as a badge on the card and the project page. Every new field has a schema default, so listings saved before these fields existed still load. Cards, search, compare and the shortlist receive a lighter copy of each listing (`toCardView` in `lib/data/publicView.ts`); only the project page gets the full record. A listing that fails validation is skipped and logged instead of breaking every page. A starting price of ₹1 (imported with no price) is left out of budget filters.
 
 ## Data architecture (Firebase-ready, not connected)
 

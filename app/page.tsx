@@ -8,7 +8,7 @@ import { SavedRail } from '@/components/home/SavedRail';
 import { AdvisoryBand } from '@/components/home/AdvisoryBand';
 import { FromTheBlog } from '@/components/home/FromTheBlog';
 import { JsonLd } from '@/components/ui/JsonLd';
-import { getCorridors, getMarketSnapshots, getPublishedBlogs, getPublishedProperties, getSettings } from '@/lib/data/cached';
+import { getCorridors, getMarketSnapshots, getPublishedBlogs, getListingCards, getSettings } from '@/lib/data/cached';
 import { realEstateAgentJsonLd } from '@/lib/seo';
 
 export const revalidate = 60;
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 // Hero (auto-cycling segments) → market pulse → region → need → your brief / picks → blog → advisory.
 export default async function HomePage() {
   const [properties, corridors, snapshots, settings, posts] = await Promise.all([
-    getPublishedProperties(),
+    getListingCards(),
     getCorridors(),
     getMarketSnapshots(),
     getSettings(),

@@ -8,7 +8,7 @@ import { JsonLd } from '@/components/ui/JsonLd';
 import { ArticleBody, articleHeadings } from '@/components/blog/ArticleBody';
 import { BlogCard } from '@/components/blog/BlogCard';
 import { ExploreCard } from '@/components/explore/ExploreCard';
-import { getPublishedBlogs, getPublishedProperties, getSettings } from '@/lib/data/cached';
+import { getListingCards, getPublishedBlogs, getSettings } from '@/lib/data/cached';
 import { blogDate, suggestedPosts } from '@/lib/blog';
 import { whatsAppLink } from '@/lib/contact';
 import { breadcrumbJsonLd } from '@/lib/seo';
@@ -50,7 +50,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
   const { post, posts } = await findPost(params.slug);
   if (!post) notFound();
-  const [properties, settings] = await Promise.all([getPublishedProperties(), getSettings()]);
+  const [properties, settings] = await Promise.all([getListingCards(), getSettings()]);
   const related = post.relatedPropertyIds.map((id) => properties.find((p) => p.id === id)).filter((p): p is NonNullable<typeof p> => Boolean(p));
   const suggestions = suggestedPosts(post, posts, 4);
   const more = posts.filter((p) => p.id !== post.id && !suggestions.some((s) => s.id === p.id)).slice(0, 3);

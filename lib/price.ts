@@ -44,6 +44,11 @@ export function formatINRRange(min: number, max: number | null | undefined, suff
   return `${formatINR(min)} – ${formatINRShort(max)}${suffix}`;
 }
 
+/** "₹1.58 Cr" for one figure, "₹1.58 – 1.6 Cr" for a range (no "From"). */
+export function formatINRSpan(min: number, max: number | null | undefined): string {
+  return max && max > min ? `${formatINR(min)} – ${formatINRShort(max)}` : formatINR(min);
+}
+
 export function formatSqft(value: number): string {
   return `${Math.round(value).toLocaleString('en-IN')} sq.ft`;
 }
@@ -52,5 +57,12 @@ export function formatSqftRange(min: number | null | undefined, max: number | nu
   if (min == null && max == null) return null;
   if (min != null && max != null && min !== max) return `${min.toLocaleString('en-IN')}–${max.toLocaleString('en-IN')} sq.ft`;
   if (min != null && max == null) return `${min.toLocaleString('en-IN')}+ sq.ft`;
+  return formatSqft((min ?? max)!);
+}
+
+/** A unit's size: one stated size is exact ("1,280 sq.ft"); two sizes give a range. */
+export function formatUnitSqft(min: number | null | undefined, max: number | null | undefined): string | null {
+  if (min == null && max == null) return null;
+  if (min != null && max != null && min !== max) return `${min.toLocaleString('en-IN')}–${max.toLocaleString('en-IN')} sq.ft`;
   return formatSqft((min ?? max)!);
 }

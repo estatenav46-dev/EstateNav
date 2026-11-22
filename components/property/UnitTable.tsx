@@ -6,8 +6,8 @@ import { useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { FileText, Maximize2 } from 'lucide-react';
 import type { Configuration, Property } from '@/lib/data/types';
-import { formatINRRange, formatSqftRange } from '@/lib/price';
-import { bhkLabel } from '@/lib/property';
+import { formatINRRange, formatINRSpan, formatUnitSqft } from '@/lib/price';
+import { bhkLabel, unitGroupLabel } from '@/lib/property';
 import { openLeadSheet } from '@/lib/ui/stores';
 
 const Lightbox = dynamic(() => import('./Lightbox'), { ssr: false });
@@ -67,7 +67,7 @@ export function UnitTable({ property }: { property: Property }) {
           const plan = planIndex >= 0 ? plans[planIndex] : null;
           const badge = c.availability ? AVAILABILITY[c.availability] : null;
           const value = price(c);
-          const area = formatSqftRange(c.carpetSqftMin, c.carpetSqftMax);
+          const area = formatUnitSqft(c.carpetSqftMin, c.carpetSqftMax);
           return (
             <li key={c.id} className={`grid grid-cols-[minmax(0,1fr)_88px] gap-x-4 gap-y-1 px-4 py-3.5 md:items-center ${showSuper ? 'md:grid-cols-[minmax(0,1.3fr)_1fr_1fr_1.1fr_96px]' : 'md:grid-cols-[minmax(0,1.3fr)_1.4fr_1.1fr_96px]'}`}>
               <div className="min-w-0">
@@ -75,7 +75,22 @@ export function UnitTable({ property }: { property: Property }) {
                   {c.label}
                   {badge && <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${badge.className}`}>{badge.label}</span>}
                 </p>
-                <p className="text-xs text-ink-muted">{[showBaths && c.bathrooms ? `${c.bathrooms} bath` : null, c.dimensions, c.notes].filter(Boolean).join(' · ')}</p>
+                <p className="text-xs text-ink-muted">
+                  {[
+                    c.unitKind && c.unitKind !== 'apartment' && !c.label.toLowerCase().includes(c.unitKind.replace('-', ' ')) ? unitGroupLabel(c) : null,
+                    showBaths && c.bathrooms ? `${c.bathrooms} bath` : null,
+                    c.balconySqft ? `${c.balconySqft.toLocaleString('en-IN')} sq.ft balcony` : null,
+                    c.terraceSqft ? `${c.terraceSqft.toLocaleString('en-IN')} sq.ft terrace` : null,
+                    c.udsSqft ? `UDS ${Math.round(c.udsSqft).toLocaleString('en-IN')} sq.ft` : null,
+                    c.carParks ? `${c.carParks} car park${c.carParks > 1 ? 's' : ''}` : null,
+                    c.facing ? `${c.facing} facing` : null,
+                    c.tower,
+                    c.dimensions,
+                    c.notes,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </p>
               </div>
               <div className="col-start-1 text-sm md:col-start-auto">
                 <span className="text-xs text-ink-muted md:hidden">{plot ? 'Plot ' : 'Carpet '}</span>
@@ -84,15 +99,18 @@ export function UnitTable({ property }: { property: Property }) {
               {showSuper && (
                 <div className="col-start-1 text-sm md:col-start-auto">
                   <span className="text-xs text-ink-muted md:hidden">Super built-up </span>
-                  <span className="tabular">{formatSqftRange(c.superSqftMin, c.superSqftMax) ?? '—'}</span>
+                  <span className="tabular">{formatUnitSqft(c.superSqftMin, c.superSqftMax) ?? '—'}</span>
                 </div>
               )}
               <div className="col-start-1 md:col-start-auto">
                 {value ? (
-                  <span className="tabular font-serif text-lg">
-                    {value}
-                    <sup className="ml-0.5 text-xs text-brass">*</sup>
-                  </span>
+                  <>
+                    <span className="tabular font-serif text-lg">
+                      {value}
+                      <sup className="ml-0.5 text-xs text-brass">*</sup>
+                    </span>
+                    {c.totalPriceMin ? <span className="block text-2xs text-ink-muted">All-in ≈ {formatINRSpan(c.totalPriceMin, c.totalPriceMax)}</span> : null}
+                  </>
                 ) : (
                   <button type="button" onClick={() => ask(c)} className="text-sm font-semibold text-accent-ink hover:underline">
                     {c.availability === 'sold-out' ? 'Ask for resale' : 'Price on request'}

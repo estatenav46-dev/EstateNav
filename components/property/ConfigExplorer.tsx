@@ -4,10 +4,10 @@ import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Bath, CalendarDays, FileText, Maximize2, Ruler, Table2 } from 'lucide-react';
+import { Bath, Building2, CalendarDays, Car, Compass, FileText, Hash, IndianRupee, Maximize2, Ruler, Table2, Trees } from 'lucide-react';
 import type { Configuration, Property } from '@/lib/data/types';
-import { formatINR, formatINRRange, formatSqftRange } from '@/lib/price';
-import { bhkLabel } from '@/lib/property';
+import { formatINR, formatINRRange, formatINRSpan, formatUnitSqft } from '@/lib/price';
+import { unitGroupLabel } from '@/lib/property';
 import { openLeadSheet } from '@/lib/ui/stores';
 import { UnitTable } from './UnitTable';
 
@@ -17,17 +17,21 @@ type Group = { key: string; label: string; items: Configuration[] };
 
 const AVAILABILITY: Record<NonNullable<Configuration['availability']>, string | null> = { available: null, limited: 'Few units left', 'sold-out': 'Sold out' };
 
-/** Configurations grouped by BHK (or by name for plots, villas and offices). */
+const sortKey = (c: Configuration) => (c.unitKind === 'studio' ? 0 : c.bhk ?? 99);
+
+/** Configurations grouped by BHK and unit type (4 BHK apartments and 4 BHK row houses stay apart). */
 function groupConfigs(configs: Configuration[]): Group[] {
   const groups = new Map<string, Group>();
   for (const c of configs) {
-    const key = c.bhk != null ? `bhk-${c.bhk}` : `l-${c.label.trim().toLowerCase()}`;
-    const label = c.bhk != null ? bhkLabel(c.bhk) : c.label;
-    if (!groups.has(key)) groups.set(key, { key, label, items: [] });
+    const kind = c.unitKind ?? 'apartment';
+    const key = c.bhk != null ? `bhk-${c.bhk}-${kind}` : kind === 'studio' ? 'studio' : `l-${c.label.trim().toLowerCase()}`;
+    if (!groups.has(key)) groups.set(key, { key, label: unitGroupLabel(c), items: [] });
     groups.get(key)!.items.push(c);
   }
-  return Array.from(groups.values()).sort((a, b) => (a.items[0].bhk ?? 99) - (b.items[0].bhk ?? 99));
+  return Array.from(groups.values()).sort((a, b) => sortKey(a.items[0]) - sortKey(b.items[0]));
 }
+
+const sqft = (n: number | null | undefined) => (n ? `${n.toLocaleString('en-IN')} sq.ft` : null);
 
 // BHK buttons; picking one shows its sizes, price, floor plan and the next step.
 export function ConfigExplorer({ property }: { property: Property }) {
@@ -53,10 +57,18 @@ export function ConfigExplorer({ property }: { property: Property }) {
   };
   const price = !hidePrice && unit.priceMin ? formatINRRange(unit.priceMin, unit.priceMax, rent ? ' /month' : '') : null;
   const rows = [
-    { icon: Ruler, label: plot ? 'Plot area' : 'Carpet area', value: formatSqftRange(unit.carpetSqftMin, unit.carpetSqftMax) },
-    !plot ? { icon: Ruler, label: 'Super built-up', value: formatSqftRange(unit.superSqftMin, unit.superSqftMax) } : null,
+    { icon: Ruler, label: plot ? 'Plot area' : 'Carpet area', value: formatUnitSqft(unit.carpetSqftMin, unit.carpetSqftMax) },
+    !plot ? { icon: Ruler, label: 'Super built-up', value: formatUnitSqft(unit.superSqftMin, unit.superSqftMax) } : null,
     unit.dimensions ? { icon: Ruler, label: 'Dimensions', value: unit.dimensions } : null,
     unit.bathrooms ? { icon: Bath, label: 'Bathrooms', value: String(unit.bathrooms) } : null,
+    unit.balconySqft ? { icon: Ruler, label: 'Balcony', value: sqft(unit.balconySqft) } : null,
+    unit.terraceSqft ? { icon: Trees, label: 'Terrace / garden', value: sqft(unit.terraceSqft) } : null,
+    unit.udsSqft ? { icon: Ruler, label: 'UDS', value: `${Math.round(unit.udsSqft).toLocaleString('en-IN')} sq.ft` } : null,
+    unit.ratePerSqft && !hidePrice ? { icon: IndianRupee, label: 'Rate', value: `₹${Math.round(unit.ratePerSqft).toLocaleString('en-IN')}/sq.ft` } : null,
+    unit.carParks != null ? { icon: Car, label: 'Car parks', value: unit.carParks === 0 ? 'Not included' : String(unit.carParks) } : null,
+    unit.facing ? { icon: Compass, label: 'Facing', value: unit.facing } : null,
+    unit.tower ? { icon: Building2, label: 'Tower', value: unit.tower } : null,
+    unit.unitCount ? { icon: Hash, label: 'Units', value: unit.unitCount.toLocaleString('en-IN') } : null,
   ].filter((r): r is { icon: typeof Ruler; label: string; value: string | null } => Boolean(r));
   const status = unit.availability ? AVAILABILITY[unit.availability] : null;
   const ask = (intent: 'price-sheet' | 'site-visit') =>
@@ -95,7 +107,7 @@ export function ConfigExplorer({ property }: { property: Property }) {
             <span className="mr-1 text-xs text-ink-muted">{group.items.length} sizes:</span>
             {group.items.map((c, i) => (
               <button key={c.id} type="button" onClick={() => setV(i)} aria-pressed={i === v} className="chip min-h-[30px] px-2.5 text-xs">
-                {formatSqftRange(c.carpetSqftMin, c.carpetSqftMax) ?? c.label}
+                {formatUnitSqft(c.carpetSqftMin, c.carpetSqftMax) ?? formatUnitSqft(c.superSqftMin, c.superSqftMax) ?? c.label}{c.tower ? ` · ${c.tower}` : ''}
               </button>
             ))}
           </div>
@@ -118,6 +130,11 @@ export function ConfigExplorer({ property }: { property: Property }) {
             ) : (
               <p className="text-lg font-semibold">On request</p>
             )}
+            {price && unit.totalPriceMin ? (
+              <p className="mt-0.5 text-xs text-ink-muted">
+                All-inclusive ≈ <span className="tabular font-semibold text-ink">{formatINRSpan(unit.totalPriceMin, unit.totalPriceMax)}</span> (before stamp duty &amp; registration)
+              </p>
+            ) : null}
 
             <dl className="mt-3 grid grid-cols-2 gap-2">
               {rows.map(({ icon: Icon, label, value }) => (

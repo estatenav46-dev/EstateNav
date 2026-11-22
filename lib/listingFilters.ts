@@ -119,6 +119,8 @@ export function matchesListing(property: Property, s: ListingState): boolean {
   if (s.bhk.length && !s.bhk.some((b) => (b >= 5 ? property.bhkOptions.some((o) => o >= 5) : property.bhkOptions.includes(b)))) return false;
   // Without a segment the budget is a purchase budget; monthly rents don't compare with it.
   if ((s.min != null || s.max != null) && !s.seg && property.transaction === 'rent') return false;
+  // A starting price of ₹1 means "no price yet" (imported with price on request): leave it out of budget searches.
+  if ((s.min != null || s.max != null) && property.priceMin <= 1) return false;
   if (!overlaps(property.priceMin, property.priceMax, s.min, s.max)) return false;
   if (!overlaps(property.sizeMin, property.sizeMax, s.sizeMin, s.sizeMax)) return false;
   if (!matchesPossession(property, s.possession)) return false;

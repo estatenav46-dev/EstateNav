@@ -58,7 +58,15 @@ const properties: PropertyRepo = {
     }
 
     const snapshot = await q.get();
-    let results: Property[] = snapshot.docs.map((doc) => doc.data());
+    // One malformed record must not take every page down: skip it and log which one.
+    let results: Property[] = snapshot.docs.flatMap((doc) => {
+      try {
+        return [doc.data()];
+      } catch (error) {
+        console.error(`[properties] skipped invalid listing ${doc.id}:`, error instanceof Error ? error.message.slice(0, 400) : error);
+        return [];
+      }
+    });
 
     if (query.featuredOnly) {
       results = results.filter((p) => p.featured);

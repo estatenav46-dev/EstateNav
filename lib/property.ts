@@ -1,4 +1,4 @@
-import type { EnquiryIntent, Lens, Property, SearchSegment } from './data/types';
+import type { Configuration, EnquiryIntent, Lens, Property, SearchSegment, UnitKind } from './data/types';
 import { formatINR, formatINRRange, formatSqftRange } from './price';
 
 export const SEGMENT_LABEL: Record<SearchSegment, string> = { residential: 'Residential', plot: 'Plots', commercial: 'Commercial', rent: 'Rent' };
@@ -79,6 +79,42 @@ export function shortRera(number: string): string {
 export function bhkLabel(bhk: number): string {
   return bhk >= 5 ? '5+ BHK' : `${bhk} BHK`;
 }
+
+export const UNIT_KIND_LABEL: Record<UnitKind, string> = {
+  apartment: 'Apartment',
+  studio: 'Studio',
+  duplex: 'Duplex',
+  penthouse: 'Penthouse',
+  villa: 'Villa',
+  'row-house': 'Row house',
+  villament: 'Villament',
+  'independent-house': 'Independent house',
+  plot: 'Plot',
+  office: 'Office',
+  retail: 'Retail',
+};
+
+/** Group heading for a unit: "3 BHK", "4 BHK Row house", "Studio" or the unit's own name. */
+export function unitGroupLabel(c: Configuration): string {
+  const kind = c.unitKind && c.unitKind !== 'apartment' ? UNIT_KIND_LABEL[c.unitKind] : null;
+  if (c.bhk != null) return kind && c.unitKind !== 'plot' ? `${bhkLabel(c.bhk)} ${kind}` : bhkLabel(c.bhk);
+  return c.unitKind === 'studio' ? 'Studio' : c.label;
+}
+
+export const PLAN_AUTHORITY_LABEL: Record<string, string> = {
+  BBMP: 'BBMP',
+  GBA: 'GBA',
+  BDA: 'BDA',
+  BMRDA: 'BMRDA',
+  BIAAPA: 'BIAAPA',
+  APA: 'Anekal Planning Authority',
+  HPA: 'Hoskote Planning Authority',
+  NPA: 'Nelamangala Planning Authority',
+  KIADB: 'KIADB',
+  DTCP: 'DTCP',
+  Panchayat: 'Gram Panchayat',
+  Other: 'Sanctioned',
+};
 
 export const INTENT_LABEL: Record<EnquiryIntent, string> = {
   'site-visit': 'Site visit',

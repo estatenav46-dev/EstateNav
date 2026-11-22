@@ -1,5 +1,11 @@
 import type { z } from 'zod';
 import type {
+  chargeSchema,
+  chargeBasisSchema,
+  paymentPlanSchema,
+  paymentStageSchema,
+  unitKindSchema,
+  planAuthoritySchema,
   visitorEventSchema,
   visitorLeadSchema,
   configurationSchema,
@@ -61,3 +67,10 @@ export type VisitorLead = z.output<typeof visitorLeadSchema>;
 export type VisitorLeadInput = z.input<typeof visitorLeadSchema>;
 export type VisitorEvent = z.infer<typeof visitorEventSchema>;
 export type BlogPost = import('zod').infer<typeof import('./schemas').blogPostSchema>;
+
+export type UnitKind = z.infer<typeof unitKindSchema>;
+export type Charge = z.infer<typeof chargeSchema>;
+export type ChargeBasis = z.infer<typeof chargeBasisSchema>;
+export type PaymentPlan = z.infer<typeof paymentPlanSchema>;
+export type PaymentStage = z.infer<typeof paymentStageSchema>;
+export type PlanAuthority = z.infer<typeof planAuthoritySchema>;

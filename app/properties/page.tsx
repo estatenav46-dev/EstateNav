@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import PropertyResults from './PropertyResults';
-import { getCorridors, getMarketSnapshots, getPublishedProperties, getSettings } from '@/lib/data/cached';
+import { getCorridors, getMarketSnapshots, getListingCards, getSettings } from '@/lib/data/cached';
 
 export const revalidate = 60;
 
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 
 export default async function PropertiesPage() {
-  const [properties, corridors, snapshots, settings] = await Promise.all([getPublishedProperties(), getCorridors(), getMarketSnapshots(), getSettings()]);
+  const [properties, corridors, snapshots, settings] = await Promise.all([getListingCards(), getCorridors(), getMarketSnapshots(), getSettings()]);
   return (
     <>
       {/* Filtered links keep results hidden until the filters are applied in the browser. */}
