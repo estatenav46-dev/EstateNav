@@ -17,7 +17,7 @@ To open the admin preview locally, set `NEXT_PUBLIC_ADMIN_PREVIEW=true` and visi
 
 | Route | What it is |
 | --- | --- |
-| `/` | Hero (segment switch, search console, featured carousel), "Where do you want to live?" photo cards (West and Central as coming-soon cards), "What are you looking for?" (type photo cards and need pills with custom icons), "Picked for you", partner section and the advisory band |
+| `/` | Hero (segment switch, search console, featured carousel), "Where do you want to live?" photo cards (West and Central as coming-soon cards), "What are you looking for?" (type cards and need pills with custom icons), "The developers we work with" partner logo wall, "Picked for you", partner section and the advisory band |
 | `/properties` | Explore page, app-style: a left rail goes region → area → location, with type chips (Apartments, Plots, Offices), budget, sort, a "More filters" sheet and compact cards. From 1024px a "What's around" panel beside the headline (`components/explore/PlaceSnapshot.tsx`, data in `lib/placeGuides.ts`) describes the region or area on show: a one-line summary plus its work hubs, transport, schools and hospitals, compiled from public sources (names only, no distances); tablets show the one-line summary. The search box sits at the end of the filter row there. URL-backed (`?zone=east&corridor=whitefield&loc=…`); each region or area step is a history entry, so Back goes up a level. Opening a card shows the quick-view sheet |
 | `/properties/[slug]` | Full detail page. Property cards, the carousel and search open it in a new tab; clicking a card photo opens the photo viewer instead |
 | `/contact` | Enquiry form (`?intent=site-visit|price-sheet|loan-help|general&property=slug`) |
@@ -137,7 +137,7 @@ See `.env.example`. On Vercel add them under **Project Settings → Environment 
 
 ## Compliance built in
 
-- Header shows no developer logos; the partner developer appears as text only.
+- Header shows no developer logos. The home page's partner wall (`components/home/PartnerWall.tsx`) shows each visible partner's logo as uploaded on the admin's Partners page (`developers/{id}.logo`), or its name when none is uploaded, with the line "EstateNav is an authorised channel partner, not the developers' official website. Logos belong to their owners." Hidden partners never appear. From eight partners the wall moves in two slow rows with a Pause button; with reduced motion it is one still, centred wall; tiles link to the partner's projects.
 - Footer on every public page: RERA Registered Agent SV Praveen, the K-RERA number, validity 16-09-2026 to 16-09-2031, and "EstateNav is an independent advisory portal, not the official developer website."
 - The detail page shows the project's K-RERA number with a Verify link, or "RERA details on request". On cards this block is commented out for now at the client's request (`components/explore/ExploreCard.tsx`, `components/property/PropertyCard.tsx`); uncomment to restore.
 - Wishlist (heart): sign-in required. Saved to `users/{uid}.shortlist` through `app/actions/wishlist.ts`, which verifies the Firebase ID token; in mock mode it is kept on the device per account.
