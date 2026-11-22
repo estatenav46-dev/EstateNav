@@ -29,7 +29,7 @@ function Section({ id, title, children, aside }: { id: string; title: string; ch
   return (
     <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-32 border-t border-line pt-6 first-of-type:border-t-0 first-of-type:pt-1 sm:pt-7 sm:first-of-type:pt-2">
       <div className="flex flex-wrap items-end justify-between gap-2">
-        <h2 id={`${id}-title`} className="font-serif text-[1.5rem] leading-tight sm:text-[1.85rem]">
+        <h2 id={`${id}-title`} className="font-serif text-[1.4rem] leading-tight sm:text-[1.6rem]">
           {title}
         </h2>
         {aside}
@@ -154,7 +154,7 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
               </span>
             )}
           </div>
-          <h1 className="mt-2.5 font-serif text-[1.85rem] leading-[1.08] sm:mt-3 sm:text-[2.8rem] lg:text-[3.2rem]">{property.title}</h1>
+          <h1 className="mt-2.5 font-serif text-[1.85rem] leading-[1.08] sm:mt-3 sm:text-[2.4rem] lg:text-[2.6rem]">{property.title}</h1>
           <p className="mt-1.5 flex items-start gap-1.5 text-sm text-ink-muted sm:mt-2 sm:text-[0.95rem]">
             <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent-ink" aria-hidden="true" />
             <span>
@@ -405,10 +405,8 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
         <section aria-labelledby="similar-title" className="mt-12 border-t border-line pt-10 sm:mt-14 sm:pt-12">
           <Reveal variant="words" className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="rw-fade flex items-center gap-2.5 text-2xs font-semibold uppercase tracking-[0.16em] text-ink-muted">
-                <span aria-hidden="true" className="rw-line h-px w-8 bg-brass/60" /> Similar homes
-              </p>
-              <h2 id="similar-title" className="mt-3 font-serif text-[2rem] leading-[1.05] sm:text-[2.5rem]">
+              <p className="rw-fade text-sm font-medium text-ink-muted">Similar homes</p>
+              <h2 id="similar-title" className="mt-1 font-serif text-[1.65rem] leading-[1.1] sm:text-[2rem]">
                 <Words>
                   <>Also worth a look near <span className="text-accent-ink">{property.corridorName}</span></>
                 </Words>

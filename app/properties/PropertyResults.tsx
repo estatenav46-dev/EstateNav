@@ -28,6 +28,7 @@ import { PROPERTY_TYPE_LABEL } from '@/lib/listingMeta';
 import { FilterPanel } from '@/components/listings/FilterPanel';
 import { ExploreCard } from '@/components/explore/ExploreCard';
 import { PlaceSnapshot } from '@/components/explore/PlaceSnapshot';
+import { placeGuide } from '@/lib/placeGuides';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { JsonLd } from '@/components/ui/JsonLd';
 import { LazySheet as Sheet } from '@/components/ui/LazySheet';
@@ -190,11 +191,6 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
   const area = state.corridors.length === 1 ? corridors.find((c) => c.id === state.corridors[0]) : undefined;
   const results = useMemo(() => applyListing(properties, state), [properties, state]);
   const shown = results.slice(0, limit);
-  // Every project in the region, area or location on show, whatever the other filters say.
-  const placeProjects = useMemo(
-    () => properties.filter((p) => matchesListing(p, { ...DEFAULT_LISTING_STATE, zone: state.zone, corridors: state.corridors, loc: state.loc })),
-    [properties, state.zone, state.corridors, state.loc],
-  );
   const countWith = (patch: Partial<ListingState>) => properties.filter((p) => matchesListing(p, { ...state, ...patch })).length;
 
   // Corridors in this region, including ones only known from listings.
@@ -280,6 +276,7 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
   const toggleApproval = (key: ListingState['approvals'][number]) =>
     update({ approvals: state.approvals.includes(key) ? state.approvals.filter((a) => a !== key) : [...state.approvals, key] });
   const benchmarkCorridor = area?.id ?? (singleArea ? zoneCorridors[0]?.id : undefined);
+  const guide = placeGuide(zone?.id, benchmarkCorridor);
   const benchmark = benchmarkCorridor ? latestSnapshots(snapshots).find((s) => s.corridorId === benchmarkCorridor) : undefined;
   // With no match, or only one or two, offer the filters to relax that bring in more projects.
   const suggestions = results.length <= 2 ? relaxSuggestions(properties, state).filter((s) => s.count > results.length) : [];
@@ -361,6 +358,9 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
       />
 
       <div ref={top} className="min-w-0 flex-1 scroll-mt-[60px] px-3 pb-28 pt-4 sm:px-5 sm:pt-6 lg:px-8 md:pb-20">
+        {/* Headline on the left; on wide screens what's around the place fills the right. */}
+        <div className="lg:flex lg:items-start lg:gap-8">
+        <div className="min-w-0 flex-1">
         <div className="hidden sm:block">
           <Breadcrumbs items={crumbs} />
         </div>
@@ -372,7 +372,7 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
             </button>
           )}
           <div className="min-w-0 flex-1">
-            <h1 className="truncate font-serif text-[1.6rem] leading-tight sm:text-[2.4rem] lg:text-[2.75rem]">{title}</h1>
+            <h1 className="truncate font-serif text-[1.6rem] leading-tight sm:text-[2.1rem] lg:text-[2.3rem]">{title}</h1>
             <p className="mt-1 truncate text-[13px] text-ink-muted sm:text-[0.95rem]" aria-live="polite">
               <strong className="text-ink">{results.length}</strong> {results.length === 1 ? one : many}
               {context ? ` · ${context}` : ''}
@@ -390,16 +390,19 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
               </p>
             )}
           </div>
-          <PlaceSnapshot place={title} projects={placeProjects} className="hidden w-[min(50%,40rem)] shrink-0 lg:block" />
           <label className="relative hidden w-56 shrink-0 self-center md:block lg:hidden">
             <span className="sr-only">Search in these results</span>
             <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" strokeWidth={1.75} aria-hidden="true" />
             <input value={state.q} onChange={(e) => update({ q: e.target.value })} placeholder="Search project or builder…" className="field min-h-[44px] pl-10 text-sm" />
           </label>
         </div>
+        {guide && <p className="mt-2 hidden max-w-xl text-sm leading-snug text-ink-muted md:block lg:hidden">{guide.intro}</p>}
+        </div>
+        <PlaceSnapshot place={title} guide={guide} className="hidden w-[min(54%,42rem)] shrink-0 lg:block" />
+        </div>
 
         {/* Toolbar: what kind of property, then budget, filters and sort. */}
-        <div className="sticky top-[60px] z-20 -mx-3 mt-4 border-b border-line bg-bg/95 px-3 py-2.5 backdrop-blur-md sm:-mx-5 sm:mt-5 sm:px-5 lg:-mx-8 lg:px-8">
+        <div className="sticky top-[60px] z-20 -mx-3 mt-3 border-b border-line bg-bg/95 px-3 py-2.5 backdrop-blur-md sm:-mx-5 sm:mt-4 sm:px-5 lg:-mx-8 lg:px-8">
           <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 py-0.5" role="group" aria-label="Property type">
             {typeChips.map((t) => (
               <button

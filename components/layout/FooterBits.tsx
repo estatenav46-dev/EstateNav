@@ -13,10 +13,8 @@ export function FooterCta({ agentName, whatsapp }: { agentName: string; whatsapp
   return (
     <Reveal variant="words" className="flex flex-col gap-6 border-b border-[rgb(var(--on-night)/0.12)] pb-10 md:flex-row md:items-end md:justify-between">
       <div className="max-w-2xl">
-        <p className="rw-fade flex items-center gap-2.5 text-2xs font-semibold uppercase tracking-[0.16em] text-[rgb(var(--on-night)/0.65)]">
-          <span aria-hidden="true" className="rw-line h-px w-8 bg-brass/70" /> Ready when you are
-        </p>
-        <h2 className="mt-3 font-serif text-[2.4rem] leading-[1.02] text-[rgb(var(--on-night))] sm:text-[3.4rem]">
+        <p className="rw-fade text-sm font-medium text-[rgb(var(--on-night)/0.65)]">Ready when you are</p>
+        <h2 className="mt-1 font-serif text-[1.9rem] leading-[1.08] text-[rgb(var(--on-night))] sm:text-[2.4rem]">
           <Words>
             <>See it in person, <span className="text-brass">with the advisor.</span></>
           </Words>

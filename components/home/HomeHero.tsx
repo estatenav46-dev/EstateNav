@@ -177,17 +177,15 @@ export function HomeHero({ properties, corridors }: { properties: Property[]; co
 
   return (
     <section ref={sectionRef} aria-labelledby="hero-title" data-scrub="exit" data-scrub-span="0.8" className="relative isolate z-10 overflow-x-clip border-b border-line">
-      <div className={`mx-auto grid max-w-container gap-8 px-4 pb-8 pt-5 sm:px-6 sm:pt-8 lg:min-h-[min(calc(100svh-72px),820px)] ${all.length ? 'lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]' : 'lg:max-w-3xl'} lg:items-center lg:gap-12 lg:px-8 lg:py-10`}>
+      <div className={`mx-auto grid max-w-container gap-8 px-4 pb-8 pt-5 sm:px-6 sm:pt-8 ${all.length ? 'lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]' : 'lg:max-w-3xl'} lg:items-center lg:gap-12 lg:px-8 lg:pb-12 lg:pt-10`}>
         <div className="sc-hero-copy relative z-20 min-w-0">
-          <p className="rise-in hidden items-center gap-2.5 text-2xs font-semibold uppercase tracking-[0.16em] text-ink-muted sm:flex">
-            <span aria-hidden="true" className="h-px w-8 bg-brass/70" /> Bengaluru&apos;s verified property desk
-          </p>
+          <p className="rise-in hidden text-sm font-medium text-ink-muted sm:block">Bengaluru&apos;s verified property desk</p>
 
           {/* All three headlines share one grid cell, so switching never shifts the page. */}
-          <div className="grid sm:mt-4 [&>*]:[grid-area:1/1]">
+          <div className="grid sm:mt-3 [&>*]:[grid-area:1/1]">
             {SEG_IDS.map((id) =>
               id === seg ? (
-                <h1 key={seg} id="hero-title" className="font-serif text-[2.15rem] leading-[1.04] tracking-[-0.025em] sm:text-[3.4rem] lg:text-[3.6rem] xl:text-[4.1rem]">
+                <h1 key={seg} id="hero-title" className="hero-accent font-serif text-[2rem] leading-[1.06] tracking-[-0.02em] sm:text-[2.6rem] lg:text-[2.75rem] xl:text-[3.1rem]">
                   {words.map((w, i) => (
                     <span key={`${seg}-${i}`}>
                       <span className="word-mask">
@@ -197,13 +195,13 @@ export function HomeHero({ properties, corridors }: { properties: Property[]; co
                   ))}
                 </h1>
               ) : (
-                <p key={id} aria-hidden="true" className="invisible font-serif text-[2.15rem] leading-[1.04] tracking-[-0.025em] sm:text-[3.4rem] lg:text-[3.6rem] xl:text-[4.1rem]">
+                <p key={id} aria-hidden="true" className="invisible font-serif text-[2rem] leading-[1.06] tracking-[-0.02em] sm:text-[2.6rem] lg:text-[2.75rem] xl:text-[3.1rem]">
                   {SEGMENTS[id].headline.join(' ')}
                 </p>
               ),
             )}
           </div>
-          <div className="mt-5 hidden max-w-md sm:grid [&>*]:[grid-area:1/1]">
+          <div className="mt-3 hidden max-w-md sm:grid [&>*]:[grid-area:1/1]">
             {SEG_IDS.map((id) => (
               <p key={id === seg ? `${seg}-sub` : id} aria-hidden={id !== seg || undefined} className={`text-[1.0625rem] leading-relaxed text-ink-muted ${id === seg ? 'rise-in' : 'invisible'}`} style={{ '--d': '380ms' } as CSSProperties}>
                 {SEGMENTS[id].sub}
@@ -236,7 +234,7 @@ export function HomeHero({ properties, corridors }: { properties: Property[]; co
           </div>
 
           <div
-            className="rise-in relative z-30 mt-3 rounded-[20px] border border-line bg-surface p-2 shadow-[0_30px_60px_-40px_rgb(var(--shadow)/0.55)] transition-[box-shadow,border-color] duration-slow focus-within:border-accent-ink/40 focus-within:shadow-[0_30px_70px_-36px_rgb(var(--accent)/0.45)]"
+            className="rise-in relative z-30 mt-3 rounded-[16px] border border-line bg-surface p-2 shadow-[0_30px_60px_-40px_rgb(var(--shadow)/0.55)] transition-[box-shadow,border-color] duration-slow focus-within:border-accent-ink/40 focus-within:shadow-[0_30px_70px_-36px_rgb(var(--accent)/0.45)]"
             style={{ '--d': '580ms' } as CSSProperties}
             onFocusCapture={() => setLocked(true)}
           >
@@ -253,7 +251,7 @@ export function HomeHero({ properties, corridors }: { properties: Property[]; co
                     {seg === 'plot' ? <Ruler className="h-4 w-4" aria-hidden="true" /> : <IndianRupee className="h-4 w-4" aria-hidden="true" />}
                   </span>
                 }
-                className="min-h-[52px] rounded-[14px] border border-transparent bg-surface-2 px-3 text-[0.95rem] font-semibold hover:border-line data-[open=true]:border-accent-ink data-[open=true]:bg-surface"
+                className="min-h-[48px] rounded-[12px] border border-transparent bg-surface-2 px-3 text-[0.95rem] font-semibold hover:border-line data-[open=true]:border-accent-ink data-[open=true]:bg-surface"
               />
               <button
                 type="button"
@@ -261,7 +259,7 @@ export function HomeHero({ properties, corridors }: { properties: Property[]; co
                   startNavProgress();
                   router.push(`/properties?${serializeListingState(filters)}`);
                 }}
-                className="btn-primary min-h-[52px] rounded-[14px] px-7 text-[0.95rem]"
+                className="btn-primary min-h-[48px] rounded-[12px] px-6"
               >
                 Show {count} {count === 1 ? copy.noun[0] : copy.noun[1]}
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />

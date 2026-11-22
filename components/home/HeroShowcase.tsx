@@ -72,8 +72,8 @@ export function HeroShowcase({ all, slides, index, dir, segLabel, duration, time
       }}
     >
       <div className="mb-3 flex items-center justify-between gap-3">
-        <span className="inline-flex items-center gap-2 text-2xs font-semibold uppercase tracking-[0.16em] text-ink-muted">
-          <span className="h-1.5 w-1.5 rounded-full bg-brass" aria-hidden="true" /> Featured · {segLabel}
+        <span className="inline-flex items-center gap-2 text-sm font-medium text-ink-muted">
+          Featured {segLabel.toLowerCase()} projects
         </span>
         <span className="tabular font-mono text-xs text-ink-muted">
           {String(index + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
@@ -89,7 +89,7 @@ export function HeroShowcase({ all, slides, index, dir, segLabel, duration, time
                 key={`${timerKey}-${p.id}`}
                 aria-roledescription="slide"
                 aria-label={`${((index + k) % slides.length) + 1} of ${slides.length}: ${p.title}`}
-                className={`h-[22rem] shrink-0 grow sm:h-[24rem] lg:h-[31rem] xl:h-[33rem] ${slides.length === 1 ? 'basis-full' : slides.length === 2 ? 'basis-[84%] sm:basis-[calc((100%-0.75rem)/2)]' : 'basis-[84%] sm:basis-[calc((100%-0.75rem)/2)] md:basis-[calc((100%-1.5rem)/3)] lg:basis-[calc((100%-0.75rem)/2)]'} ${animate ? (dir === 1 ? 'card-in-next' : 'card-in-prev') : ''}`}
+                className={`h-[18rem] shrink-0 grow sm:h-[20rem] lg:h-[23rem] xl:h-[24rem] ${slides.length === 1 ? 'basis-full' : slides.length === 2 ? 'basis-[84%] sm:basis-[calc((100%-0.75rem)/2)]' : 'basis-[84%] sm:basis-[calc((100%-0.75rem)/2)] md:basis-[calc((100%-1.5rem)/3)] lg:basis-[calc((100%-0.75rem)/2)]'} ${animate ? (dir === 1 ? 'card-in-next' : 'card-in-prev') : ''}`}
                 style={{ '--d': `${k * 70}ms` } as CSSProperties}
               >
                 <a
@@ -120,7 +120,7 @@ export function HeroShowcase({ all, slides, index, dir, segLabel, duration, time
                     </span>
                   </span>
 
-                  <h2 className="line-clamp-2 font-serif text-[1.45rem] leading-[1.08] text-white lg:text-[1.7rem]">{p.title}</h2>
+                  <h2 className="line-clamp-2 font-serif text-[1.3rem] leading-[1.1] text-white lg:text-[1.4rem]">{p.title}</h2>
                   <p className="mt-1.5 truncate text-[13px] text-white/80">
                     {p.locality} · {p.corridorName}
                   </p>

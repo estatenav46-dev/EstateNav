@@ -35,11 +35,11 @@ export default async function BlogsPage({ searchParams }: { searchParams: { cate
       <Breadcrumbs items={crumbs} />
 
       <header className="mt-6 max-w-3xl">
-        <p className="sheet-label flex items-center gap-2.5"><span aria-hidden="true" className="h-px w-8 bg-brass/60" /> Blog</p>
-        <h1 className="mt-3 font-serif text-[2.4rem] leading-[1.04] sm:text-[3.4rem]">
+        <p className="text-sm font-medium text-ink-muted">Blog</p>
+        <h1 className="mt-1 font-serif text-[2rem] leading-[1.08] sm:text-[2.6rem]">
           Bengaluru property, <span className="text-accent-ink">explained.</span>
         </h1>
-        <p className="mt-4 max-w-2xl text-[1.0625rem] leading-relaxed text-ink-muted">Guides on checking K-RERA, approvals and prices, home loans, and the areas worth a look, written by the advisor who takes you on the site visit.</p>
+        <p className="mt-3 max-w-2xl leading-relaxed text-ink-muted">Guides on checking K-RERA, approvals and prices, home loans, and the areas worth a look, written by the advisor who takes you on the site visit.</p>
       </header>
 
       {posts.length === 0 ? (

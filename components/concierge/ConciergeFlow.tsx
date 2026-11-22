@@ -241,23 +241,21 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
   };
 
   const heading = (text: string) => (
-    <h3 id={titleId} tabIndex={-1} data-step-focus className={`font-serif leading-[1.1] tracking-[-0.02em] outline-none ${inline ? 'text-[1.35rem] sm:text-[1.5rem]' : 'text-[1.6rem] sm:text-[1.9rem]'}`}>
+    <h3 id={titleId} tabIndex={-1} data-step-focus className={`font-serif leading-[1.1] tracking-[-0.02em] outline-none ${inline ? 'text-[1.25rem] sm:text-[1.35rem]' : 'text-[1.6rem] sm:text-[1.9rem]'}`}>
       {text}
     </h3>
   );
 
   return (
-    <div className={`grid overflow-hidden bg-surface ${inline ? 'rounded-card border border-line shadow-[0_30px_60px_-48px_rgb(var(--shadow)/0.6)] md:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]' : 'rounded-slide shadow-[0_60px_120px_-40px_rgb(0_0_0/0.6)] md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]'}`}>
-      <aside className={`relative isolate flex flex-col overflow-hidden bg-forest text-forest-on ${inline ? 'p-5 sm:p-6' : 'p-5 sm:p-7 md:min-h-[520px] md:p-8'}`}>
-        <p className="flex items-center gap-2.5 text-2xs font-semibold uppercase tracking-[0.16em] text-forest-on/70">
-          <span aria-hidden="true" className="h-px w-8 bg-brass/70" /> EstateNav concierge
-        </p>
-        <p className={`mt-3 font-serif leading-[1.08] text-forest-on ${inline ? 'text-[1.6rem] sm:text-[1.85rem]' : 'text-[1.8rem] sm:text-[2.3rem]'}`}>
+    <div className={`grid overflow-hidden bg-surface ${inline ? 'rounded-card border border-line shadow-[0_30px_60px_-48px_rgb(var(--shadow)/0.6)] md:grid-cols-[minmax(0,3.6fr)_minmax(0,8.4fr)]' : 'rounded-slide shadow-[0_60px_120px_-40px_rgb(0_0_0/0.6)] md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]'}`}>
+      <aside className={`relative isolate flex flex-col overflow-hidden bg-forest text-forest-on ${inline ? 'p-5' : 'p-5 sm:p-7 md:min-h-[520px] md:p-8'}`}>
+        <p className="text-sm font-medium text-forest-on/70">EstateNav concierge</p>
+        <p className={`mt-3 font-serif leading-[1.08] text-forest-on ${inline ? 'text-[1.35rem] sm:text-[1.5rem]' : 'text-[1.8rem] sm:text-[2.3rem]'}`}>
           Tell us what you&apos;re after. <span className="text-brass">We&apos;ll do the shortlisting.</span>
         </p>
 
         <div className={`flex items-end gap-3 ${inline ? 'mt-4' : 'mt-5 md:mt-8'}`}>
-          <span className={`font-serif leading-none tracking-[-0.04em] text-forest-on ${inline ? 'text-[2.25rem]' : 'text-[2.75rem] sm:text-[3.25rem]'}`}>
+          <span className={`font-serif leading-none tracking-[-0.04em] text-forest-on ${inline ? 'text-[2rem]' : 'text-[2.75rem] sm:text-[3.25rem]'}`}>
             <NumberRoll value={matches.length} />
           </span>
           <span className="pb-1.5 text-sm text-forest-on/75" aria-live="polite">
@@ -297,7 +295,7 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
         </p>
       </aside>
 
-      <div ref={body} className={`relative flex min-w-0 flex-col ${inline ? 'p-5 sm:p-6' : 'p-5 sm:p-8'}`}>
+      <div ref={body} className={`relative flex min-w-0 flex-col ${inline ? 'p-5' : 'p-5 sm:p-8'}`}>
         <div className="flex items-center gap-3">
           {current !== 'done' ? (
             <>
@@ -322,12 +320,12 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
           )}
         </div>
 
-        <div key={current} className={`flex flex-1 flex-col ${inline ? 'mt-4' : 'mt-5'} ${dir === 1 ? 'step-in' : 'step-back'}`}>
+        <div key={current} className={`flex flex-1 flex-col ${inline ? 'mt-3' : 'mt-5'} ${dir === 1 ? 'step-in' : 'step-back'}`}>
           {current === 'goal' && (
             <>
               {heading(STEP_TITLE.goal)}
               <p className="mt-1.5 text-sm text-ink-muted">Pick one. About 20 seconds in all, no sign-up.</p>
-              <div className={`stagger grid gap-2.5 sm:grid-cols-2 ${inline ? 'mt-4 xl:grid-cols-3' : 'mt-5'}`}>
+              <div className={`stagger grid gap-2 sm:grid-cols-2 ${inline ? 'mt-3 xl:grid-cols-3' : 'mt-5'}`}>
                 {GOALS.map((g, i) => (
                   <Tile key={g.id} index={i} selected={answers.goal === g.id} onPick={() => pick('goal', g.id)} className={g.id === 'browsing' ? 'sm:col-span-2' : ''}>
                     <span className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] transition-colors duration-base ${answers.goal === g.id ? 'bg-accent text-accent-on' : 'bg-accent-soft text-accent-ink group-hover:bg-accent group-hover:text-accent-on'}`}>

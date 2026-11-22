@@ -29,12 +29,12 @@ export default async function ContactPage({ searchParams }: { searchParams: { pr
       <Breadcrumbs items={[{ name: 'Home', path: '/' }, { name: 'Contact', path: '/contact' }]} />
       <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-14">
         <section aria-labelledby="contact-title">
-          <p className="sheet-label flex items-center gap-2.5"><span aria-hidden="true" className="h-px w-8 bg-brass/60" /> Enquiry</p>
-          <h1 id="contact-title" className="mt-3 font-serif text-[2.4rem] leading-[1.04] sm:text-[3.2rem]">Talk to <span className="text-accent-ink">the advisor</span></h1>
-          <p className="mt-4 max-w-xl text-[1.0625rem] leading-relaxed text-ink-muted">
+          <p className="text-sm font-medium text-ink-muted">Enquiry</p>
+          <h1 id="contact-title" className="mt-1 font-serif text-[2rem] leading-[1.08] sm:text-[2.5rem]">Talk to <span className="text-accent-ink">the advisor</span></h1>
+          <p className="mt-3 max-w-xl leading-relaxed text-ink-muted">
             {property ? `About ${property.title}. ` : ''}Tell us what you need — a site visit, the developer’s price sheet or help with a home loan. {agent.name} replies personally.
           </p>
-          <div className="panel mt-8 p-5 shadow-[0_30px_60px_-48px_rgb(var(--shadow)/0.6)] sm:p-8">
+          <div className="panel mt-6 p-5 shadow-[0_30px_60px_-48px_rgb(var(--shadow)/0.6)] sm:p-7">
             <LeadForm consent={consent} source="contact" property={property ? { slug: property.slug, title: property.title } : null} intent={intent} intentChoices={INTENTS} whatsapp={contact.whatsapp} advisorName={agent.name} />
           </div>
         </section>

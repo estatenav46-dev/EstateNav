@@ -9,8 +9,6 @@ import { Reveal } from '@/components/Reveal';
 import { SectionHeading } from './SectionHeading';
 
 const TYPE_IDS = ['apartments', 'plots', 'offices'];
-// Columns for however many property types have projects, so no row is left half empty.
-const TYPE_COLS: Record<number, string> = { 1: 'sm:grid-cols-1', 2: 'sm:grid-cols-2', 3: 'sm:grid-cols-3' };
 const TYPE_COPY: Record<string, string> = {
   apartments: 'Ready and upcoming homes in gated communities',
   plots: 'Approved layouts to build your own',
@@ -30,36 +28,29 @@ export function NeedTiles({ properties }: { properties: Property[] }) {
 
   return (
     <section aria-labelledby="needs-title" className="mx-auto max-w-container px-4 pt-12 sm:px-6 sm:pt-14 lg:px-8 lg:pt-16">
-      <SectionHeading index="02" kicker="Browse by need" id="needs-title" title={<>What are you <span className="text-accent-ink">looking for?</span></>} />
+      <SectionHeading kicker="Browse by need" id="needs-title" title={<>What are you <span className="text-accent-ink">looking for?</span></>} />
 
-      <ul className={`no-scrollbar -mx-4 mt-6 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:mt-7 sm:grid ${TYPE_COLS[types.length] ?? 'sm:grid-cols-3'} sm:gap-5 sm:overflow-visible sm:px-0 sm:pb-0`}>
+      <ul className="mt-6 grid gap-3 sm:mt-7 sm:grid-cols-[repeat(auto-fit,minmax(17rem,1fr))]">
         {types.map((t, i) => (
-          <Reveal as="li" key={t.id} index={i} variant="zoom" className={`${types.length === 1 ? 'w-full' : 'w-[82%]'} shrink-0 snap-start sm:w-auto`}>
-            <Link
-              href={t.href}
-              data-ripple
-              className={`group relative isolate flex aspect-[4/3] h-full flex-col justify-end overflow-hidden rounded-card bg-forest p-5 text-white ${types.length <= 2 ? 'sm:aspect-auto sm:h-64' : 'sm:aspect-[3/4] lg:aspect-[4/3.4]'}`}
-            >
-              {t.cover && <Image src={t.cover.url} alt="" fill sizes="(min-width: 640px) 31vw, 100vw" quality={60} className="-z-10 object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]" />}
-              <span aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
-              <span className="flex items-end justify-between gap-3">
-                <span className="min-w-0">
-                  <span className="block font-serif text-[1.75rem] leading-tight">{t.label}</span>
-                  <span className="mt-1 block text-sm text-white/80">{TYPE_COPY[t.id]}</span>
-                  <span className="mt-3 inline-flex rounded-full bg-white/15 px-2.5 py-1 text-xs font-semibold ring-1 ring-white/25 backdrop-blur-sm">
-                    {t.count} {t.count === 1 ? 'project' : 'projects'}
-                  </span>
-                </span>
-                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-neutral-900 transition-transform duration-base group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true">
-                  <ArrowUpRight className="h-4 w-4" />
+          <Reveal as="li" key={t.id} index={i} variant="zoom">
+            <Link href={t.href} data-ripple className="lift group flex h-full items-center gap-4 rounded-card border border-line bg-surface p-2.5 pr-5">
+              <span className="relative h-[5.5rem] w-[7.5rem] shrink-0 overflow-hidden rounded-[12px] bg-forest">
+                {t.cover && <Image src={t.cover.url} alt="" fill sizes="120px" quality={60} className="lift-photo object-cover" />}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-serif text-[1.3rem] leading-tight">{t.label}</span>
+                <span className="mt-0.5 line-clamp-2 block text-[13px] leading-snug text-ink-muted">{TYPE_COPY[t.id]}</span>
+                <span className="mt-1.5 block text-xs font-semibold text-accent-ink">
+                  {t.count} {t.count === 1 ? 'project' : 'projects'}
                 </span>
               </span>
+              <ArrowUpRight className="h-4 w-4 shrink-0 text-ink-muted transition-[transform,color] duration-base group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink" aria-hidden="true" />
             </Link>
           </Reveal>
         ))}
       </ul>
 
-      <ul className="mt-5 grid grid-cols-2 gap-2.5 sm:grid-cols-[repeat(auto-fit,minmax(11rem,1fr))]">
+      <ul className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-[repeat(auto-fit,minmax(11rem,1fr))]">
         {needs.map((t, i) => (
           <Reveal as="li" key={t.id} index={i}>
             <Link

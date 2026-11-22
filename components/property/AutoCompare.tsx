@@ -35,10 +35,10 @@ export function AutoCompare({ base, suggested, pool }: { base: Property; suggest
 
   return (
     <section aria-labelledby="auto-compare-title" className="mt-12 border-t border-line pt-10 sm:mt-14 sm:pt-12">
-      <p className="flex items-center gap-2.5 text-2xs font-semibold uppercase tracking-[0.16em] text-ink-muted">
-        <span aria-hidden="true" className="h-px w-8 bg-brass/60" /> Compared for you
+      <p className="text-sm font-medium text-ink-muted">
+        Compared for you
       </p>
-      <h2 id="auto-compare-title" className="mt-3 font-serif text-[2rem] leading-[1.05] sm:text-[2.5rem]">
+      <h2 id="auto-compare-title" className="mt-1 font-serif text-[1.65rem] leading-[1.1] sm:text-[2rem]">
         {base.title} <em className="text-ink-muted">vs</em> {others.length === 1 ? 'a close match' : 'two close matches'}
       </h2>
 

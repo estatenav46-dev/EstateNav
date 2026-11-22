@@ -80,7 +80,7 @@ export function ShortlistView({ properties, whatsapp, advisorName }: { propertie
       <Breadcrumbs items={[{ name: 'Home', path: '/' }, { name: 'Wishlist', path: '/shortlist' }]} />
       <div className="mt-4 flex flex-wrap items-end justify-between gap-5 border-b border-line pb-6">
         <div>
-          <h1 className="font-serif text-[2.4rem] leading-[1.05] sm:text-[3rem]">{shared ? 'A shared wishlist' : 'Your wishlist'}</h1>
+          <h1 className="font-serif text-[2rem] leading-[1.08] sm:text-[2.5rem]">{shared ? 'A shared wishlist' : 'Your wishlist'}</h1>
           <p className="mt-2 text-ink-muted">{items.length} {items.length === 1 ? 'project' : 'projects'}{shared ? '' : ' saved to your account'}</p>
         </div>
         {items.length > 0 && (

@@ -2,7 +2,7 @@
 export default function Loading() {
   return (
     <main aria-busy="true" aria-label="Loading" className="mx-auto max-w-container px-4 pb-16 pt-6 sm:px-6 sm:pt-10 lg:px-8">
-      <div className="grid gap-10 lg:min-h-[min(calc(100svh-72px),860px)] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:gap-14">
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:gap-14">
         <div className="space-y-3">
           <div className="skeleton h-3 w-56 max-w-full rounded-full" />
           <div className="skeleton h-14 w-full rounded-[12px]" />
@@ -13,7 +13,7 @@ export default function Loading() {
         </div>
         <div className="grid grid-cols-2 gap-3">
           {Array.from({ length: 2 }, (_, i) => (
-            <div key={i} className="skeleton h-[22rem] rounded-card lg:h-[31rem] xl:h-[33rem]" />
+            <div key={i} className="skeleton h-[18rem] rounded-card lg:h-[23rem] xl:h-[24rem]" />
           ))}
         </div>
       </div>

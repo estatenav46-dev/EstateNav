@@ -55,7 +55,7 @@ export function ForYou({ properties, settings }: { properties: Property[]; setti
   if (!prefs || justDone) {
     return (
       <section id="brief" aria-labelledby="brief-title" className="mx-auto max-w-container scroll-mt-24 px-4 pt-12 sm:px-6 sm:pt-14 lg:px-8 lg:pt-16">
-        <SectionHeading index="03" kicker="Your brief" id="brief-title" title={<>Thirty seconds, <span className="text-accent-ink">then we shortlist.</span></>} />
+        <SectionHeading kicker="Your brief" id="brief-title" title={<>Thirty seconds, <span className="text-accent-ink">then we shortlist.</span></>} />
         <Reveal variant="zoom" className="mt-8 sm:mt-10">
           <ConciergeCard variant="inline" titleId="brief-step-title" consent={{ text: settings.consentText, version: settings.consentVersion, privacyNote: settings.privacyNote }} advisorName={settings.agent.name} catalogue={catalogue} onDone={() => setJustDone(true)} onFinish={() => setJustDone(false)} />
         </Reveal>
@@ -79,7 +79,6 @@ export function ForYou({ properties, settings }: { properties: Property[]; setti
   return (
     <section id="brief" aria-labelledby="for-you-title" className="mx-auto max-w-container scroll-mt-24 px-4 pt-12 sm:px-6 sm:pt-14 lg:px-8 lg:pt-16">
       <SectionHeading
-        index="03"
         kicker={prefs?.name ? `For you, ${prefs.name}` : 'For you'}
         id="for-you-title"
         title={<>Picked <span className="text-accent-ink">for you.</span></>}

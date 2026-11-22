@@ -27,23 +27,18 @@ export function AdvisoryBand({ settings }: { settings: SiteSettings }) {
       <div className="mx-auto grid max-w-container gap-10 px-4 py-12 sm:px-6 sm:py-14 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-center lg:gap-16 lg:px-8 lg:py-16">
         <div>
           <Reveal variant="words">
-            <p className="rw-fade flex items-center gap-2.5 text-2xs font-semibold uppercase tracking-[0.16em] text-forest-on/70">
-              <span className="tabular text-brass">05</span>
-              <span aria-hidden="true" className="rw-line h-px w-8 bg-brass/60" />
-              Advisory
-            </p>
-            <h2 id="advisory-title" className="mt-3 max-w-xl font-serif text-[2.2rem] leading-[1.04] text-forest-on sm:text-[2.8rem] lg:text-[3.2rem]">
+            <p className="rw-fade text-sm font-medium text-forest-on/70">Advisory</p>
+            <h2 id="advisory-title" className="mt-1 max-w-xl font-serif text-[1.75rem] leading-[1.1] text-forest-on sm:text-[2.1rem] lg:text-[2.3rem]">
               <Words>
                 <>One registered advisor, from <span className="text-brass">first call to keys.</span></>
               </Words>
             </h2>
           </Reveal>
-          <ol className="mt-7 grid gap-x-10 sm:grid-cols-2">
+          <ol className="mt-6 grid gap-x-10 sm:grid-cols-2">
             {PROMISES.map((p, i) => (
               <Reveal as="li" key={p.title} index={i} className="border-t border-forest-on/20 py-4">
-                <span className="tabular text-xs font-semibold text-brass">0{i + 1}</span>
-                <h3 className="mt-2 font-serif text-xl text-forest-on">{p.title}</h3>
-                <p className="mt-1.5 text-[0.95rem] leading-relaxed text-forest-on/75">{p.body}</p>
+                <h3 className="text-base font-semibold text-forest-on">{p.title}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-forest-on/75">{p.body}</p>
               </Reveal>
             ))}
           </ol>

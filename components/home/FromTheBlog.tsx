@@ -16,7 +16,6 @@ export function FromTheBlog({ posts }: { posts: BlogPost[] }) {
   return (
     <section aria-labelledby="blog-title" className="mx-auto max-w-container px-4 pt-12 sm:px-6 sm:pt-14 lg:px-8 lg:pt-16">
       <SectionHeading
-        index="04"
         kicker="From the blog"
         id="blog-title"
         title={<>Know before <span className="text-accent-ink">you visit.</span></>}

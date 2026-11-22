@@ -109,7 +109,14 @@
     letter-spacing: -0.018em;
     font-optical-sizing: auto;
   }
-  .font-serif :is(em, .text-accent-ink, .text-accent, .text-brass) {
+  /* Headings stay one colour; only the hero headline (.hero-accent) sets its highlighted words
+     in green italic, so the device is a signature rather than a pattern on every section. */
+  /* Attribute selectors on purpose: Tailwind copies rules naming its utility classes into every
+     variant (dark:, hover:...), and those copies would override the hero rule below. */
+  .font-serif :is([class~='text-accent-ink'], [class~='text-accent'], [class~='text-brass']) { color: inherit; }
+  .font-serif em { font-style: italic; font-weight: 400; }
+  .font-serif.hero-accent :is([class~='text-accent-ink'], [class~='text-accent']) {
+    color: rgb(var(--accent-ink));
     font-style: italic;
     font-weight: 400;
     letter-spacing: -0.01em;
@@ -130,7 +137,8 @@
   .dark .zone-central, .dark .zone-other { --tint: 148 163 184; }
 
   ::selection {
-    @apply bg-accent-soft text-accent-ink;
+    background-color: rgb(var(--accent-soft));
+    color: rgb(var(--accent-ink));
   }
 
   :focus-visible {
