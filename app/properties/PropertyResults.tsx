@@ -27,6 +27,7 @@ import { budgetSummary } from '@/components/search/BudgetRange';
 import { PROPERTY_TYPE_LABEL } from '@/lib/listingMeta';
 import { FilterPanel } from '@/components/listings/FilterPanel';
 import { ExploreCard } from '@/components/explore/ExploreCard';
+import { PlaceSnapshot } from '@/components/explore/PlaceSnapshot';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { JsonLd } from '@/components/ui/JsonLd';
 import { LazySheet as Sheet } from '@/components/ui/LazySheet';
@@ -189,6 +190,11 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
   const area = state.corridors.length === 1 ? corridors.find((c) => c.id === state.corridors[0]) : undefined;
   const results = useMemo(() => applyListing(properties, state), [properties, state]);
   const shown = results.slice(0, limit);
+  // Every project in the region, area or location on show, whatever the other filters say.
+  const placeProjects = useMemo(
+    () => properties.filter((p) => matchesListing(p, { ...DEFAULT_LISTING_STATE, zone: state.zone, corridors: state.corridors, loc: state.loc })),
+    [properties, state.zone, state.corridors, state.loc],
+  );
   const countWith = (patch: Partial<ListingState>) => properties.filter((p) => matchesListing(p, { ...state, ...patch })).length;
 
   // Corridors in this region, including ones only known from listings.
@@ -384,7 +390,8 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
               </p>
             )}
           </div>
-          <label className="relative hidden w-56 shrink-0 self-center md:block lg:w-72">
+          <PlaceSnapshot place={title} projects={placeProjects} className="hidden w-[min(50%,40rem)] shrink-0 lg:block" />
+          <label className="relative hidden w-56 shrink-0 self-center md:block lg:hidden">
             <span className="sr-only">Search in these results</span>
             <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" strokeWidth={1.75} aria-hidden="true" />
             <input value={state.q} onChange={(e) => update({ q: e.target.value })} placeholder="Search project or builder…" className="field min-h-[44px] pl-10 text-sm" />
@@ -451,6 +458,11 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
               <span className="sr-only sm:hidden">Filters</span>
               {chips.length > 0 && <span className="absolute -right-1 -top-1 min-w-[18px] rounded-full bg-accent px-1 text-center text-[10px] leading-[18px] text-accent-on sm:static sm:bg-bg/20 sm:px-1.5 sm:text-xs sm:text-bg">{chips.length}</span>}
             </button>
+            <label className="relative ml-auto hidden w-64 shrink-0 lg:block xl:w-72">
+              <span className="sr-only">Search in these results</span>
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" strokeWidth={1.75} aria-hidden="true" />
+              <input value={state.q} onChange={(e) => update({ q: e.target.value })} placeholder="Search project or builder…" className="field min-h-[40px] rounded-full pl-10 text-sm" />
+            </label>
           </div>
         </div>
 
