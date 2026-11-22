@@ -38,8 +38,8 @@ export function MarketTicker({ snapshots, corridors }: { snapshots: MarketSnapsh
   const sources = Array.from(new Set(latest.map(({ s }) => `${s.source}, ${monthYear(s.asOf)}`)));
 
   return (
-    <section aria-label="Corridor price benchmarks" className="mx-auto max-w-container px-4 pt-6 sm:px-6 lg:px-8">
-      <div className="overflow-hidden rounded-[22px] bg-[rgb(var(--night))] text-[rgb(var(--on-night)/0.7)] shadow-[0_30px_60px_-40px_rgb(0_0_0/0.7)]">
+    <section aria-label="Corridor price benchmarks" className="mx-auto max-w-container px-4 pt-8 sm:px-6 lg:px-8">
+      <div className="overflow-hidden rounded-card bg-[rgb(var(--night))] text-[rgb(var(--on-night)/0.7)]">
         <div className="flex items-stretch">
           <p className="hidden shrink-0 items-center gap-2 border-r border-white/10 px-5 text-[11px] font-semibold uppercase tracking-[0.16em] text-brass sm:flex">
             <span className="relative flex h-2 w-2" aria-hidden="true">

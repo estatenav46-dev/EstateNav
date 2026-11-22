@@ -69,7 +69,7 @@ export function BlogCarousel({ posts, priority = false }: { posts: BlogPost[]; p
         })}
       </div>
 
-      <div className="mt-2.5 flex items-center justify-between gap-3">
+      <div className="mt-4 flex items-center justify-between gap-3">
         <div className="flex items-center gap-1.5" role="tablist" aria-label="Choose a featured article">
           {posts.map((post, i) => (
             <button
@@ -79,7 +79,7 @@ export function BlogCarousel({ posts, priority = false }: { posts: BlogPost[]; p
               aria-selected={i === index}
               aria-label={`Show “${post.title}”`}
               onClick={() => go(i)}
-              className="group flex h-6 items-center"
+              className="group flex h-10 min-w-[24px] items-center"
             >
               <span className={`block h-1.5 rounded-full transition-all duration-300 ${i === index ? 'w-7 bg-accent' : 'w-3 bg-line-strong group-hover:bg-ink-muted'}`} />
             </button>
@@ -89,13 +89,13 @@ export function BlogCarousel({ posts, priority = false }: { posts: BlogPost[]; p
           </span>
         </div>
         <div className="flex items-center gap-1">
-          <button type="button" onClick={() => setStopped((s) => !s)} className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-line bg-surface text-ink transition-colors hover:border-line-strong hover:bg-surface-2" aria-label={stopped ? 'Play the carousel' : 'Pause the carousel'}>
+          <button type="button" onClick={() => setStopped((s) => !s)} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-surface text-ink transition-colors hover:border-ink/40" aria-label={stopped ? 'Play the carousel' : 'Pause the carousel'}>
             {stopped ? <Play className="h-3.5 w-3.5" aria-hidden="true" /> : <Pause className="h-3.5 w-3.5" aria-hidden="true" />}
           </button>
-          <button type="button" onClick={() => go(index - 1)} className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-line bg-surface text-ink transition-colors hover:border-line-strong hover:bg-surface-2" aria-label="Previous featured article">
+          <button type="button" onClick={() => go(index - 1)} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-surface text-ink transition-colors hover:border-ink/40" aria-label="Previous featured article">
             <ChevronLeft className="h-4 w-4" aria-hidden="true" />
           </button>
-          <button type="button" onClick={() => go(index + 1)} className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-line bg-surface text-ink transition-colors hover:border-line-strong hover:bg-surface-2" aria-label="Next featured article">
+          <button type="button" onClick={() => go(index + 1)} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-surface text-ink transition-colors hover:border-ink/40" aria-label="Next featured article">
             <ChevronRight className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>

@@ -27,7 +27,7 @@ const STATUS_DOT: Record<ReturnType<typeof statusChip>, string> = {
 export function StatusChip({ property, className = '' }: { property: Property; className?: string }) {
   const status = statusChip(property);
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full bg-surface px-2.5 py-1 text-2xs font-medium text-ink ${className}`}>
+    <span className={`inline-flex items-center gap-1.5 rounded-full bg-surface px-2.5 py-1 text-2xs font-semibold text-ink ${className}`}>
       <i className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[status]}`} aria-hidden="true" />
       {status}
     </span>
@@ -84,7 +84,7 @@ export function PropertyCard({ property, priority = false, variant = 'grid', siz
           blurDataURL={cover.blurDataURL || undefined}
           unoptimized={cover.url.startsWith('blob:')}
           sizes={sizes ?? (feature ? '(min-width: 1024px) 50vw, 100vw' : '(min-width: 1280px) 30vw, (min-width: 640px) 50vw, 100vw')}
-          className="object-cover"
+          className="lift-photo object-cover"
         />
         {second && swap !== 'idle' && (
           <Image
@@ -135,7 +135,7 @@ export function PropertyCard({ property, priority = false, variant = 'grid', siz
 
       <div className={`flex min-w-0 flex-col gap-2.5 p-4 ${feature ? 'lg:p-6' : 'flex-1'}`}>
         <div className="min-w-0">
-          <h3 className={`truncate font-serif leading-tight ${feature ? 'text-2xl lg:text-3xl' : 'text-xl'}`} title={property.title}>
+          <h3 className={`truncate font-serif leading-tight ${feature ? 'text-2xl lg:text-3xl' : 'text-[1.3rem]'}`} title={property.title}>
             <Link href={href} target="_blank" rel="noopener noreferrer" className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none" aria-label={`${property.title}, ${property.locality}. View details (opens in a new tab)`}>
               {property.title}
             </Link>
@@ -147,7 +147,7 @@ export function PropertyCard({ property, priority = false, variant = 'grid', siz
 
         <ul className="flex flex-wrap gap-1.5" aria-label="Configurations">
           {chips.slice(0, 3).map((chip) => (
-            <li key={chip} className="rounded-md border border-line bg-surface-2 px-2 py-0.5 text-2xs text-ink">{chip}</li>
+            <li key={chip} className="rounded-full border border-line px-2.5 py-0.5 text-2xs font-medium text-ink">{chip}</li>
           ))}
           {chips.length > 3 && <li className="rounded-md px-1 py-0.5 text-2xs text-ink-muted">+{chips.length - 3}</li>}
         </ul>
@@ -156,7 +156,7 @@ export function PropertyCard({ property, priority = false, variant = 'grid', siz
 
         <div className="mt-auto flex flex-wrap items-end justify-between gap-3 pt-1">
           <div className="min-w-0">
-            <p className="tabular font-serif text-2xl leading-none">{priceLabel(property)}</p>
+            <p className="tabular text-[1.35rem] font-semibold leading-none tracking-[-0.015em]">{priceLabel(property)}</p>
             {rate && <p className="mt-1 text-2xs text-ink-muted">{rate}{property.transaction === 'sale' ? ' (from)' : ''}</p>}
           </div>
           <div className="relative z-10 flex shrink-0 gap-1">

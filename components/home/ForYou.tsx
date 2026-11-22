@@ -54,16 +54,16 @@ export function ForYou({ properties, settings }: { properties: Property[]; setti
 
   if (!prefs || justDone) {
     return (
-      <section id="brief" aria-labelledby="brief-title" className="mx-auto max-w-container scroll-mt-24 px-4 pt-8 sm:px-6 sm:pt-10 lg:px-8">
+      <section id="brief" aria-labelledby="brief-title" className="mx-auto max-w-container scroll-mt-24 px-4 pt-12 sm:px-6 sm:pt-14 lg:px-8 lg:pt-16">
         <SectionHeading index="03" kicker="Your brief" id="brief-title" title={<>Thirty seconds, <span className="text-accent-ink">then we shortlist.</span></>} />
-        <Reveal variant="zoom" className="mt-4 sm:mt-5">
+        <Reveal variant="zoom" className="mt-8 sm:mt-10">
           <ConciergeCard variant="inline" titleId="brief-step-title" consent={{ text: settings.consentText, version: settings.consentVersion, privacyNote: settings.privacyNote }} advisorName={settings.agent.name} catalogue={catalogue} onDone={() => setJustDone(true)} onFinish={() => setJustDone(false)} />
         </Reveal>
         {result.viewed.length > 0 && (
           <p className="mt-5 flex flex-wrap items-center gap-2 text-sm text-ink-muted">
             <span>Recently viewed:</span>
             {result.viewed.map((p) => (
-              <a key={p.id} href={`/properties/${p.slug}`} target="_blank" rel="noopener noreferrer" className="chip min-h-[36px] px-3 text-xs">
+              <a key={p.id} href={`/properties/${p.slug}`} target="_blank" rel="noopener noreferrer" className="chip min-h-[40px] px-3.5 text-sm">
                 {p.title}
               </a>
             ))}
@@ -77,7 +77,7 @@ export function ForYou({ properties, settings }: { properties: Property[]; setti
   if (!rail.length) return null;
 
   return (
-    <section id="brief" aria-labelledby="for-you-title" className="mx-auto max-w-container scroll-mt-24 px-4 pt-8 sm:px-6 sm:pt-10 lg:px-8">
+    <section id="brief" aria-labelledby="for-you-title" className="mx-auto max-w-container scroll-mt-24 px-4 pt-12 sm:px-6 sm:pt-14 lg:px-8 lg:pt-16">
       <SectionHeading
         index="03"
         kicker={prefs?.name ? `For you, ${prefs.name}` : 'For you'}
@@ -86,17 +86,17 @@ export function ForYou({ properties, settings }: { properties: Property[]; setti
         action={
           <div className="flex flex-wrap items-center gap-2">
             {result.reasons.length > 0 && (
-              <p className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-2 text-xs text-ink-muted">
+              <p className="inline-flex items-center gap-2 text-sm text-ink-muted">
                 <Sparkles className="h-3.5 w-3.5 text-brass" aria-hidden="true" /> Because you chose {result.reasons.join(' · ')}
               </p>
             )}
-            <button type="button" onClick={() => conciergeStore.set(true)} className="btn-secondary min-h-[40px] px-4 text-xs">
+            <button type="button" onClick={() => conciergeStore.set(true)} className="btn-secondary min-h-[44px] px-4">
               <PenLine className="h-3.5 w-3.5" aria-hidden="true" /> Edit my brief
             </button>
           </div>
         }
       />
-      <ul className="no-scrollbar -mx-4 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-hidden px-4 pb-3 pt-1 sm:mx-0 sm:mt-5 sm:grid sm:grid-cols-2 sm:overflow-visible sm:p-0 lg:grid-cols-4">
+      <ul className="no-scrollbar -mx-4 mt-6 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto overflow-y-hidden px-4 pb-3 pt-1 sm:mx-0 sm:mt-7 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:p-0 lg:grid-cols-4">
         {rail.map((p, i) => (
           <Reveal as="li" key={p.id} index={i} variant="zoom" className="w-[80%] shrink-0 snap-start sm:w-auto">
             <ExploreCard property={p} sizes="(min-width: 1024px) 24vw, (min-width: 640px) 46vw, 80vw" />
@@ -107,7 +107,7 @@ export function ForYou({ properties, settings }: { properties: Property[]; setti
         <p className="mt-5 flex flex-wrap items-center gap-2 text-sm text-ink-muted">
           <span>Recently viewed:</span>
           {result.viewed.map((p) => (
-            <a key={p.id} href={`/properties/${p.slug}`} target="_blank" rel="noopener noreferrer" className="chip min-h-[36px] px-3 text-xs">
+            <a key={p.id} href={`/properties/${p.slug}`} target="_blank" rel="noopener noreferrer" className="chip min-h-[40px] px-3.5 text-sm">
               {p.title}
             </a>
           ))}

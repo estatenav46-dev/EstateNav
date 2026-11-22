@@ -105,7 +105,7 @@ export function UnitTable({ property }: { property: Property }) {
               <div className="col-start-1 md:col-start-auto">
                 {value ? (
                   <>
-                    <span className="tabular font-serif text-lg">
+                    <span className="tabular text-base font-semibold">
                       {value}
                       <sup className="ml-0.5 text-xs text-brass">*</sup>
                     </span>
@@ -119,14 +119,14 @@ export function UnitTable({ property }: { property: Property }) {
               </div>
               <div className="col-start-2 row-span-4 row-start-1 flex justify-end md:col-start-auto md:row-span-1 md:row-start-auto">
                 {plan ? (
-                  <button type="button" onClick={() => setViewer(planIndex)} className="group relative h-16 w-[88px] overflow-hidden rounded-lg border border-line bg-white" aria-label={`View the ${c.label} floor plan`}>
+                  <button type="button" onClick={() => setViewer(planIndex)} className="group relative h-16 w-[88px] overflow-hidden rounded-[10px] border border-line bg-white" aria-label={`View the ${c.label} floor plan`}>
                     <Image src={plan.url} alt="" fill sizes="96px" className="object-contain" />
                     <span className="absolute inset-0 flex items-center justify-center bg-black/0 text-white opacity-0 transition group-hover:bg-black/40 group-hover:opacity-100">
                       <Maximize2 className="h-4 w-4" aria-hidden="true" />
                     </span>
                   </button>
                 ) : (
-                  <button type="button" onClick={() => ask(c)} className="inline-flex h-16 w-[88px] flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-line-strong text-[11px] font-medium text-ink-muted hover:border-accent hover:text-accent-ink">
+                  <button type="button" onClick={() => ask(c)} className="inline-flex h-16 w-[88px] flex-col items-center justify-center gap-1 rounded-[10px] border border-dashed border-line-strong text-[11px] font-medium text-ink-muted hover:border-accent hover:text-accent-ink">
                     <FileText className="h-4 w-4" aria-hidden="true" /> Get plan
                   </button>
                 )}

@@ -61,8 +61,8 @@ export function CookieBanner() {
       className={`fixed inset-x-3 bottom-[84px] z-[60] mx-auto max-w-[460px] md:inset-x-auto md:bottom-6 md:left-6 md:mx-0 md:w-[440px] ${leaving !== null ? 'cookie-out' : 'cookie-in'}`}
       style={leaving ? { animationDelay: '240ms' } : undefined}
     >
-      <div className="relative overflow-hidden rounded-[28px] bg-[rgb(var(--night))] p-5 text-[rgb(var(--on-night))] shadow-[0_40px_90px_-30px_rgb(0_0_0/0.7)] ring-1 ring-white/10 sm:p-6">
-        <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-brass/25 blur-3xl" />
+      <div className="relative overflow-hidden rounded-card bg-[rgb(var(--night))] p-5 text-[rgb(var(--on-night))] shadow-[0_40px_90px_-30px_rgb(0_0_0/0.7)] ring-1 ring-white/10 sm:p-6">
+
         <div className="relative flex items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="flex items-center gap-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--on-night)/0.6)]">
@@ -88,7 +88,7 @@ export function CookieBanner() {
         <div className={`grid transition-[grid-template-rows,opacity,margin] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${custom ? 'mt-4 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
           <div className="overflow-hidden">
             {custom && (
-            <ul className="divide-y divide-white/10 rounded-2xl bg-white/[0.05] ring-1 ring-white/10">
+            <ul className="divide-y divide-white/10 rounded-card bg-white/[0.05] ring-1 ring-white/10">
               <li className="flex items-center gap-4 p-3.5">
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold">Essential</p>
@@ -118,7 +118,7 @@ export function CookieBanner() {
               <button type="button" onClick={() => decide(true)} className="btn-primary min-h-[48px] flex-1 px-5">
                 Accept all <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </button>
-              <button type="button" onClick={() => decide(false)} className="inline-flex min-h-[48px] flex-1 items-center justify-center rounded-full px-5 text-sm font-semibold ring-1 ring-white/25 transition-colors hover:bg-white/10">
+              <button type="button" onClick={() => decide(false)} className="inline-flex min-h-[48px] flex-1 items-center justify-center rounded-[var(--radius)] px-5 text-sm font-semibold ring-1 ring-white/25 transition-[background-color,transform] hover:-translate-y-px hover:bg-white/10 active:scale-[0.97]">
                 Essential only
               </button>
             </>

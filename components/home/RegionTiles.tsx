@@ -34,9 +34,11 @@ export function RegionTiles({ properties, advisorName, whatsapp }: { properties:
     .sort((a, b) => b.list.length - a.list.length);
   if (!tiles.length) return null;
   const lgCols = LG_COLS[tiles.length] ?? 'lg:grid-cols-3 xl:grid-cols-5';
+  // With one or two regions the tiles span the row, so their photos turn landscape.
+  const photoRatio = tiles.length === 1 ? 'aspect-[4/3] sm:aspect-[21/9]' : tiles.length === 2 ? 'aspect-[4/3] sm:aspect-[16/10] lg:aspect-[16/9]' : 'aspect-[4/3]';
 
   return (
-    <section id="regions" aria-labelledby="regions-title" className="mx-auto max-w-container scroll-mt-24 px-4 pt-8 sm:px-6 sm:pt-10 lg:px-8">
+    <section id="regions" aria-labelledby="regions-title" className="mx-auto max-w-container scroll-mt-24 px-4 pt-12 sm:px-6 sm:pt-14 lg:px-8 lg:pt-16">
       <SectionHeading
         index="01"
         kicker="Explore by region"
@@ -45,58 +47,54 @@ export function RegionTiles({ properties, advisorName, whatsapp }: { properties:
         action={
           <Link href="/properties" className="group inline-flex min-h-[44px] items-center gap-2 text-sm font-semibold text-ink hover:text-accent-ink">
             All of Bengaluru
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-line transition-transform duration-base group-hover:translate-x-1 group-hover:border-accent">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line-strong transition-[transform,border-color] duration-base group-hover:translate-x-1 group-hover:border-ink">
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </span>
           </Link>
         }
       />
 
-      <ul className={`mt-4 grid grid-cols-1 gap-3 sm:mt-5 sm:grid-cols-2 ${lgCols}`}>
+      <ul className={`no-scrollbar -mx-4 mt-6 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:mt-7 sm:grid ${tiles.length === 1 ? 'sm:grid-cols-1' : 'sm:grid-cols-2'} sm:gap-x-5 sm:gap-y-8 sm:overflow-visible sm:px-0 sm:pb-0 ${lgCols}`}>
         {tiles.map(({ zone, list, from, areas }, i) => (
-          <Reveal as="li" key={zone.id} index={i} variant="zoom">
+          <Reveal as="li" key={zone.id} index={i} variant="zoom" className={`${tiles.length === 1 ? 'w-full' : 'w-[82%]'} shrink-0 snap-start sm:w-auto`}>
             <Link
               href={`/properties?zone=${zone.id}`}
               data-track="region"
               data-track-zone={zone.id}
-              className="group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface outline-offset-4 transition-[transform,box-shadow,border-color] duration-base hover:border-line-strong [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:shadow-[0_22px_44px_-30px_rgb(var(--shadow)/0.7)]"
+              className="group flex h-full flex-col rounded-card outline-offset-4"
             >
-              <span className="relative block h-36 overflow-hidden bg-forest sm:h-40">
+              <span className={`relative block overflow-hidden rounded-card bg-forest ${photoRatio}`}>
                 {list[0]?.media.cover && (
-                  <Image src={list[0].media.cover.url} alt="" fill sizes="(min-width: 1024px) 24vw, (min-width: 640px) 46vw, 100vw" quality={55} className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.06]" />
+                  <Image src={list[0].media.cover.url} alt="" fill sizes="(min-width: 1024px) 24vw, (min-width: 640px) 46vw, 100vw" quality={60} className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]" />
                 )}
-                <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/20" />
-                <span className="absolute left-3 top-3 rounded-full bg-black/50 px-2 py-0.5 text-[11px] font-semibold text-white ring-1 ring-white/20">
+                <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-transparent" />
+                <span className="absolute left-3.5 top-3.5 rounded-full bg-black/45 px-2.5 py-1 text-[11px] font-semibold text-white ring-1 ring-white/20 backdrop-blur-sm">
                   {list.length} {list.length === 1 ? 'project' : 'projects'}
                 </span>
-                <span className="absolute right-3 top-3">
+                <span className="absolute right-3.5 top-3.5">
                   <Direction zone={zone} />
                 </span>
-                <span className="absolute inset-x-3 bottom-2.5 flex items-end justify-between gap-2 text-white">
-                  <span className="font-serif text-xl leading-tight">{zone.short}</span>
+              </span>
+              <span className="flex flex-1 flex-col pt-4">
+                <span className="flex items-baseline justify-between gap-3">
+                  <span className="font-serif text-[1.6rem] leading-tight transition-colors group-hover:text-accent-ink">{zone.short}</span>
                   {from && (
-                    <span className="text-right text-[11px] leading-tight text-white/80">
-                      from <span className="block font-serif text-base text-white">{formatINR(from)}</span>
+                    <span className="shrink-0 text-sm text-ink-muted">
+                      from <span className="tabular font-semibold text-ink">{formatINR(from)}</span>
                     </span>
                   )}
                 </span>
-              </span>
-              <span className="flex flex-1 flex-col gap-2 p-3">
-                <span className="line-clamp-1 text-xs text-ink-muted">{zone.areas}</span>
-                <span className="flex flex-wrap gap-1">
-                  {list.slice(0, 2).map((p) => (
-                    <span key={p.id} className="max-w-full truncate rounded-md bg-surface-2 px-1.5 py-0.5 text-[11px] font-medium">
-                      {p.title}
-                    </span>
-                  ))}
-                  {list.length > 2 && <span className="rounded-md px-1 py-0.5 text-[11px] text-ink-muted">+{list.length - 2} more</span>}
+                <span className="mt-1 line-clamp-1 text-sm text-ink-muted">{zone.areas}</span>
+                <span className="mt-3 line-clamp-2 border-t border-line pt-3 text-sm text-ink">
+                  {list.slice(0, 2).map((p) => p.title).join(' · ')}
+                  {list.length > 2 && <span className="text-ink-muted"> · +{list.length - 2} more</span>}
                 </span>
-                <span className="mt-auto flex items-center justify-between pt-1 text-xs">
+                <span className="mt-auto flex items-center justify-between pt-3 text-sm">
                   <span className="text-ink-muted">
                     {areas} {areas === 1 ? 'area' : 'areas'}
                   </span>
-                  <span className="inline-flex items-center gap-1 font-semibold text-accent-ink">
-                    Explore {zone.short} <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                  <span className="inline-flex items-center gap-1.5 font-semibold text-accent-ink">
+                    Explore {zone.short} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                   </span>
                 </span>
               </span>
@@ -105,15 +103,15 @@ export function RegionTiles({ properties, advisorName, whatsapp }: { properties:
         ))}
       </ul>
 
-      <p className="mt-3 flex flex-wrap items-center justify-end gap-x-1.5 text-xs text-ink-muted">
+      <p className="mt-8 flex flex-wrap items-center gap-x-1.5 text-sm text-ink-muted">
         Not sure which side of the city suits you?
         <a
           href={whatsAppLink(`Hi ${advisorName}, I'm not sure which part of Bengaluru suits me. Can you help?`, whatsapp)}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 font-semibold text-accent-ink hover:underline"
+          className="inline-flex min-h-[44px] items-center gap-1.5 font-semibold text-accent-ink"
         >
-          <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" /> Ask {advisorName.split(' ')[0]} on WhatsApp
+          <MessageCircle className="h-4 w-4" aria-hidden="true" /> <span className="link-draw">Ask {advisorName.split(' ')[0]} on WhatsApp</span>
         </a>
       </p>
     </section>

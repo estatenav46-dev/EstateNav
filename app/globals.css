@@ -3,36 +3,40 @@
 @tailwind utilities;
 
 /* Theme tokens. Values are RGB channels so Tailwind opacity modifiers work.
-   Light = "Site Plan" (drafting paper), dark = "Blueprint" (night linework). */
+   Light = "Site Plan": warm limestone paper, deep estate green, brass hairlines.
+   Dark = "Blueprint": the blueprint deck's slate canvas (#111827) and emerald actions (#10B981). */
 @layer base {
   :root {
-    --bg: 250 249 246;
+    --bg: 246 244 239;
     --surface: 255 255 255;
-    --surface-2: 243 241 236;
-    --ink: 22 25 29;
-    --ink-muted: 88 96 106;
-    --line: 228 224 216;
-    --line-strong: 205 199 188;
-    --accent: 4 120 87;
-    --accent-hover: 6 95 70;
-    --accent-ink: 4 120 87;
+    --surface-2: 238 235 228;
+    --ink: 21 25 27;
+    --ink-muted: 86 92 97;
+    --line: 226 222 213;
+    --line-strong: 201 195 183;
+    --accent: 25 92 67;
+    --accent-hover: 18 72 52;
+    --accent-ink: 25 92 67;
     --on-accent: 255 255 255;
-    --accent-soft: 230 243 237;
-    --danger: 185 28 28;
+    --accent-soft: 225 237 230;
+    --danger: 180 35 24;
     --scrim: 10 13 16;
-    --shadow: 22 25 29;
-    --backdrop-ink: 22 25 29;
-    --backdrop-opacity: 0.06;
-    --survey: 4 120 87;
-    /* Premium accents: deep forest bands, warm sand surfaces, brass details (used sparingly). */
-    --forest: 11 58 44;
-    --on-forest: 236 244 239;
-    --sand: 244 239 229;
-    --brass: 150 113 58;
+    --shadow: 28 30 26;
+    --backdrop-ink: 25 92 67;
+    --backdrop-opacity: 0.05;
+    --survey: 25 92 67;
+    /* Deep forest bands, warm sand surfaces, brass details (used sparingly). */
+    --forest: 16 50 39;
+    --on-forest: 236 242 238;
+    --sand: 240 235 225;
+    --brass: 140 104 56;
     /* Footer and deep bands: near-black green in both themes. */
-    --night: 12 22 19;
+    --night: 13 24 20;
     --on-night: 226 233 229;
 
+    --radius-sm: 8px;
+    --radius: 12px;
+    --radius-card: 18px;
     --dur-fast: 150ms;
     --dur-base: 240ms;
     --dur-slow: 400ms;
@@ -59,7 +63,7 @@
     --scrim: 4 8 11;
     --shadow: 0 0 0;
     --backdrop-ink: 52 211 153;
-    --backdrop-opacity: 0.09;
+    --backdrop-opacity: 0.07;
     --survey: 103 232 249;
     --forest: 15 46 38;
     --on-forest: 230 240 235;
@@ -73,17 +77,18 @@
   html {
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
+    scroll-padding-top: 88px;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  /* Type and spacing scale with the root size, as a percentage of the visitor's own browser /
-     system text size (so accessibility settings are respected): full size on phones and
-     tablets, compact on laptops and desktops, a touch larger on very wide screens. */
+  /* Type scales with the visitor's own browser text size: full size on phones and tablets,
+     15px on laptops and desktops, back to full size on very wide screens. */
   html { font-size: 100%; }
   @media (min-width: 1024px) {
-    html { font-size: 87.5%; }
+    html { font-size: 93.75%; }
   }
   @media (min-width: 2200px) {
-    html { font-size: 93.75%; }
+    html { font-size: 100%; }
   }
 
   body {
@@ -95,24 +100,32 @@
     @apply text-ink;
     text-wrap: balance;
   }
+  p { text-wrap: pretty; }
 
-  /* Display headings: bold geometric sans; an explicit weight utility still wins. */
+  /* Display headings: Source Serif 4 at a book weight. Highlighted words in a heading
+     (accent or brass colour, or <em>) turn to the italic. */
   .font-serif {
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-weight: 500;
+    letter-spacing: -0.018em;
+    font-optical-sizing: auto;
+  }
+  .font-serif :is(em, .text-accent-ink, .text-accent, .text-brass) {
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.01em;
   }
 
   /* Region tints (RGB channels) for direction badges and tiles, tuned per theme. */
   .zone-north { --tint: 3 105 161; }
   .zone-east { --tint: 180 83 9; }
-  .zone-south-east { --tint: 4 120 87; }
-  .zone-south { --tint: 109 40 217; }
+  .zone-south-east { --tint: 25 92 67; }
+  .zone-south { --tint: 14 116 144; }
   .zone-west { --tint: 190 18 60; }
   .zone-central, .zone-other { --tint: 71 85 105; }
   .dark .zone-north { --tint: 56 189 248; }
   .dark .zone-east { --tint: 251 191 36; }
   .dark .zone-south-east { --tint: 52 211 153; }
-  .dark .zone-south { --tint: 167 139 250; }
+  .dark .zone-south { --tint: 45 212 191; }
   .dark .zone-west { --tint: 251 113 133; }
   .dark .zone-central, .dark .zone-other { --tint: 148 163 184; }
 
@@ -122,83 +135,70 @@
 
   :focus-visible {
     outline: 2px solid rgb(var(--accent-ink));
-    outline-offset: 2px;
+    outline-offset: 3px;
     border-radius: 6px;
   }
 }
 
 @layer components {
-  /* Drawing-set sheet label, e.g. "A-02 · Corridors" */
-  .sheet-label {
-    @apply font-mono text-2xs uppercase tracking-[0.14em] text-ink-muted;
+  /* Small uppercase label above a heading or a group of fields. */
+  .sheet-label, .eyebrow {
+    @apply text-2xs font-semibold uppercase tracking-[0.14em] text-ink-muted;
   }
 
-  /* Buttons: pills with a fill that sweeps in on hover, a pressed scale, and trailing arrows
-     that loop forward. The sweep sits on ::before (behind the label, above the background). */
+  /* Buttons: one family. Solid green (primary), outlined (secondary), quiet (ghost).
+     They step up 1px on hover and press in on click; trailing arrows loop forward. */
   .btn, .btn-primary, .btn-secondary, .btn-ghost {
-    @apply inline-flex min-h-[48px] select-none items-center justify-center gap-2 whitespace-nowrap rounded-full px-6 text-sm font-semibold tracking-[-0.005em];
+    @apply inline-flex min-h-[48px] select-none items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius)] px-5 text-sm font-semibold tracking-[-0.005em];
     touch-action: manipulation;
-    transition: transform 180ms var(--ease), color 320ms var(--ease), border-color 320ms var(--ease), box-shadow 320ms var(--ease), background-color 320ms var(--ease);
+    transition: transform 200ms var(--ease), color 200ms var(--ease), border-color 200ms var(--ease), box-shadow 240ms var(--ease), background-color 200ms var(--ease);
   }
-  .btn:active, .btn-primary:active, .btn-secondary:active, .btn-ghost:active { transform: scale(0.965); }
+  .btn:active, .btn-primary:active, .btn-secondary:active, .btn-ghost:active { transform: translateY(0) scale(0.97); }
   .btn-primary, .btn-secondary { cursor: pointer; }
-  .btn-primary::before, .btn-secondary::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: inherit;
-    transition: transform 520ms var(--ease-expo);
-  }
   .btn-primary {
     background-color: rgb(var(--accent));
     color: rgb(var(--on-accent));
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.2), 0 1px 2px rgb(var(--shadow) / 0.14), 0 14px 28px -16px rgb(var(--accent) / 0.85);
-  }
-  .btn-primary::before {
-    background: linear-gradient(100deg, rgb(var(--accent-hover)), rgb(var(--accent-hover)) 60%, rgb(var(--brass) / 0.85));
-    transform: translateX(-101%);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.14), 0 1px 2px rgb(var(--shadow) / 0.18);
   }
   .btn-secondary {
     border: 1px solid rgb(var(--line-strong));
     background-color: rgb(var(--surface));
     color: rgb(var(--ink));
   }
-  .btn-secondary::before { background: rgb(var(--ink)); transform: translateY(101%); }
   .btn-ghost { color: rgb(var(--ink-muted)); }
   @media (hover: hover) {
-    .btn-primary:hover { box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.2), 0 1px 2px rgb(var(--shadow) / 0.14), 0 18px 34px -16px rgb(var(--accent) / 0.95); }
-    .btn-primary:hover::before { transform: translateX(0); }
-    .btn-secondary:hover { color: rgb(var(--bg)); border-color: rgb(var(--ink)); }
-    .btn-secondary:hover::before { transform: translateY(0); }
+    .btn-primary:hover { background-color: rgb(var(--accent-hover)); transform: translateY(-1px); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.14), 0 10px 22px -12px rgb(var(--accent) / 0.9); }
+    .btn-secondary:hover { border-color: rgb(var(--ink)); transform: translateY(-1px); }
     .btn-ghost:hover { background-color: rgb(var(--surface-2)); color: rgb(var(--ink)); }
     .btn-primary:hover :is(.lucide-arrow-right, .lucide-arrow-up-right, .lucide-chevron-right),
     .btn-secondary:hover :is(.lucide-arrow-right, .lucide-arrow-up-right, .lucide-chevron-right),
     .arrow-host:hover :is(.lucide-arrow-right, .lucide-arrow-up-right) { animation: arrow-loop 560ms var(--ease); }
   }
-  .btn-primary:disabled, .btn-secondary:disabled { cursor: not-allowed; }
-  .btn-primary:disabled::before, .btn-secondary:disabled::before { transform: translateX(-101%); }
+  .btn-primary:disabled, .btn-secondary:disabled { cursor: not-allowed; opacity: 0.6; transform: none; }
 
   .icon-btn {
-    @apply inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-ink transition-[transform,background-color,border-color] duration-base ease-out hover:border-line-strong hover:bg-surface-2 active:scale-[0.94];
+    @apply inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-ink transition-[transform,background-color,border-color] duration-base ease-out hover:border-ink/40 active:scale-[0.94];
   }
 
   .field {
-    @apply min-h-[48px] w-full rounded-xl border border-line bg-surface px-4 text-base text-ink transition-colors duration-fast placeholder:text-ink-muted/80 hover:border-line-strong;
+    @apply min-h-[48px] w-full rounded-[var(--radius)] border border-line-strong/70 bg-surface px-4 text-base text-ink transition-[border-color,box-shadow] duration-fast placeholder:text-ink-muted/80 hover:border-line-strong;
   }
-  .field:focus-visible { @apply border-accent-ink; outline-offset: 0; }
-  .field[aria-invalid='true'] { @apply border-danger; }
+  .field:focus-visible { @apply border-accent-ink; outline: none; box-shadow: 0 0 0 4px rgb(var(--accent) / 0.16); border-radius: var(--radius); }
+  .field[aria-invalid='true'] { @apply border-danger; box-shadow: 0 0 0 4px rgb(var(--danger) / 0.1); }
 
+  /* Filter and choice chips: outlined pills; the chosen one is filled with ink. */
   .chip {
-    @apply inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-line bg-surface px-3.5 text-sm text-ink transition-colors duration-fast hover:border-line-strong;
+    @apply inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-line bg-surface px-3.5 text-sm text-ink transition-[color,background-color,border-color] duration-fast hover:border-ink/40;
   }
   .chip[aria-pressed='true'], .chip[aria-checked='true'], .chip[data-active='true'] {
-    @apply border-accent-ink bg-accent-soft text-accent-ink;
+    @apply border-ink bg-ink text-bg;
   }
+  .chip[aria-pressed='true'] .text-ink-muted, .chip[aria-checked='true'] .text-ink-muted, .chip[data-active='true'] .text-ink-muted { color: rgb(var(--bg) / 0.72); }
 
   .panel { @apply rounded-card border border-line bg-surface; }
 
-  /* Hover lift: transform on the card, shadow on a pseudo-element that only fades in. */
+  /* Hover lift: 2px on the card, a soft shadow fading in on a pseudo-element, and any
+     .lift-photo inside zooms a touch within its frame. */
   .lift {
     position: relative;
     transition: transform var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease);
@@ -208,14 +208,16 @@
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    box-shadow: 0 18px 40px -18px rgb(var(--shadow) / 0.35), 0 4px 12px -6px rgb(var(--shadow) / 0.12);
+    box-shadow: 0 22px 44px -24px rgb(var(--shadow) / 0.38), 0 4px 12px -8px rgb(var(--shadow) / 0.14);
     opacity: 0;
     pointer-events: none;
     transition: opacity var(--dur-base) var(--ease);
   }
+  .lift-photo { transition: transform 700ms var(--ease); }
   @media (hover: hover) {
-    .lift:hover { transform: translateY(-4px); border-color: rgb(var(--accent-ink) / 0.3); }
+    .lift:hover { transform: translateY(-2px); border-color: rgb(var(--line-strong)); }
     .lift:hover::after { opacity: 1; }
+    .lift:hover .lift-photo { transform: scale(1.03); }
   }
 
   .skeleton {
@@ -226,9 +228,19 @@
     position: absolute;
     inset: 0;
     transform: translateX(-100%);
-    background: linear-gradient(90deg, transparent, rgb(var(--surface) / 0.6), transparent);
+    background: linear-gradient(90deg, transparent, rgb(var(--surface) / 0.65), transparent);
     @apply animate-shimmer;
   }
+
+  /* Underline that draws in from the left on hover (text links). */
+  .link-draw {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 320ms var(--ease);
+  }
+  @media (hover: hover) { .link-draw:hover { background-size: 100% 1px; } }
 
   .hairline { @apply border-line; }
   .no-scrollbar { scrollbar-width: none; }
@@ -241,21 +253,21 @@
    words (heading words rise out of masks). Each runs once when it scrolls into view. */
 .reveal {
   --rv-x: 0px;
-  --rv-y: 64px;
+  --rv-y: 28px;
   --rv-s: 1;
   transition: opacity 700ms var(--ease-expo) var(--reveal-delay, 0ms),
               transform 1000ms var(--ease-expo) var(--reveal-delay, 0ms);
 }
-.reveal[data-variant='zoom'] { --rv-y: 32px; --rv-s: 0.9; }
-.reveal[data-variant='left'] { --rv-y: 0px; --rv-x: -72px; }
-.reveal[data-variant='right'] { --rv-y: 0px; --rv-x: 72px; }
+.reveal[data-variant='zoom'] { --rv-y: 20px; --rv-s: 0.97; }
+.reveal[data-variant='left'] { --rv-y: 0px; --rv-x: -28px; }
+.reveal[data-variant='right'] { --rv-y: 0px; --rv-x: 28px; }
 .reveal[data-reveal='waiting'] { opacity: 0; transform: translate3d(var(--rv-x), var(--rv-y), 0) scale(var(--rv-s)); }
 /* The wipe sits on an inner wrapper: an observed element that is fully clipped never counts as visible. */
 .reveal[data-variant='clip'][data-reveal='waiting'] { opacity: 1; transform: translate3d(0, 40px, 0); }
 .rv-clip { clip-path: inset(-30% -30% -30% -30%); transition: clip-path 1100ms var(--ease-expo) var(--reveal-delay, 0ms); }
 [data-reveal='waiting'] > .rv-clip { clip-path: inset(100% 0 0 0); }
 .rv-clip img { transition: scale 1700ms var(--ease-expo) var(--reveal-delay, 0ms), transform 1400ms var(--ease); }
-[data-reveal='waiting'] > .rv-clip img { scale: 1.35; }
+[data-reveal='waiting'] > .rv-clip img { scale: 1.12; }
 .reveal[data-variant='words'][data-reveal='waiting'] { opacity: 1; transform: none; }
 
 .rw-word { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.12em; margin-bottom: -0.12em; }
@@ -336,7 +348,7 @@ html { scroll-behavior: smooth; }
 /* Headline words rise out of a mask, staggered with --i. */
 .word-mask { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.08em; margin-bottom: -0.08em; }
 .word-mask > span { display: inline-block; animation: word-in 1000ms var(--ease-expo) both; animation-delay: calc(var(--i, 0) * 60ms + 60ms); }
-@keyframes word-in { from { transform: translateY(110%) rotate(4deg); } to { transform: none; } }
+@keyframes word-in { from { transform: translateY(110%); } to { transform: none; } }
 
 .frame-in { animation: frame-in 1300ms var(--ease-expo) 120ms backwards; }
 @keyframes frame-in { from { clip-path: inset(10% 10% 10% 10% round 40px); opacity: 0.3; transform: translateY(30px); } to { clip-path: inset(0 0 0 0 round 0px); opacity: 1; transform: none; } }
@@ -367,7 +379,7 @@ html { scroll-behavior: smooth; }
 @keyframes page-in { from { opacity: 0.35; } to { opacity: 1; } }
 
 /* Navigation progress bar (components/ui/NavProgress.tsx). */
-.nav-progress { position: fixed; inset: 0 0 auto 0; z-index: 120; height: 3px; pointer-events: none; transform-origin: left; background: linear-gradient(90deg, rgb(var(--accent)), rgb(var(--brass))); box-shadow: 0 0 12px rgb(var(--accent) / 0.6); }
+.nav-progress { position: fixed; inset: 0 0 auto 0; z-index: 120; height: 3px; pointer-events: none; transform-origin: left; background: rgb(var(--accent)); }
 .nav-pill { position: fixed; top: 0.75rem; left: 50%; z-index: 120; display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.85rem; border-radius: 9999px; border: 1px solid rgb(var(--line)); background: rgb(var(--surface)); color: rgb(var(--ink)); font-size: 0.75rem; font-weight: 600; pointer-events: none; box-shadow: 0 12px 30px -14px rgb(var(--shadow) / 0.55); transform: translate(-50%, 0); opacity: 1; transition: opacity 200ms ease, transform 200ms ease; }
 .nav-pill[data-show='false'] { opacity: 0; transform: translate(-50%, -8px); }
 .nav-spinner { width: 0.85rem; height: 0.85rem; border-radius: 9999px; border: 2px solid rgb(var(--accent) / 0.25); border-top-color: rgb(var(--accent)); animation: nav-spin 700ms linear infinite; }
@@ -432,9 +444,9 @@ html { scroll-behavior: smooth; }
   .sc-hero-copy { transform: translate3d(0, calc(var(--p) * 120px), 0); opacity: calc(1 - var(--p) * 1.25); }
   .sc-hero-media { transform: translate3d(0, calc(var(--p) * 60px), 0) scale(calc(1 - var(--p) * 0.1)); }
 }
-.sc-inset { transform: translate3d(0, calc((1 - var(--p)) * 48px), 0) scale(calc(0.94 + var(--p) * 0.06)); }
+.sc-inset { transform: translate3d(0, calc((1 - var(--p)) * 24px), 0) scale(calc(0.97 + var(--p) * 0.03)); }
 .sc-rise { transform: translate3d(0, calc((1 - var(--p)) * 45%), 0); }
-.sc-tilt { transform: perspective(1200px) rotateX(calc((1 - var(--p)) * 14deg)) translate3d(0, calc((1 - var(--p)) * 60px), 0); opacity: calc(0.25 + var(--p) * 1.5); }
+.sc-tilt { transform: translate3d(0, calc((1 - var(--p)) * 32px), 0); opacity: calc(0.25 + var(--p) * 1.5); }
 .sc-hero-copy, .sc-hero-media, .sc-inset, .sc-rise, .sc-tilt { will-change: transform; }
 
 /* Property cards adapt to their own width (two-up on phones next to the region rail). */
@@ -442,8 +454,9 @@ html { scroll-behavior: smooth; }
 @container (max-width: 230px) {
   .cq-wide { display: none !important; }
   .cq-btn { height: 2rem; width: 2rem; }
-  .cq-title { -webkit-line-clamp: 2; }
+  .cq-title { -webkit-line-clamp: 2; font-size: 1.05rem; line-height: 1.2; }
   .cq-pad { padding: 0.75rem 0.75rem 0.85rem; }
+  .cq-actions { flex-direction: row; gap: 0.375rem; }
 }
 
 /* Parallax layers are moved by Interactions.tsx; keep them on the GPU. */

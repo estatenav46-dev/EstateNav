@@ -18,7 +18,7 @@ const STATUS_DOT: Record<ReturnType<typeof statusChip>, string> = {
   Ready: 'bg-emerald-500',
   'Under construction': 'bg-amber-500',
   'Pre-launch': 'bg-sky-500',
-  'New launch': 'bg-violet-500',
+  'New launch': 'bg-teal-500',
 };
 
 const TYPE_NOUN: Record<Property['propertyType'], string> = {
@@ -47,7 +47,7 @@ export function propertyPhotos(p: Property) {
 }
 
 const roundBtn =
-  'cq-btn relative inline-flex h-10 w-10 items-center justify-center rounded-full shadow-[0_6px_16px_-6px_rgb(0_0_0/0.45)] transition-[transform,background-color,color] duration-base active:scale-[0.9] before:absolute before:-inset-1 before:content-[""]';
+  'cq-btn relative inline-flex h-10 w-10 items-center justify-center rounded-full shadow-[0_4px_12px_-6px_rgb(0_0_0/0.5)] backdrop-blur-sm transition-[transform,background-color,color] duration-base active:scale-[0.9] before:absolute before:-inset-1 before:content-[""]';
 
 // The whole card opens the project page (in a new tab, so the list keeps its place). The
 // heart, compare and photo buttons sit above that link and keep their own actions.
@@ -76,8 +76,8 @@ export function ExploreCard({ property, priority = false, reasons, sizes }: { pr
   ];
 
   return (
-    <article className="cq group relative flex h-full flex-col overflow-hidden rounded-[24px] border border-line bg-surface transition-[transform,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] [@media(hover:hover)]:hover:-translate-y-1.5 [@media(hover:hover)]:hover:border-transparent [@media(hover:hover)]:hover:shadow-[0_30px_60px_-30px_rgb(var(--shadow)/0.55)]">
-      <div className="relative aspect-[16/11] overflow-hidden bg-surface-2">
+    <article className="cq lift group relative flex h-full flex-col overflow-hidden rounded-card border border-line bg-surface">
+      <div className="relative aspect-[4/3] overflow-hidden bg-surface-2">
         <Image
           src={cover.url}
           alt=""
@@ -87,10 +87,10 @@ export function ExploreCard({ property, priority = false, reasons, sizes }: { pr
           placeholder={cover.blurDataURL ? 'blur' : 'empty'}
           blurDataURL={cover.blurDataURL}
           sizes={sizes ?? '(min-width: 1536px) 22vw, (min-width: 1024px) 28vw, (min-width: 640px) 44vw, 80vw'}
-          className="object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.07]"
+          className="lift-photo object-cover"
         />
-        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10" />
-        <span className="cq-wide absolute left-3 top-3 inline-flex max-w-[calc(100%-4rem)] items-center gap-1.5 whitespace-nowrap rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-neutral-900 shadow-sm">
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/15" />
+        <span className="cq-wide absolute left-3 top-3 inline-flex max-w-[calc(100%-4rem)] items-center gap-1.5 whitespace-nowrap rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-neutral-900 shadow-sm">
           <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT[status]}`} />
           <span className="truncate">{status}</span>
         </span>
@@ -112,16 +112,40 @@ export function ExploreCard({ property, priority = false, reasons, sizes }: { pr
         <button
           type="button"
           onClick={() => setViewer(true)}
-          className="absolute bottom-3 right-3 z-[2] inline-flex h-8 items-center gap-1.5 rounded-full bg-black/60 px-2.5 text-[11px] font-semibold text-white ring-1 ring-white/20 transition-colors hover:bg-black/70"
+          className="absolute bottom-3 right-3 z-[2] inline-flex h-8 items-center gap-1.5 rounded-full bg-black/55 px-2.5 text-[11px] font-semibold text-white ring-1 ring-white/20 backdrop-blur-sm transition-colors before:absolute before:-inset-1.5 before:content-[''] hover:bg-black/75"
           aria-label={`View ${photos.length} ${photos.length === 1 ? 'photo' : 'photos'} of ${property.title}`}
         >
           <Images className="h-3.5 w-3.5" aria-hidden="true" /> {photos.length}
         </button>
       </div>
 
-      <div className="cq-pad flex flex-1 flex-col px-4 pb-3.5 pt-3">
-        <div className="flex items-baseline justify-between gap-3">
-          <p className="tabular whitespace-nowrap text-[1.15rem] font-bold leading-tight tracking-[-0.01em]">
+      <div className="cq-pad flex flex-1 flex-col px-4 pb-4 pt-3.5">
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="cq-title line-clamp-2 font-serif text-[1.25rem] leading-[1.2]">
+            <a href={href} target="_blank" rel="noopener noreferrer" className="outline-none after:absolute after:inset-0 after:z-[1] after:rounded-card after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-accent-ink">
+              {property.title}
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+          </h3>
+          <span aria-hidden="true" className="cq-wide mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-line text-ink transition-[transform,background-color,border-color,color] duration-base group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:border-ink group-hover:bg-ink group-hover:text-bg">
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </span>
+        </div>
+        <p className="mt-0.5 flex min-w-0 items-center gap-1 text-[13px] text-ink-muted">
+          <MapPin className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+          <span className="truncate">
+            {property.locality || property.corridorName}
+            {property.locality && property.corridorName && <span className="cq-wide"> · {property.corridorName}</span>}
+          </span>
+        </p>
+        {property.developerName && (
+          <p className="cq-wide mt-0.5 truncate text-xs text-ink-muted">
+            by <span className="font-medium text-ink">{property.developerName}</span>
+          </p>
+        )}
+
+        <div className="mt-3 flex items-baseline justify-between gap-2">
+          <p className="tabular shrink-0 whitespace-nowrap text-[1.2rem] font-semibold leading-tight tracking-[-0.015em]">
             {property.priceOnRequest ? (
               <span className="text-[0.95rem]">Price on request</span>
             ) : (
@@ -132,51 +156,26 @@ export function ExploreCard({ property, priority = false, reasons, sizes }: { pr
               </>
             )}
           </p>
-          {rate && <p className="cq-wide shrink-0 text-[11px] font-medium text-ink-muted">{rate}</p>}
+          {rate && <p className="cq-wide tabular min-w-0 truncate text-xs text-ink-muted" title={rate}>{rate}</p>}
         </div>
-        <div className="mt-1 flex items-start justify-between gap-2">
-          <h3 className="cq-title line-clamp-1 text-[0.95rem] font-semibold leading-snug">
-            <a href={href} target="_blank" rel="noopener noreferrer" className="outline-none after:absolute after:inset-0 after:z-[1] after:rounded-[24px] after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-accent-ink">
-              {property.title}
-              <span className="sr-only"> (opens in a new tab)</span>
-            </a>
-          </h3>
-          <span aria-hidden="true" className="cq-wide inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-line text-ink transition-[transform,background-color,border-color,color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:rotate-45 group-hover:border-accent group-hover:bg-accent group-hover:text-accent-on">
-            <ArrowUpRight className="h-3.5 w-3.5" />
-          </span>
-        </div>
-        <p className="mt-0.5 flex min-w-0 items-center gap-1 text-xs text-ink-muted">
-          <MapPin className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
-          <span className="truncate">
-            {property.locality}
-            <span className="cq-wide"> · {property.corridorName}</span>
-          </span>
-        </p>
-        <p className="cq-wide mt-0.5 truncate text-[11px] text-ink-muted">
-          by <span className="font-medium text-ink">{property.developerName}</span>
-        </p>
 
-        <ul className="cq-wide mt-2.5 flex flex-wrap gap-1" aria-label="Unit types">
-          {units.slice(0, 4).map((u) => (
-            <li key={u} className="rounded-md bg-surface-2 px-1.5 py-0.5 text-[11px] font-semibold">
-              {u}
-            </li>
-          ))}
-          {units.length > 4 && <li className="rounded-md bg-surface-2 px-1.5 py-0.5 text-[11px] font-semibold text-ink-muted">+{units.length - 4}</li>}
-          {size && <li className="rounded-md border border-line px-1.5 py-0.5 text-[11px] text-ink-muted">{size}</li>}
-        </ul>
+        <p className="cq-wide mt-1.5 truncate text-[13px] font-medium" aria-label={`Unit types: ${units.join(', ')}`}>
+          {units.slice(0, 4).join(' · ')}
+          {units.length > 4 && <span className="text-ink-muted"> · +{units.length - 4}</span>}
+        </p>
+        {size && <p className="cq-wide truncate text-[13px] text-ink-muted">{size}</p>}
 
-        <dl className="cq-wide mt-auto grid grid-cols-3 gap-2 border-t border-line pt-2.5 text-[11px]">
+        <dl className="cq-wide mt-auto grid grid-cols-[1.35fr_1fr_1.1fr] gap-x-2 pt-4 text-[11.5px]">
           {stats.map(([label, value, ok]) => (
-            <div key={label} className="min-w-0">
+            <div key={label} className="min-w-0 border-t border-line pt-2.5">
               <dt className="text-ink-muted">{label}</dt>
-              <dd className={`truncate font-semibold ${ok ? 'text-accent-ink' : ''}`}>{value}</dd>
+              <dd className={`mt-0.5 truncate font-semibold ${ok ? 'text-accent-ink' : ''}`}>{value}</dd>
             </div>
           ))}
         </dl>
       </div>
 
-      <div className="absolute right-3 top-3 z-[2] flex flex-col gap-2">
+      <div className="cq-actions absolute right-3 top-3 z-[2] flex flex-col gap-2">
         <button
           type="button"
           onClick={() => {
@@ -184,7 +183,7 @@ export function ExploreCard({ property, priority = false, reasons, sizes }: { pr
           }}
           aria-pressed={saved}
           aria-label={saved ? `Remove ${property.title} from your wishlist` : `Save ${property.title} to your wishlist`}
-          className={`${roundBtn} ${saved ? 'bg-accent text-accent-on' : 'bg-white/90 text-neutral-900 hover:scale-105'}`}
+          className={`${roundBtn} ${saved ? 'bg-accent text-accent-on' : 'bg-white/95 text-neutral-900 hover:scale-105'}`}
         >
           <Heart key={pop} className={`h-[18px] w-[18px] ${saved ? 'fill-current' : ''} ${pop && saved ? 'heart-pop' : ''}`} strokeWidth={1.75} aria-hidden="true" />
           {pop > 0 && saved && <span key={`b${pop}`} className="heart-burst" aria-hidden="true" />}
@@ -198,7 +197,7 @@ export function ExploreCard({ property, priority = false, reasons, sizes }: { pr
           aria-pressed={comparing}
           aria-label={comparing ? `Remove ${property.title} from compare` : compareFull ? `Compare holds ${MAX_COMPARE} projects; remove one first` : `Add ${property.title} to compare`}
           title={compareFull ? `Compare up to ${MAX_COMPARE} projects` : 'Compare'}
-          className={`${roundBtn} disabled:opacity-50 ${comparing ? 'bg-ink text-bg' : 'bg-white/90 text-neutral-900 hover:scale-105'}`}
+          className={`${roundBtn} disabled:opacity-50 ${comparing ? 'bg-ink text-bg' : 'bg-white/95 text-neutral-900 hover:scale-105'}`}
         >
           <GitCompareArrows className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
         </button>

@@ -40,7 +40,7 @@ const NAV = [
 function Wordmark() {
   return (
     <Link href="/" className="group flex shrink-0 items-center gap-2.5" aria-label="EstateNav home">
-      <span className="relative h-10 w-10 overflow-hidden rounded-[14px] border border-line bg-surface shadow-[0_6px_16px_-10px_rgb(var(--shadow)/0.6)] transition-transform duration-slow ease-out group-hover:-rotate-6">
+      <span className="relative h-10 w-10 overflow-hidden rounded-full border border-line bg-surface transition-transform duration-base ease-out group-hover:-translate-y-px">
         <Image src="/logo.png" alt="" width={40} height={40} className="h-full w-full object-cover" priority />
       </span>
       <span className="text-[1.3rem] font-bold tracking-[-0.03em]">
@@ -54,15 +54,15 @@ function MegaMenu({ menu, onNavigate }: { menu: HeaderMenu; onNavigate: () => vo
   return (
     <div className="mx-auto grid max-w-container gap-8 px-8 pb-8 pt-6 lg:grid-cols-[minmax(0,6fr)_minmax(0,3.2fr)_minmax(0,3.6fr)]">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">Explore by region</p>
+        <p className="text-2xs font-semibold uppercase tracking-[0.16em] text-ink-muted">Explore by region</p>
         <ul className="stagger mt-3 grid grid-cols-2 gap-2.5">
           {menu.zones.map((z, i) => (
             <li key={z.id} style={{ '--i': i } as CSSProperties}>
-              <Link href={`/properties?zone=${z.id}`} onClick={onNavigate} className="group relative flex h-[92px] overflow-hidden rounded-2xl bg-forest text-white">
-                {z.cover && <Image src={z.cover} alt="" fill sizes="220px" quality={45} className="object-cover opacity-80 transition-[transform,opacity] duration-700 ease-out group-hover:scale-110 group-hover:opacity-100" />}
+              <Link href={`/properties?zone=${z.id}`} onClick={onNavigate} className="group relative flex h-[100px] overflow-hidden rounded-[14px] bg-forest text-white">
+                {z.cover && <Image src={z.cover} alt="" fill sizes="220px" quality={45} className="object-cover opacity-85 transition-[transform,opacity] duration-700 ease-out group-hover:scale-[1.03] group-hover:opacity-100" />}
                 <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/35 to-transparent" />
                 <span className="relative flex min-w-0 flex-1 flex-col justify-end p-3.5">
-                  <span className="flex items-center gap-1.5 text-base font-semibold">
+                  <span className="flex items-center gap-1.5 font-serif text-lg">
                     {z.name}
                     <ArrowUpRight className="h-4 w-4 opacity-0 transition-all duration-base group-hover:translate-x-0.5 group-hover:opacity-100" aria-hidden="true" />
                   </span>
@@ -75,12 +75,12 @@ function MegaMenu({ menu, onNavigate }: { menu: HeaderMenu; onNavigate: () => vo
         {menu.soon.length > 0 && <p className="mt-3 text-xs text-ink-muted">{menu.soon.join(' and ')} Bengaluru: coming soon.</p>}
       </div>
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">Browse by need</p>
+        <p className="text-2xs font-semibold uppercase tracking-[0.16em] text-ink-muted">Browse by need</p>
         <ul className="stagger mt-3 grid gap-0.5">
           {menu.needs.map((n, i) => (
             <li key={n.id} style={{ '--i': i + 2 } as CSSProperties}>
-              <Link href={n.href} onClick={onNavigate} className="group flex min-h-[44px] items-center gap-3 rounded-xl px-2 text-sm font-medium transition-colors hover:bg-surface-2">
-                <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sand text-forest transition-colors group-hover:bg-accent group-hover:text-accent-on dark:text-brass">
+              <Link href={n.href} onClick={onNavigate} className="group flex min-h-[44px] items-center gap-3 rounded-[12px] px-2 text-sm font-medium transition-colors hover:bg-surface-2">
+                <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-accent-soft text-accent-ink transition-colors group-hover:bg-accent group-hover:text-accent-on">
                   <NeedIcon name={n.icon} className="h-[18px] w-[18px]" />
                 </span>
                 <span className="flex-1">{n.label}</span>
@@ -91,16 +91,16 @@ function MegaMenu({ menu, onNavigate }: { menu: HeaderMenu; onNavigate: () => vo
         </ul>
       </div>
       {menu.featured && (
-        <a href={`/properties/${menu.featured.slug}`} target="_blank" rel="noopener noreferrer" onClick={onNavigate} className="group relative block min-h-[260px] overflow-hidden rounded-3xl bg-forest text-white">
-          <Image src={menu.featured.cover} alt="" fill sizes="360px" quality={55} className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105" />
+        <a href={`/properties/${menu.featured.slug}`} target="_blank" rel="noopener noreferrer" onClick={onNavigate} className="group relative block min-h-[260px] overflow-hidden rounded-slide bg-forest text-white">
+          <Image src={menu.featured.cover} alt="" fill sizes="360px" quality={55} className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]" />
           <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
           <span className="absolute left-4 top-4 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-semibold ring-1 ring-white/20">Featured project</span>
           <span className="absolute inset-x-0 bottom-0 p-5">
-            <span className="block font-serif text-xl leading-tight">{menu.featured.title}</span>
+            <span className="block font-serif text-2xl leading-tight">{menu.featured.title}</span>
             <span className="mt-1 block text-xs text-white/75">{menu.featured.place}</span>
             <span className="mt-3 flex items-center justify-between">
               <span className="font-semibold">{menu.featured.price}*</span>
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-forest transition-transform duration-slow group-hover:rotate-45">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-forest transition-transform duration-base group-hover:-translate-y-0.5 group-hover:translate-x-0.5">
                 <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
               </span>
             </span>
@@ -169,7 +169,7 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, agentName, agentRera
   return (
     <header className="site-header sticky top-0 z-50 h-header" data-compact={compact}>
       <div aria-hidden="true" className="absolute inset-0 bg-bg transition-opacity duration-base" style={{ opacity: compact || mega ? 0 : 1 }} />
-      <div aria-hidden="true" className={`site-header__chrome absolute inset-0 border-b border-line bg-bg/[0.97] ${mega ? '!opacity-100' : ''}`} />
+      <div aria-hidden="true" className={`site-header__chrome absolute inset-0 border-b border-line bg-bg/90 backdrop-blur-md ${mega ? '!opacity-100' : ''}`} />
       <div ref={megaRef} onPointerLeave={(e) => e.pointerType === 'mouse' && hover(false)}>
         <div className="site-header__inner relative mx-auto flex h-header max-w-container items-center gap-2 px-4 sm:px-6 lg:gap-6 lg:px-8">
           <Wordmark />
@@ -194,7 +194,7 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, agentName, agentRera
                 className={`group relative h-11 items-center whitespace-nowrap rounded-full px-3.5 text-sm font-medium text-ink-muted transition-colors hover:text-ink ${'wide' in item ? 'hidden xl:inline-flex' : 'inline-flex'}`}
               >
                 {item.label}
-                <span aria-hidden="true" className="absolute inset-x-3.5 bottom-2 h-[2px] origin-left scale-x-0 rounded-full bg-accent transition-transform duration-slow ease-out group-hover:scale-x-100" />
+                <span aria-hidden="true" className="absolute inset-x-3.5 bottom-2 h-px origin-left scale-x-0 bg-ink transition-transform duration-slow ease-out group-hover:scale-x-100" />
               </Link>
             ))}
           </nav>
@@ -248,20 +248,20 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, agentName, agentRera
           </div>
         )}
       </div>
-      <span data-scroll-progress aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[2px] origin-left bg-gradient-to-r from-accent via-accent to-brass" style={{ transform: 'scaleX(0)' }} />
+      <span data-scroll-progress aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[2px] origin-left bg-accent" style={{ transform: 'scaleX(0)' }} />
 
       <Sheet open={drawer} onOpenChange={setDrawer} direction="right" title="Menu" className="max-w-[440px]">
         <div className="stagger space-y-6">
           <section style={{ '--i': 0 } as CSSProperties}>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">Regions</p>
+            <p className="text-2xs font-semibold uppercase tracking-[0.16em] text-ink-muted">Regions</p>
             <ul className="mt-2 grid grid-cols-2 gap-2">
               {menu.zones.map((z) => (
                 <li key={z.id}>
-                  <Link href={`/properties?zone=${z.id}`} className="relative flex h-20 overflow-hidden rounded-2xl bg-forest text-white">
+                  <Link href={`/properties?zone=${z.id}`} className="relative flex h-24 overflow-hidden rounded-[14px] bg-forest text-white">
                     {z.cover && <Image src={z.cover} alt="" fill sizes="200px" quality={40} className="object-cover opacity-75" />}
                     <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/75 to-black/10" />
                     <span className="relative mt-auto p-3">
-                      <span className="block text-sm font-semibold">{z.short}</span>
+                      <span className="block font-serif text-lg leading-tight">{z.short}</span>
                       <span className="block text-[11px] text-white/75">{z.count} {z.count === 1 ? 'project' : 'projects'}</span>
                     </span>
                   </Link>
@@ -270,7 +270,7 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, agentName, agentRera
             </ul>
           </section>
           <section style={{ '--i': 1 } as CSSProperties}>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">Browse</p>
+            <p className="text-2xs font-semibold uppercase tracking-[0.16em] text-ink-muted">Browse</p>
             <ul className="mt-1 divide-y divide-line">
               {menu.needs.map((n) => (
                 <li key={n.id}>

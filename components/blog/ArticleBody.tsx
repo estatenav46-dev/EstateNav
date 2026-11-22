@@ -70,11 +70,11 @@ export function ArticleBody({ source, className = '' }: { source: string; classN
 
         if (/^###\s+/.test(block)) {
           const text = block.replace(/^###\s+/, '');
-          return <h3 key={key} id={headingId(text)} className="scroll-mt-28 pt-2 text-lg font-semibold leading-snug text-ink">{inline(text, key)}</h3>;
+          return <h3 key={key} id={headingId(text)} className="scroll-mt-28 pt-2 text-xl font-semibold leading-snug text-ink">{inline(text, key)}</h3>;
         }
         if (/^##\s+/.test(block)) {
           const text = block.replace(/^##\s+/, '');
-          return <h2 key={key} id={headingId(text)} className="scroll-mt-28 pt-4 font-serif text-[1.45rem] font-bold leading-tight tracking-[-0.01em] text-ink">{inline(text, key)}</h2>;
+          return <h2 key={key} id={headingId(text)} className="scroll-mt-28 pt-6 font-serif text-[1.75rem] leading-tight text-ink">{inline(text, key)}</h2>;
         }
         if (/^-{3,}$/.test(block)) return <hr key={key} className="border-line" />;
 
@@ -83,7 +83,7 @@ export function ArticleBody({ source, className = '' }: { source: string; classN
           return (
             <figure key={key} className="my-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={image[2]} alt={image[1]} loading="lazy" className="w-full rounded-2xl border border-line object-cover" />
+              <img src={image[2]} alt={image[1]} loading="lazy" className="w-full rounded-card border border-line object-cover" />
               {(image[3] || image[1]) && <figcaption className="mt-2 text-center text-sm text-ink-muted">{image[3] || image[1]}</figcaption>}
             </figure>
           );

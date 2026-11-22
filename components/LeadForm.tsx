@@ -29,7 +29,7 @@ export function LeadForm({ property }: { property?: Pick<Property, 'id' | 'proje
     }
   };
 
-  if (sent) return <div role="status" className="rounded-2xl border border-[#B7E4C7] bg-[#F0FDF4] p-4 text-sm leading-6 text-[#155E3B]">{CONFIRMATION}</div>;
+  if (sent) return <div role="status" className="rounded-card border border-[#B7E4C7] bg-[#F0FDF4] p-4 text-sm leading-6 text-[#155E3B]">{CONFIRMATION}</div>;
 
   return <form onSubmit={submit} className="space-y-3">
     <label className="block text-sm font-medium">Name<input className="field-input mt-1" name="name" autoComplete="name" required /></label>

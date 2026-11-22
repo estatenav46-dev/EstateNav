@@ -36,7 +36,7 @@ export function CompareTray() {
         style={{ transform: show ? 'none' : 'translateY(140%)', opacity: show ? 1 : 0, transition: 'transform var(--dur-slow) var(--ease), opacity var(--dur-base) var(--ease)' }}
         aria-hidden={!show}
       >
-        <div className="pointer-events-auto flex w-full max-w-3xl items-center gap-3 rounded-2xl border border-line bg-surface p-2 pl-4 shadow-[0_18px_40px_-18px_rgb(var(--shadow)/0.45)]">
+        <div className="pointer-events-auto flex w-full max-w-3xl items-center gap-3 rounded-card border border-line bg-surface p-2 pl-4 shadow-[0_18px_40px_-18px_rgb(var(--shadow)/0.45)]">
           <p className="shrink-0 text-sm">
             Compare <span className="font-mono text-ink-muted">{items.length}/{MAX_COMPARE}</span>
           </p>

@@ -21,8 +21,8 @@ export function SectionNav({ sections }: { sections: { id: string; label: string
   }, [sections]);
 
   return (
-    <nav aria-label="On this page" className="sticky top-[60px] z-30 -mx-4 border-b border-line bg-bg px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0">
-      <ul className="no-scrollbar flex gap-1 overflow-x-auto">
+    <nav aria-label="On this page" className="sticky top-[60px] z-30 -mx-4 border-b border-line bg-bg/95 px-4 backdrop-blur-md sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0">
+      <ul className="no-scrollbar -ml-2.5 flex gap-1 overflow-x-auto">
         {sections.map((s) => (
           <li key={s.id}>
             <a
@@ -34,10 +34,10 @@ export function SectionNav({ sections }: { sections: { id: string; label: string
                 document.getElementById(s.id)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
                 history.replaceState(null, '', `#${s.id}`);
               }}
-              className={`relative inline-flex min-h-[40px] items-center whitespace-nowrap px-2.5 text-sm transition-colors duration-fast ${active === s.id ? 'text-ink' : 'text-ink-muted hover:text-ink'}`}
+              className={`relative inline-flex min-h-[48px] items-center whitespace-nowrap px-2.5 text-sm transition-colors duration-fast ${active === s.id ? 'font-semibold text-ink' : 'text-ink-muted hover:text-ink'}`}
             >
               {s.label}
-              <span aria-hidden="true" className="absolute inset-x-3 bottom-0 h-0.5 origin-left bg-accent transition-transform duration-base" style={{ transform: active === s.id ? 'scaleX(1)' : 'scaleX(0)' }} />
+              <span aria-hidden="true" className="absolute inset-x-2.5 bottom-0 h-[2px] origin-left bg-ink transition-transform duration-base" style={{ transform: active === s.id ? 'scaleX(1)' : 'scaleX(0)' }} />
             </a>
           </li>
         ))}

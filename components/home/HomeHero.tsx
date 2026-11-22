@@ -30,7 +30,7 @@ const SEGMENTS: Record<Seg, { tab: string; icon: NeedIconName; noun: [string, st
     noun: ['home', 'homes'],
     headline: ['Verified homes across', 'Bengaluru’s growth corridors.'],
     sub: 'Direct developer pricing, zero buyer brokerage and K-RERA details you can check yourself.',
-    placeholder: 'Micro-market or project, e.g. Whitefield',
+    placeholder: 'Micro-market or project, e.g. Whitefield…',
     fieldLabel: 'Budget',
     choices: SALE_BUDGET_CHOICES.map((b) => ({ id: b.id, label: b.label, patch: { min: b.min, max: b.max } })),
   },
@@ -40,7 +40,7 @@ const SEGMENTS: Record<Seg, { tab: string; icon: NeedIconName; noun: [string, st
     noun: ['plot', 'plots'],
     headline: ['Plots with the', 'paperwork in view.'],
     sub: 'Gated layouts on the Sarjapur and Whitefield belts, with approval and title details shown wherever we hold them.',
-    placeholder: 'Plotted belt or layout, e.g. Sarjapur',
+    placeholder: 'Plotted belt or layout, e.g. Sarjapur…',
     fieldLabel: 'Plot size',
     choices: [
       { id: 'any', label: 'Any plot size', patch: { sizeMin: null } },
@@ -55,7 +55,7 @@ const SEGMENTS: Record<Seg, { tab: string; icon: NeedIconName; noun: [string, st
     noun: ['workspace', 'workspaces'],
     headline: ['Workspaces on the', 'city’s tech corridors.'],
     sub: 'Warm-shell floors and managed suites on Outer Ring Road and North Bengaluru, leased on direct terms.',
-    placeholder: 'Tech corridor, e.g. Outer Ring Road',
+    placeholder: 'Tech corridor, e.g. Outer Ring Road…',
     fieldLabel: 'Monthly rent',
     choices: [
       { id: 'any', label: 'Any monthly rent', patch: { min: null, max: null } },
@@ -176,19 +176,18 @@ export function HomeHero({ properties, corridors }: { properties: Property[]; co
   const timerKey = `${seg}-${index}-${tick}`;
 
   return (
-    <section ref={sectionRef} aria-labelledby="hero-title" data-scrub="exit" data-scrub-span="0.8" className="relative isolate z-10 overflow-x-clip">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_6%_0%,rgb(var(--accent-soft))_0%,transparent_70%),radial-gradient(45%_50%_at_100%_0%,rgb(var(--sand))_0%,transparent_70%)]" />
-      <div className="mx-auto grid max-w-container gap-6 px-4 pb-2 pt-4 sm:px-6 lg:grid-cols-[minmax(0,5.2fr)_minmax(0,6.8fr)] lg:items-center lg:gap-10 lg:px-8 lg:pb-2 lg:pt-6">
+    <section ref={sectionRef} aria-labelledby="hero-title" data-scrub="exit" data-scrub-span="0.8" className="relative isolate z-10 overflow-x-clip border-b border-line">
+      <div className={`mx-auto grid max-w-container gap-8 px-4 pb-8 pt-5 sm:px-6 sm:pt-8 lg:min-h-[min(calc(100svh-72px),820px)] ${all.length ? 'lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]' : 'lg:max-w-3xl'} lg:items-center lg:gap-12 lg:px-8 lg:py-10`}>
         <div className="sc-hero-copy relative z-20 min-w-0">
-          <p className="rise-in flex items-center gap-3 text-sm font-medium text-ink-muted">
-            <span aria-hidden="true" className="h-px w-8 bg-brass" /> Bengaluru&apos;s verified property desk
+          <p className="rise-in hidden items-center gap-2.5 text-2xs font-semibold uppercase tracking-[0.16em] text-ink-muted sm:flex">
+            <span aria-hidden="true" className="h-px w-8 bg-brass/70" /> Bengaluru&apos;s verified property desk
           </p>
 
           {/* All three headlines share one grid cell, so switching never shifts the page. */}
-          <div className="mt-4 grid [&>*]:[grid-area:1/1]">
+          <div className="grid sm:mt-4 [&>*]:[grid-area:1/1]">
             {SEG_IDS.map((id) =>
               id === seg ? (
-                <h1 key={seg} id="hero-title" className="font-serif text-[2.1rem] leading-[1.04] tracking-[-0.035em] sm:text-[2.6rem] lg:text-[2.8rem] xl:text-[3.1rem]">
+                <h1 key={seg} id="hero-title" className="font-serif text-[2.15rem] leading-[1.04] tracking-[-0.025em] sm:text-[3.4rem] lg:text-[3.6rem] xl:text-[4.1rem]">
                   {words.map((w, i) => (
                     <span key={`${seg}-${i}`}>
                       <span className="word-mask">
@@ -198,23 +197,23 @@ export function HomeHero({ properties, corridors }: { properties: Property[]; co
                   ))}
                 </h1>
               ) : (
-                <p key={id} aria-hidden="true" className="invisible font-serif text-[2.1rem] leading-[1.04] tracking-[-0.035em] sm:text-[2.6rem] lg:text-[2.8rem] xl:text-[3.1rem]">
+                <p key={id} aria-hidden="true" className="invisible font-serif text-[2.15rem] leading-[1.04] tracking-[-0.025em] sm:text-[3.4rem] lg:text-[3.6rem] xl:text-[4.1rem]">
                   {SEGMENTS[id].headline.join(' ')}
                 </p>
               ),
             )}
           </div>
-          <div className="mt-4 grid max-w-lg [&>*]:[grid-area:1/1]">
+          <div className="mt-5 hidden max-w-md sm:grid [&>*]:[grid-area:1/1]">
             {SEG_IDS.map((id) => (
-              <p key={id === seg ? `${seg}-sub` : id} aria-hidden={id !== seg || undefined} className={`text-[1.05rem] leading-relaxed text-ink-muted ${id === seg ? 'rise-in' : 'invisible'}`} style={{ '--d': '380ms' } as CSSProperties}>
+              <p key={id === seg ? `${seg}-sub` : id} aria-hidden={id !== seg || undefined} className={`text-[1.0625rem] leading-relaxed text-ink-muted ${id === seg ? 'rise-in' : 'invisible'}`} style={{ '--d': '380ms' } as CSSProperties}>
                 {SEGMENTS[id].sub}
               </p>
             ))}
           </div>
 
-          <div className="rise-in mt-6" style={{ '--d': '480ms' } as CSSProperties}>
-            <div role="tablist" aria-label="Property segment" className="relative flex w-full rounded-full border border-line bg-surface p-1 shadow-[0_10px_30px_-20px_rgb(var(--shadow)/0.55)] sm:inline-flex sm:w-auto">
-              <span aria-hidden="true" className="absolute top-1 h-[calc(100%-8px)] overflow-hidden rounded-full bg-ink shadow-[0_8px_20px_-10px_rgb(var(--shadow)/0.8)] transition-[transform,width] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]" style={{ width: pill.w, transform: `translateX(${pill.x - 4}px)`, left: 4 }}>
+          <div className="rise-in mt-5 sm:mt-6" style={{ '--d': '480ms' } as CSSProperties}>
+            <div role="tablist" aria-label="Property segment" className="relative flex w-full rounded-[14px] bg-surface-2 p-1 sm:inline-flex sm:w-auto">
+              <span aria-hidden="true" className="absolute top-1 h-[calc(100%-8px)] overflow-hidden rounded-[10px] bg-surface shadow-[0_1px_2px_rgb(var(--shadow)/0.12),0_6px_16px_-8px_rgb(var(--shadow)/0.35)] transition-[transform,width] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]" style={{ width: pill.w, transform: `translateX(${pill.x - 4}px)`, left: 4 }}>
                 {!locked && !reduced && <span key={timerKey} className="timer-fill absolute inset-x-0 bottom-0 h-[3px] bg-brass" style={{ '--dur': `${SLIDE_MS}ms`, animationPlayState: running ? 'running' : 'paused' } as CSSProperties} />}
               </span>
               {SEG_IDS.map((id, i) => (
@@ -227,7 +226,7 @@ export function HomeHero({ properties, corridors }: { properties: Property[]; co
                   role="tab"
                   aria-selected={seg === id}
                   onClick={() => chooseSeg(id)}
-                  className={`relative z-10 inline-flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors duration-slow sm:flex-none sm:px-5 ${seg === id ? (pill.w ? 'text-bg' : 'bg-ink text-bg') : 'text-ink-muted hover:text-ink'}`}
+                  className={`relative z-10 inline-flex min-h-[46px] flex-1 items-center justify-center gap-2 rounded-[10px] px-4 text-sm font-semibold transition-colors duration-slow sm:flex-none sm:px-5 ${seg === id ? (pill.w ? 'text-ink' : 'bg-surface text-ink') : 'text-ink-muted hover:text-ink'}`}
                 >
                   <NeedIcon name={SEGMENTS[id].icon} className="hidden h-[18px] w-[18px] sm:block" />
                   {SEGMENTS[id].tab}
@@ -237,7 +236,7 @@ export function HomeHero({ properties, corridors }: { properties: Property[]; co
           </div>
 
           <div
-            className="rise-in relative z-30 mt-4 rounded-[28px] border border-line bg-surface p-2 shadow-[0_40px_80px_-48px_rgb(var(--shadow)/0.7)] transition-shadow duration-slow focus-within:shadow-[0_40px_90px_-40px_rgb(var(--accent)/0.5)]"
+            className="rise-in relative z-30 mt-3 rounded-[20px] border border-line bg-surface p-2 shadow-[0_30px_60px_-40px_rgb(var(--shadow)/0.55)] transition-[box-shadow,border-color] duration-slow focus-within:border-accent-ink/40 focus-within:shadow-[0_30px_70px_-36px_rgb(var(--accent)/0.45)]"
             style={{ '--d': '580ms' } as CSSProperties}
             onFocusCapture={() => setLocked(true)}
           >
@@ -250,11 +249,11 @@ export function HomeHero({ properties, corridors }: { properties: Property[]; co
                 options={options}
                 onChange={setChoice}
                 icon={
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-accent-soft text-accent-ink">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-accent-soft text-accent-ink">
                     {seg === 'plot' ? <Ruler className="h-4 w-4" aria-hidden="true" /> : <IndianRupee className="h-4 w-4" aria-hidden="true" />}
                   </span>
                 }
-                className="min-h-[50px] rounded-[16px] border border-transparent bg-surface-2 px-3 text-[0.95rem] font-semibold hover:border-line data-[open=true]:border-accent-ink data-[open=true]:bg-surface"
+                className="min-h-[52px] rounded-[14px] border border-transparent bg-surface-2 px-3 text-[0.95rem] font-semibold hover:border-line data-[open=true]:border-accent-ink data-[open=true]:bg-surface"
               />
               <button
                 type="button"
@@ -262,7 +261,7 @@ export function HomeHero({ properties, corridors }: { properties: Property[]; co
                   startNavProgress();
                   router.push(`/properties?${serializeListingState(filters)}`);
                 }}
-                className="btn-primary min-h-[50px] rounded-[16px] px-7 text-[0.95rem]"
+                className="btn-primary min-h-[52px] rounded-[14px] px-7 text-[0.95rem]"
               >
                 Show {count} {count === 1 ? copy.noun[0] : copy.noun[1]}
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -270,24 +269,24 @@ export function HomeHero({ properties, corridors }: { properties: Property[]; co
             </div>
           </div>
 
-          <ul className="rise-in mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-ink-muted" style={{ '--d': '680ms' } as CSSProperties}>
+          <ul className="rise-in mt-4 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-ink-muted sm:mt-5 sm:gap-x-6 sm:gap-y-2 sm:text-sm" style={{ '--d': '680ms' } as CSSProperties}>
             {['K-RERA details on every project', 'Zero buyer brokerage', 'Developer’s own price list'].map((t) => (
-              <li key={t} className="flex items-center gap-1.5">
-                <Check className="h-4 w-4 text-brass" aria-hidden="true" /> {t}
+              <li key={t} className="flex items-center gap-2">
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-accent-soft text-accent-ink"><Check className="h-3 w-3" strokeWidth={2.5} aria-hidden="true" /></span> {t}
               </li>
             ))}
           </ul>
-          <div className="rise-in mt-4 flex flex-wrap items-center gap-x-5 gap-y-2" style={{ '--d': '780ms' } as CSSProperties}>
+          <div className="rise-in mt-5 hidden flex-wrap items-center gap-x-5 gap-y-2 border-t border-line pt-4 sm:flex" style={{ '--d': '780ms' } as CSSProperties}>
             <button
               type="button"
               onClick={() => conciergeStore.set(true)}
-              className="arrow-host group inline-flex min-h-[44px] items-center gap-2 rounded-full border border-brass/40 bg-sand/70 py-1 pl-1.5 pr-4 text-sm font-semibold text-ink transition-colors hover:border-brass"
+              className="arrow-host group inline-flex min-h-[44px] items-center gap-3 text-sm font-semibold text-ink"
             >
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-forest text-forest-on">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-forest text-forest-on transition-transform duration-base group-hover:-translate-y-px">
                 <Sparkles className="h-4 w-4" aria-hidden="true" />
               </span>
-              Get matched in 30 seconds
-              <ArrowRight className="h-4 w-4 text-brass" aria-hidden="true" />
+              <span className="link-draw">Not sure where to start? Get matched in 30 seconds</span>
+              <ArrowRight className="h-4 w-4 text-accent-ink" aria-hidden="true" />
             </button>
           </div>
         </div>

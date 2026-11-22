@@ -34,7 +34,7 @@ export function CommuteRadar({ property, hubs, disclaimer }: { property: Propert
       <div>
         <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Office hub">
           {hubs.map((h) => (
-            <button key={h.id} type="button" role="radio" aria-checked={hubId === h.id} onClick={() => setHubId(h.id)} className="chip text-2xs">
+            <button key={h.id} type="button" role="radio" aria-checked={hubId === h.id} onClick={() => setHubId(h.id)} className="chip min-h-[40px] text-xs">
               {h.name}
             </button>
           ))}

@@ -63,7 +63,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   ];
 
   return (
-    <main id="main" className="mx-auto max-w-container px-4 pb-20 pt-4 sm:px-6 lg:px-8">
+    <main id="main" className="mx-auto max-w-container px-4 pb-20 pt-4 sm:px-6 sm:pt-6 lg:px-8">
       <JsonLd data={breadcrumbJsonLd(crumbs)} />
       <JsonLd
         data={{
@@ -82,15 +82,15 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       />
       <Breadcrumbs items={crumbs} />
 
-      <div className="mt-5 grid gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
+      <div className="mt-8 grid gap-12 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-16">
         <article className="min-w-0">
           <header className="max-w-3xl">
-            <Link href={`/blogs?category=${encodeURIComponent(post.category)}`} className="inline-flex rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold text-accent-ink">
+            <Link href={`/blogs?category=${encodeURIComponent(post.category)}`} className="inline-flex min-h-[32px] items-center rounded-full bg-accent-soft px-3 text-xs font-semibold text-accent-ink">
               {post.category}
             </Link>
-            <h1 className="mt-3 font-serif text-[1.9rem] leading-[1.12] tracking-[-0.02em] sm:text-[2.3rem]">{post.title}</h1>
-            {post.excerpt && <p className="mt-3 text-lg leading-relaxed text-ink-muted">{post.excerpt}</p>}
-            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-ink-muted">
+            <h1 className="mt-4 font-serif text-[2.2rem] leading-[1.08] sm:text-[3rem]">{post.title}</h1>
+            {post.excerpt && <p className="mt-4 text-lg leading-relaxed text-ink-muted sm:text-xl">{post.excerpt}</p>}
+            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-line pt-4 text-sm text-ink-muted">
               <span className="font-semibold text-ink">
                 {post.author.name}
                 {post.author.role && <span className="font-normal text-ink-muted"> · {post.author.role}</span>}
@@ -105,12 +105,12 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           </header>
 
           {post.cover && (
-            <div className="relative mt-6 aspect-[16/8] overflow-hidden rounded-[22px] bg-surface-2">
+            <div className="relative mt-8 aspect-[16/8] overflow-hidden rounded-card bg-surface-2">
               <Image src={post.cover.url} alt={post.cover.alt} fill priority sizes="(min-width: 1024px) 60vw, 100vw" quality={75} className="object-cover" />
             </div>
           )}
 
-          <ArticleBody source={post.body} className="mt-8 max-w-[68ch]" />
+          <ArticleBody source={post.body} className="mt-10 max-w-[68ch]" />
 
           <div className="mt-10 flex max-w-[68ch] flex-wrap items-center justify-between gap-3 border-t border-line pt-5">
             <ul className="flex flex-wrap gap-1.5">
@@ -126,11 +126,11 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           </div>
 
           {related.length > 0 && (
-            <section aria-labelledby="related-title" className="mt-12">
-              <h2 id="related-title" className="text-lg font-semibold">
+            <section aria-labelledby="related-title" className="mt-14">
+              <h2 id="related-title" className="font-serif text-[1.75rem] leading-tight">
                 Projects in this article
               </h2>
-              <ul className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <ul className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                 {related.map((p) => (
                   <li key={p.id}>
                     <ExploreCard property={p} sizes="(min-width: 1280px) 20vw, (min-width: 640px) 40vw, 90vw" />
@@ -143,12 +143,12 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
         <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start" aria-label="More to read">
           {headings.length >= 2 && (
-            <nav aria-label="On this page" className="hidden rounded-2xl border border-line bg-surface p-4 lg:block">
+            <nav aria-label="On this page" className="hidden border-l border-line pl-5 lg:block">
               <p className="sheet-label">On this page</p>
-              <ol className="mt-2 space-y-1.5 text-sm">
+              <ol className="mt-3 space-y-2 text-sm">
                 {headings.map((h) => (
                   <li key={h.id}>
-                    <a href={`#${h.id}`} className="text-ink-muted hover:text-accent-ink">
+                    <a href={`#${h.id}`} className="text-ink-muted transition-colors hover:text-ink">
                       {h.text}
                     </a>
                   </li>
@@ -158,9 +158,9 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           )}
 
           {suggestions.length > 0 && (
-            <section className="rounded-2xl border border-line bg-surface p-3">
-              <p className="sheet-label px-1.5 pt-1">Suggested reads</p>
-              <ul className="mt-2 space-y-1">
+            <section className="border-t border-line pt-5">
+              <p className="sheet-label">Suggested reads</p>
+              <ul className="mt-1 divide-y divide-line">
                 {suggestions.map((p) => (
                   <li key={p.id}>
                     <BlogCard post={p} variant="compact" />
@@ -170,14 +170,14 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             </section>
           )}
 
-          <section className="rounded-2xl bg-forest p-5 text-forest-on">
-            <p className="text-sm font-semibold">Questions about a project?</p>
-            <p className="mt-1 text-sm text-forest-on/75">{settings.agent.name} answers on WhatsApp, usually the same day. Zero buyer brokerage.</p>
+          <section className="rounded-card bg-forest p-6 text-forest-on">
+            <p className="font-serif text-xl leading-tight">Questions about a project?</p>
+            <p className="mt-2 text-sm leading-relaxed text-forest-on/75">{settings.agent.name} answers on WhatsApp, usually the same day. Zero buyer brokerage.</p>
             <div className="mt-4 grid gap-2">
-              <a href={whatsAppLink(`Hi ${settings.agent.name}, I read "${post.title}" on EstateNav and have a question.`, settings.contact.whatsapp)} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-full bg-forest-on px-4 text-sm font-semibold text-forest">
+              <a href={whatsAppLink(`Hi ${settings.agent.name}, I read "${post.title}" on EstateNav and have a question.`, settings.contact.whatsapp)} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-[var(--radius)] bg-forest-on px-4 text-sm font-semibold text-forest transition-transform hover:-translate-y-px active:scale-[0.97]">
                 <MessageCircle className="h-4 w-4" aria-hidden="true" /> Ask on WhatsApp
               </a>
-              <Link href="/properties" className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-full px-4 text-sm font-semibold text-forest-on ring-1 ring-forest-on/30 hover:bg-forest-on/10">
+              <Link href="/properties" className="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-[var(--radius)] px-4 text-sm font-semibold text-forest-on ring-1 ring-forest-on/30 transition-[background-color,transform] hover:-translate-y-px hover:bg-forest-on/10 active:scale-[0.97]">
                 Explore projects <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
@@ -186,16 +186,16 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       </div>
 
       {more.length > 0 && (
-        <section aria-labelledby="more-title" className="mt-16 border-t border-line pt-10">
+        <section aria-labelledby="more-title" className="mt-20 border-t border-line pt-12">
           <div className="flex items-end justify-between gap-4">
-            <h2 id="more-title" className="font-serif text-2xl">
+            <h2 id="more-title" className="font-serif text-[2rem] leading-tight sm:text-[2.5rem]">
               Keep reading
             </h2>
-            <Link href="/blogs" className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent-ink hover:underline">
+            <Link href="/blogs" className="arrow-host inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold text-accent-ink">
               All articles <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
-          <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-8 grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
             {more.map((p) => (
               <li key={p.id}>
                 <BlogCard post={p} />

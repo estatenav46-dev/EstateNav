@@ -33,30 +33,30 @@ export function GalleryMosaic({ images, title, plans = [] }: { images: ImageRef[
 
   return (
     <div className="min-w-0">
-      <div className={`relative grid gap-2 sm:h-[clamp(14rem,24vw,22.5rem)] ${layout.grid}`}>
-        <button type="button" onClick={() => show(0)} className={`group relative aspect-[16/10] overflow-hidden rounded-2xl bg-surface-2 sm:aspect-auto ${layout.main}`} aria-label={`Open photo 1 of ${images.length}`}>
-          <Image src={main.url} alt={main.alt} fill priority quality={70} sizes="(min-width: 640px) 50vw, 100vw" {...blur(main)} className="object-cover transition-transform duration-slow ease-out group-hover:scale-[1.02]" />
+      <div className={`relative grid gap-2 sm:h-[clamp(18rem,34vw,32rem)] sm:gap-2.5 ${layout.grid}`}>
+        <button type="button" onClick={() => show(0)} className={`group relative aspect-[4/3] overflow-hidden rounded-card bg-surface-2 sm:aspect-auto ${layout.main}`} aria-label={`Open photo 1 of ${images.length}`}>
+          <Image src={main.url} alt={main.alt} fill priority quality={70} sizes="(min-width: 640px) 50vw, 100vw" {...blur(main)} className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]" />
         </button>
         {thumbs.map((img, i) => (
           <button
             key={img.id}
             type="button"
             onClick={() => show(i + 1)}
-            className={`group relative hidden overflow-hidden rounded-2xl bg-surface-2 sm:block ${thumbs.length === 3 && i === 2 ? 'sm:col-span-2' : ''}`}
+            className={`group relative hidden overflow-hidden rounded-card bg-surface-2 sm:block ${thumbs.length === 3 && i === 2 ? 'sm:col-span-2' : ''}`}
             aria-label={`Open photo ${i + 2} of ${images.length}`}
           >
-            <Image src={img.url} alt={img.alt} fill quality={55} sizes="25vw" {...blur(img)} className="object-cover transition-transform duration-slow ease-out group-hover:scale-[1.04]" />
+            <Image src={img.url} alt={img.alt} fill quality={55} sizes="25vw" {...blur(img)} className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]" />
           </button>
         ))}
 
-        <div className="pointer-events-none absolute bottom-2.5 right-2.5 flex gap-1.5">
+        <div className="pointer-events-none absolute bottom-3 right-3 flex gap-2">
           {images.length > 1 && (
-            <button type="button" onClick={() => show(0)} className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-surface/95 px-3 py-1.5 text-xs font-semibold text-ink shadow-sm hover:bg-surface">
+            <button type="button" onClick={() => show(0)} className="pointer-events-auto inline-flex min-h-[40px] items-center gap-1.5 rounded-full bg-surface/95 px-3.5 text-xs font-semibold text-ink shadow-[0_6px_18px_-8px_rgb(0_0_0/0.5)] backdrop-blur-sm transition-transform hover:-translate-y-px active:scale-[0.97]">
               <Images className="h-3.5 w-3.5" aria-hidden="true" /> All photos ({images.length})
             </button>
           )}
           {plans.length > 0 && (
-            <button type="button" onClick={() => setOpen({ set: 'plans', start: 0 })} className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full bg-surface/95 px-3 py-1.5 text-xs font-semibold text-ink shadow-sm hover:bg-surface">
+            <button type="button" onClick={() => setOpen({ set: 'plans', start: 0 })} className="pointer-events-auto inline-flex min-h-[40px] items-center gap-1.5 rounded-full bg-surface/95 px-3.5 text-xs font-semibold text-ink shadow-[0_6px_18px_-8px_rgb(0_0_0/0.5)] backdrop-blur-sm transition-transform hover:-translate-y-px active:scale-[0.97]">
               <LayoutGrid className="h-3.5 w-3.5" aria-hidden="true" /> Floor plans ({plans.length})
             </button>
           )}
@@ -67,7 +67,7 @@ export function GalleryMosaic({ images, title, plans = [] }: { images: ImageRef[
         <ul className="no-scrollbar mt-2 flex gap-2 overflow-x-auto sm:hidden" aria-label="More photos">
           {rest.map((img, i) => (
             <li key={img.id} className="shrink-0">
-              <button type="button" onClick={() => show(i + 1)} className="relative block h-14 w-20 overflow-hidden rounded-lg bg-surface-2" aria-label={`Open photo ${i + 2}`}>
+              <button type="button" onClick={() => show(i + 1)} className="relative block h-16 w-24 overflow-hidden rounded-[10px] bg-surface-2" aria-label={`Open photo ${i + 2}`}>
                 <Image src={img.url} alt="" fill sizes="80px" quality={45} className="object-cover" />
               </button>
             </li>

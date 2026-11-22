@@ -29,23 +29,23 @@ export default async function BlogsPage({ searchParams }: { searchParams: { cate
   ];
 
   return (
-    <main id="main" className="mx-auto max-w-container px-4 pb-14 pt-4 sm:px-6 lg:px-8">
+    <main id="main" className="mx-auto max-w-container px-4 pb-20 pt-4 sm:px-6 sm:pt-6 lg:px-8">
       <JsonLd data={breadcrumbJsonLd(crumbs)} />
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'Blog', name: 'EstateNav blog', url: absoluteUrl('/blogs') }} />
       <Breadcrumbs items={crumbs} />
 
-      <header className="mt-4 max-w-2xl">
-        <p className="sheet-label">Blog</p>
-        <h1 className="mt-1 font-serif text-3xl leading-tight tracking-[-0.02em]">
+      <header className="mt-6 max-w-3xl">
+        <p className="sheet-label flex items-center gap-2.5"><span aria-hidden="true" className="h-px w-8 bg-brass/60" /> Blog</p>
+        <h1 className="mt-3 font-serif text-[2.4rem] leading-[1.04] sm:text-[3.4rem]">
           Bengaluru property, <span className="text-accent-ink">explained.</span>
         </h1>
-        <p className="mt-2 text-ink-muted">Guides on checking K-RERA, approvals and prices, home loans, and the areas worth a look, written by the advisor who takes you on the site visit.</p>
+        <p className="mt-4 max-w-2xl text-[1.0625rem] leading-relaxed text-ink-muted">Guides on checking K-RERA, approvals and prices, home loans, and the areas worth a look, written by the advisor who takes you on the site visit.</p>
       </header>
 
       {posts.length === 0 ? (
-        <div className="mt-10 flex flex-col items-center gap-3 rounded-[22px] border border-dashed border-line-strong bg-surface p-12 text-center">
-          <Newspaper className="h-8 w-8 text-ink-muted" aria-hidden="true" />
-          <p className="font-semibold">The first articles are on their way.</p>
+        <div className="mt-10 flex flex-col items-center gap-3 rounded-card border border-line bg-surface px-6 py-16 text-center">
+          <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-surface-2 text-ink-muted"><Newspaper className="h-6 w-6" aria-hidden="true" /></span>
+          <p className="mt-2 font-serif text-[1.75rem]">The first articles are on their way.</p>
           <Link href="/properties" className="btn-secondary">
             Explore projects meanwhile
           </Link>
@@ -53,13 +53,13 @@ export default async function BlogsPage({ searchParams }: { searchParams: { cate
       ) : (
         <>
           {lead.length > 0 && (
-            <div className="mt-5">
+            <div className="mt-10">
               <BlogCarousel posts={lead} priority />
             </div>
           )}
 
           {categories.length > 1 && (
-            <nav aria-label="Blog categories" className="no-scrollbar mt-6 flex gap-2 overflow-x-auto pb-1">
+            <nav aria-label="Blog categories" className="no-scrollbar mt-12 flex gap-2 overflow-x-auto pb-1">
               <Link href="/blogs" scroll={false} aria-current={!active ? 'page' : undefined} data-active={!active} className="chip shrink-0">
                 All <span className="font-mono text-2xs text-ink-muted">{posts.length}</span>
               </Link>
@@ -72,9 +72,9 @@ export default async function BlogsPage({ searchParams }: { searchParams: { cate
           )}
 
           {rest.length > 0 && (
-            <section aria-label={active ? `${active} articles` : 'More articles'} className="mt-6">
-              {!active && <h2 className="mb-3 text-base font-semibold">More to read</h2>}
-              <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+            <section aria-label={active ? `${active} articles` : 'More articles'} className="mt-8">
+              {!active && <h2 className="mb-6 font-serif text-[1.75rem] leading-tight">More to read</h2>}
+              <ul className="grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
                 {rest.map((p) => (
                   <li key={p.id}>
                     <BlogCard post={p} />

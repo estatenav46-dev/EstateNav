@@ -11,12 +11,12 @@ export function FooterCta({ agentName, whatsapp }: { agentName: string; whatsapp
   const pathname = usePathname();
   if (pathname === '/') return null;
   return (
-    <Reveal variant="words" className="flex flex-col gap-6 border-b border-[rgb(var(--on-night)/0.12)] pb-12 md:flex-row md:items-end md:justify-between">
+    <Reveal variant="words" className="flex flex-col gap-6 border-b border-[rgb(var(--on-night)/0.12)] pb-10 md:flex-row md:items-end md:justify-between">
       <div className="max-w-2xl">
-        <p className="rw-fade flex items-center gap-3 text-sm font-medium text-[rgb(var(--on-night)/0.65)]">
-          <span aria-hidden="true" className="rw-line h-px w-8 bg-brass" /> Ready when you are
+        <p className="rw-fade flex items-center gap-2.5 text-2xs font-semibold uppercase tracking-[0.16em] text-[rgb(var(--on-night)/0.65)]">
+          <span aria-hidden="true" className="rw-line h-px w-8 bg-brass/70" /> Ready when you are
         </p>
-        <h2 className="mt-3 font-serif text-[2.1rem] leading-[1.04] tracking-[-0.03em] text-[rgb(var(--on-night))] sm:text-[3rem]">
+        <h2 className="mt-3 font-serif text-[2.4rem] leading-[1.02] text-[rgb(var(--on-night))] sm:text-[3.4rem]">
           <Words>
             <>See it in person, <span className="text-brass">with the advisor.</span></>
           </Words>
@@ -30,7 +30,7 @@ export function FooterCta({ agentName, whatsapp }: { agentName: string; whatsapp
           href={whatsAppLink(`Hi ${agentName}, I'm browsing EstateNav and would like some advice.`, whatsapp)}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex min-h-[52px] items-center gap-2 rounded-full px-6 text-sm font-semibold text-[rgb(var(--on-night))] ring-1 ring-[rgb(var(--on-night)/0.25)] transition-colors hover:bg-[rgb(var(--on-night)/0.08)]"
+          className="inline-flex min-h-[52px] items-center gap-2 rounded-[var(--radius)] px-6 text-sm font-semibold text-[rgb(var(--on-night))] ring-1 ring-[rgb(var(--on-night)/0.25)] transition-[background-color,transform] hover:-translate-y-px hover:bg-[rgb(var(--on-night)/0.08)] active:scale-[0.97]"
         >
           <MessageCircle className="h-4 w-4 text-brass" aria-hidden="true" /> WhatsApp the advisor
         </a>

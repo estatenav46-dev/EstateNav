@@ -32,7 +32,7 @@ export function TrustStrip() {
   return (
     <section className="mx-auto max-w-container px-4 pt-12 sm:px-6 sm:pt-16 lg:px-8" aria-label="Why buyers choose EstateNav">
       <Reveal>
-        <div className="rounded-2xl border border-line bg-surface shadow-sm overflow-hidden">
+        <div className="rounded-card border border-line bg-surface shadow-sm overflow-hidden">
           <div className="grid grid-cols-1 divide-y divide-line sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4 lg:divide-x">
             {TRUST_PILLARS.map((item, idx) => {
               const Icon = item.icon;

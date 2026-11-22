@@ -87,7 +87,7 @@ export function VerificationLedger({ property, summary = false, notes = true }: 
     </span>
   );
   const label = (row: Row) => (
-    <span className="block text-[11px] font-medium uppercase tracking-wide text-ink-muted">
+    <span className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">
       {row.label}
       <span className="sr-only">{row.ok ? ': on record' : ': not on record'}</span>
     </span>
@@ -103,9 +103,9 @@ export function VerificationLedger({ property, summary = false, notes = true }: 
   const cells = reraFirst ? rest : rows;
 
   return (
-    <div ref={ref} className="overflow-hidden rounded-xl border border-line bg-surface">
+    <div ref={ref} className="overflow-hidden rounded-card border border-line bg-surface">
       {reraFirst && (
-        <div className="flex gap-2.5 border-b border-line px-3.5 py-2.5">
+        <div className="flex gap-3 border-b border-line px-4 py-4 sm:px-5">
           {tick(first, 0)}
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center justify-between gap-x-3">
@@ -132,7 +132,7 @@ export function VerificationLedger({ property, summary = false, notes = true }: 
       )}
       <dl className={`grid grid-cols-1 gap-px bg-line ${summary ? '' : 'sm:grid-cols-2 lg:grid-cols-3'}`}>
         {cells.map((row, i) => (
-          <div key={row.label} className={`flex min-w-0 gap-2.5 bg-surface px-3.5 py-2.5 ${span(row)}`}>
+          <div key={row.label} className={`flex min-w-0 gap-3 bg-surface px-4 py-3.5 sm:px-5 ${span(row)}`}>
             {tick(row, i + 1)}
             <div className="min-w-0">
               <dt>{label(row)}</dt>
@@ -141,7 +141,7 @@ export function VerificationLedger({ property, summary = false, notes = true }: 
           </div>
         ))}
       </dl>
-      <p className="border-t border-line bg-surface-2/60 px-3.5 py-2 text-2xs leading-relaxed text-ink-muted">
+      <p className="border-t border-line bg-surface-2/50 px-4 py-3 text-2xs leading-relaxed text-ink-muted sm:px-5">
         {notes && property.approvals.notes && <span className="text-ink">Developer note: {property.approvals.notes}. </span>}
         Ticks reflect documents on record; check originals with your own lawyer before booking.
       </p>

@@ -36,7 +36,7 @@ export function PartnerShowcase({ developer, legalName, projectCount }: { develo
 
   return (
     <section id="partner" aria-labelledby="partner-title" data-scrub="enter" data-scrub-span="0.85" className="mt-8 scroll-mt-24 px-2 sm:mt-10 sm:px-4">
-      <div className="sc-inset overflow-hidden rounded-[28px] bg-sand sm:rounded-[40px]">
+      <div className="sc-inset overflow-hidden rounded-slide bg-sand sm:rounded-slide">
       <div className="mx-auto grid max-w-container gap-6 px-4 py-9 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-10 lg:px-8 lg:py-11">
         <Reveal variant="words">
           <p className="rw-fade flex items-center gap-3 text-sm font-medium text-ink-muted">

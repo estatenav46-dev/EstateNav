@@ -18,15 +18,15 @@ export function AdvisorTitleBlock({ settings, compact = false }: { settings: Sit
     ['Phone', contact.phoneDisplay],
   ];
   return (
-    <div className={`grid border border-ink/70 bg-surface text-sm ${compact ? 'grid-cols-1' : 'grid-cols-[96px_minmax(0,1fr)] sm:grid-cols-[132px_minmax(0,1fr)]'}`}>
-      <div style={{ gridRow: 'span 5' }} className={`${compact ? 'hidden' : 'flex'} flex-col items-center justify-center gap-2 border-r border-ink/70 bg-surface-2 p-3 text-ink-muted`}>
+    <div className={`grid overflow-hidden rounded-card border border-line bg-surface text-sm ${compact ? 'grid-cols-1' : 'grid-cols-[96px_minmax(0,1fr)] sm:grid-cols-[132px_minmax(0,1fr)]'}`}>
+      <div style={{ gridRow: 'span 5' }} className={`${compact ? 'hidden' : 'flex'} flex-col items-center justify-center gap-2 border-r border-line bg-surface-2 p-3 text-ink-muted`}>
         <UserRound className="h-10 w-10" aria-hidden="true" />
         <span className="text-center font-mono text-[10px] uppercase tracking-wider">Photo</span>
       </div>
       {rows.slice(0, compact ? 4 : rows.length).map(([label, value], i) => (
-        <div key={label} className={`grid grid-cols-[88px_minmax(0,1fr)] ${i ? 'border-t border-ink/70' : ''}`}>
-          <span className="border-r border-ink/70 px-2 py-2 font-mono text-[10px] uppercase tracking-wider text-ink-muted">{label}</span>
-          <span className={`px-3 py-2 ${label === 'K-RERA reg.' || label === 'Phone' || label === 'Validity' ? 'break-all font-mono text-2xs leading-5' : ''}`}>{value}</span>
+        <div key={label} className={`grid grid-cols-[96px_minmax(0,1fr)] ${i ? 'border-t border-line' : ''}`}>
+          <span className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">{label}</span>
+          <span className={`px-3 py-2.5 ${label === 'K-RERA reg.' || label === 'Phone' || label === 'Validity' ? 'break-all font-mono text-2xs leading-5' : ''}`}>{value}</span>
         </div>
       ))}
     </div>
@@ -46,12 +46,12 @@ export function AdvisorBlock({ settings }: { settings: SiteSettings }) {
   return (
     <section className="mx-auto max-w-container px-4 pb-12 pt-8 sm:px-6 sm:pb-16 sm:pt-10 lg:px-8" aria-label="Talk to the advisor">
       <Reveal>
-        <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-sm transition-[border-color,box-shadow] duration-base hover:border-line-strong">
+        <div className="overflow-hidden rounded-card border border-line bg-surface shadow-sm transition-[border-color,box-shadow] duration-base hover:border-line-strong">
           <div className="p-5 sm:p-8">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               {/* Advisor Identity & K-RERA credentials */}
               <div className="flex items-start gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-line bg-surface-2 text-ink">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-card border border-line bg-surface-2 text-ink">
                   <UserCheck className="h-7 w-7 text-accent-ink" strokeWidth={1.75} aria-hidden="true" />
                 </div>
                 <div>

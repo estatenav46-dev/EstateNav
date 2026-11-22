@@ -14,8 +14,8 @@ const TYPES = [
   { label: 'Ready to move', href: '/properties?pos=ready' },
 ];
 
-const link = 'inline-flex min-h-[36px] items-center text-[rgb(var(--on-night)/0.7)] transition-colors hover:text-[rgb(var(--on-night))]';
-const heading = 'text-xs font-semibold uppercase tracking-[0.14em] text-[rgb(var(--on-night)/0.45)]';
+const link = 'inline-flex min-h-[40px] items-center text-[rgb(var(--on-night)/0.72)] transition-colors hover:text-[rgb(var(--on-night))] lg:min-h-[34px]';
+const heading = 'text-2xs font-semibold uppercase tracking-[0.16em] text-brass';
 
 // Statutory footer. The agent block, registration number, validity and the portal
 // disclosure are mandatory on every public page.
@@ -25,16 +25,14 @@ export function SiteFooter({ settings, corridors }: { settings: SiteSettings; co
   const soon = ZONES.filter((z) => !z.available);
 
   return (
-    <footer className="relative overflow-hidden bg-[rgb(var(--night))] pb-28 pt-16 text-sm text-[rgb(var(--on-night))] md:pb-10 md:pt-20">
-      <div aria-hidden="true" className="pointer-events-none absolute -left-40 top-0 h-[420px] w-[420px] rounded-full bg-accent/20 blur-[120px]" />
-      <div aria-hidden="true" className="pointer-events-none absolute -right-32 bottom-20 h-[360px] w-[360px] rounded-full bg-brass/15 blur-[120px]" />
+    <footer className="relative overflow-hidden bg-[rgb(var(--night))] pb-24 pt-12 text-sm text-[rgb(var(--on-night))] md:pb-0 md:pt-16">
       <div className="relative mx-auto max-w-container px-4 sm:px-6 lg:px-8">
         <FooterCta agentName={agent.name} whatsapp={contact.whatsapp} />
 
-        <div className="grid gap-10 pt-12 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.5fr)_repeat(4,minmax(0,1fr))] lg:gap-8">
-          <div className="space-y-5">
-            <p className="text-2xl font-bold tracking-[-0.03em]">
-              Estate<span className="text-brass">Nav</span>
+        <div className="grid grid-cols-2 gap-x-6 gap-y-8 pt-10 lg:grid-cols-[minmax(0,1.5fr)_repeat(4,minmax(0,1fr))] lg:gap-8">
+          <div className="col-span-2 space-y-5 lg:col-span-1">
+            <p className="font-serif text-[1.75rem] leading-none">
+              EstateNav
             </p>
             <p className="max-w-xs leading-relaxed text-[rgb(var(--on-night)/0.65)]">
               A small, verified catalogue of Bengaluru homes, plots and workspaces, at direct-developer pricing with no buyer brokerage.
@@ -115,8 +113,8 @@ export function SiteFooter({ settings, corridors }: { settings: SiteSettings; co
           </nav>
         </div>
 
-        <div className="mt-12 grid gap-4 rounded-[24px] bg-[rgb(var(--on-night)/0.05)] p-5 ring-1 ring-[rgb(var(--on-night)/0.1)] sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:gap-6 sm:p-6">
-          <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-brass/15 text-brass">
+        <div className="mt-10 grid gap-4 border-y border-[rgb(var(--on-night)/0.12)] py-6 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:gap-6">
+          <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-brass/15 text-brass">
             <ShieldCheck className="h-6 w-6" aria-hidden="true" />
           </span>
           <dl className="grid gap-x-8 gap-y-2 sm:grid-cols-3">
@@ -135,24 +133,24 @@ export function SiteFooter({ settings, corridors }: { settings: SiteSettings; co
               </dd>
             </div>
           </dl>
-          <a href={agent.verifyUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center gap-1.5 justify-self-start rounded-full px-4 text-sm font-semibold text-brass ring-1 ring-brass/40 transition-colors hover:bg-brass/10">
+          <a href={agent.verifyUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center gap-1.5 justify-self-start rounded-[var(--radius)] px-4 text-sm font-semibold text-brass ring-1 ring-brass/40 transition-[background-color,transform] hover:-translate-y-px hover:bg-brass/10">
             Verify on K-RERA <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
           </a>
         </div>
 
-        <div className="mt-8 space-y-2 text-xs leading-relaxed text-[rgb(var(--on-night)/0.5)]">
+        <div className="mt-6 max-w-4xl space-y-2 text-xs leading-relaxed text-[rgb(var(--on-night)/0.55)]">
           <p className="text-[rgb(var(--on-night)/0.75)]">{settings.disclaimers.portal}</p>
           <p>{settings.disclaimers.listing}</p>
         </div>
 
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-[rgb(var(--on-night)/0.12)] pt-6 text-xs text-[rgb(var(--on-night)/0.55)]">
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-[rgb(var(--on-night)/0.12)] pt-5 text-xs text-[rgb(var(--on-night)/0.55)]">
           <span>© {new Date().getFullYear()} EstateNav · Bengaluru</span>
           <BackToTop />
         </div>
       </div>
 
-      <div data-scrub="enter" data-scrub-span="0.9" aria-hidden="true" className="relative mt-6 overflow-hidden">
-        <p className="sc-rise select-none whitespace-nowrap text-center font-serif text-[22vw] font-bold leading-[0.8] tracking-[-0.06em] text-transparent [-webkit-text-stroke:1px_rgb(var(--on-night)/0.18)] sm:text-[19vw]">
+      <div aria-hidden="true" className="relative mt-6 hidden h-[7.5vw] overflow-hidden md:block">
+        <p className="select-none whitespace-nowrap text-center font-serif text-[12vw] font-normal leading-[0.9] tracking-[-0.04em] text-[rgb(var(--on-night)/0.06)]">
           EstateNav
         </p>
       </div>

@@ -28,7 +28,25 @@ Links from the previous site (`?for=`, `?category=`, `?locality=`, `?budgetMin=`
 
 ## Design system
 
-"Site Plan" (light) and "Blueprint" (dark) themes via `next-themes` (class strategy, system default, no flash). All colours are CSS variables in `app/globals.css`, mapped in `tailwind.config.ts` (`bg`, `surface`, `ink`, `line`, `accent`…); components use tokens only. Fonts: Plus Jakarta Sans (headings, via the `font-serif` utility), Geist Sans (UI), Geist Mono (RERA numbers, areas). Regions and their colours live in `lib/regions.ts`; home shortcuts, type chips and quick budgets in `lib/categories.ts`. Motion uses `motion` through `LazyMotion` + `domAnimation`, animating transform and opacity only; everything respects `prefers-reduced-motion`.
+Art direction: an editorial property desk. Calm limestone pages, a deep estate green for actions, brass only for small details, real project photographs carrying every section, and serif display type for headings. Light theme "Site Plan", dark theme "Blueprint" (the blueprint deck's slate `#111827` canvas and emerald `#10B981` actions), via `next-themes` (class strategy, light by default, no flash).
+
+| Layer | Where | Notes |
+| --- | --- | --- |
+| Colour tokens | `app/globals.css` (`:root`, `.dark`), mapped in `tailwind.config.ts` | `bg` limestone `#F6F4EF`, `surface`, `surface-2`, `ink`, `ink-muted`, `line`, `line-strong`, `accent` estate green `#195C43` (white text 7.8:1), `accent-soft`, `forest` and `night` bands, `brass`, `sand`. Components use tokens only. Region tints (`.zone-*`) avoid violet. |
+| Type | `app/layout.tsx` | Source Serif 4 (`font-serif`, weight 500, optical sizing) for headings; words inside a heading coloured `text-accent-ink`/`text-brass` or wrapped in `<em>` turn italic. Geist Sans for UI and body, Geist Mono for RERA numbers. Root size 100% on phones and tablets, 15px from 1024px, never smaller. |
+| Radius scale | `--radius-sm` 8px, `--radius` 12px (buttons, fields), `rounded-card` 18px (cards, panels, photos), `rounded-slide` 24px (sheets, large dialogs), `rounded-full` for chips, icon buttons and badges | |
+| Buttons | `.btn-primary`, `.btn-secondary`, `.btn-ghost` | One family: 12px corners, step up 1px on hover, press to 97% on click, trailing arrows loop. 48px tall on touch screens, 40px on desktop. |
+| Chips | `.chip` | Outlined pills; the chosen one (`aria-pressed`, `aria-checked`, `data-active`) fills with ink. |
+| Fields | `.field` | 48px, 12px corners, green border plus soft 4px ring on focus, red ring when `aria-invalid`. |
+| Cards | `components/explore/ExploreCard.tsx` (and `.lift`, `.lift-photo`) | One card family everywhere listings appear: 4:3 photo, serif title, location and developer, price row with rate, unit types, size, then Possession / Type / K-RERA. Hover lifts 2px and zooms the photo 3%. Under 230px wide (two-up on phones) the card drops to title, place and price. |
+| Section headings | `components/home/SectionHeading.tsx` | Uppercase kicker with a brass index and rule, serif title rising word by word. |
+| Project page | `app/properties/[slug]/PropertyDetail.tsx` | One document: sections divided by hairlines with serif titles, no boxes around them; the sticky price card sits in a 340px column. |
+| Surfaces | | Flat page ground (the drafting grid is gone; `BlueprintBackdrop` keeps only the faint building drawing in the corner). Deep forest for the advisory band and advisor notes, near-black green for the footer. |
+| Loading and empty states | `app/**/loading.tsx`, explore, shortlist, blog | Skeletons match the real layouts; empty states are a centred icon disc, serif title, one line and one action. |
+| Few-item layouts | home regions and types, hero showcase, explore, project page | One or two regions or property types turn their tiles landscape and span the row; one featured project fills the hero rail and its controls hide; with no featured project the hero is one column; one or two explore results get a "Want more options?" card with relaxed-filter suggestions; fact rows, amenity, nearby and developer groups stretch to fill their row. |
+| Phones | | The home hero drops its kicker, subline and concierge link (the dock has Concierge), so featured projects show on the first screen. The project page opens on the photos, then name, price, RERA and key facts; the breadcrumb trail shows from 640px up. |
+
+Sizes and spacing come from Tailwind's scale; home sections are separated by 64–96px, cards by 20px. Regions in `lib/regions.ts`; home shortcuts, type chips and quick budgets in `lib/categories.ts`. Motion uses `motion` through `LazyMotion` + `domAnimation` and CSS, animating transform and opacity only; everything respects `prefers-reduced-motion`.
 
 ## Product blueprint (design/EstateNav_Product_Blueprint.pdf)
 
@@ -60,7 +78,7 @@ Not added: the deck's sample figures (corridor ₹/sq.ft, ~79,200 unsold units, 
 ## Motion and interaction
 
 - **Scroll reveals** (`components/Reveal.tsx`): `variant` = `up`, `zoom`, `left`, `right`, `clip` (photo wipes up while it settles) or `words` (wrap the title in `<Words>`); one shared observer, each runs once.
-- **Scroll-linked effects** (`components/ui/Interactions.tsx`): elements with `data-scrub` (`enter`, `exit` or a full pass) get `--p` from 0 to 1 for the `.sc-*` classes in `app/globals.css`: the hero drifting away, the partner and advisory panels expanding to full width, the footer wordmark. `data-parallax` moves photo layers; `data-scroll-progress` is the bar under the header.
+- **Scroll-linked effects** (`components/ui/Interactions.tsx`): elements with `data-scrub` (`enter`, `exit` or a full pass) get `--p` from 0 to 1 for the `.sc-*` classes in `app/globals.css`; today only the hero drifts away on desktop (the advisory band and footer wordmark are static). `data-parallax` moves photo layers; `data-scroll-progress` is the bar under the header. Reveals rise 28px at most and never tilt.
 - **Hero**: Residential → Plots → Commercial cycle with the featured projects until the visitor picks a segment or starts searching (`components/home/HomeHero.tsx`, `HeroShowcase.tsx`).
 - **Dropdowns** use `components/ui/Select.tsx` (listbox with keyboard support, counts per option) instead of native selects; **navigation** shows a top progress bar at once (`components/ui/NavProgress.tsx`) and the explore and project pages have loading skeletons.
 - Everything respects the visitor's reduced-motion setting.

@@ -154,7 +154,7 @@ export function QuickSearch({ properties, corridors, id = 'quick-search', classN
       </form>
 
       {open && (
-        <div className="pop-in absolute inset-x-0 top-full z-40 mt-2 overflow-hidden rounded-[22px] border border-line bg-surface shadow-[0_30px_70px_-28px_rgb(var(--shadow)/0.55)]">
+        <div className="pop-in absolute inset-x-0 top-full z-40 mt-2 overflow-hidden rounded-slide border border-line bg-surface shadow-[0_30px_70px_-28px_rgb(var(--shadow)/0.55)]">
           {results.length ? (
             <ul id={listId} role="listbox" aria-label="Suggestions" className="no-scrollbar max-h-[min(420px,60vh)] overflow-y-auto overscroll-contain p-2">
               {results.map((s, i) => {
@@ -171,7 +171,7 @@ export function QuickSearch({ properties, corridors, id = 'quick-search', classN
                       onClick={() => go(s.href)}
                       onMouseEnter={() => setActive(i)}
                       style={{ '--i': i } as React.CSSProperties}
-                      className={`group/opt flex cursor-pointer items-center gap-3 rounded-2xl px-2.5 py-2 transition-colors duration-fast ${i === active ? 'bg-surface-2' : ''}`}
+                      className={`group/opt flex cursor-pointer items-center gap-3 rounded-card px-2.5 py-2 transition-colors duration-fast ${i === active ? 'bg-surface-2' : ''}`}
                     >
                       {s.img ? (
                         <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl bg-surface-2">

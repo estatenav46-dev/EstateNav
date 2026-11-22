@@ -51,12 +51,14 @@ export function ShortlistView({ properties, whatsapp, advisorName }: { propertie
       <main id="main" className="mx-auto max-w-container px-4 pb-16 pt-4 sm:px-6 lg:px-8">
         <Breadcrumbs items={[{ name: 'Home', path: '/' }, { name: 'Wishlist', path: '/shortlist' }]} />
         {loading ? (
-          <div className="skeleton mt-8 h-48 rounded-card" />
+          <div className="skeleton mt-8 h-64 rounded-card" />
         ) : (
-          <div className="panel mt-8 flex flex-col items-start gap-3 p-8">
-            <Heart className="h-8 w-8 text-accent-ink" aria-hidden="true" />
-            <h1 className="font-serif text-2xl">Sign in to see your shortlist</h1>
-            <p className="max-w-md text-ink-muted">Saved homes are kept with your account, so they are there on your phone and laptop alike.</p>
+          <div className="panel mt-8 flex flex-col items-center gap-3 px-6 py-14 text-center sm:py-20">
+            <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-accent-soft text-accent-ink">
+              <Heart className="h-6 w-6" aria-hidden="true" />
+            </span>
+            <h1 className="mt-2 font-serif text-[2rem] leading-tight sm:text-[2.4rem]">Sign in to see your shortlist</h1>
+            <p className="max-w-md text-[0.95rem] leading-relaxed text-ink-muted">Saved homes are kept with your account, so they are there on your phone and laptop alike.</p>
             <button
               type="button"
               onClick={() => {
@@ -74,12 +76,12 @@ export function ShortlistView({ properties, whatsapp, advisorName }: { propertie
   }
 
   return (
-    <main id="main" className="mx-auto max-w-container px-4 pb-16 pt-4 sm:px-6 lg:px-8">
+    <main id="main" className="mx-auto max-w-container px-4 pb-20 pt-4 sm:px-6 sm:pt-6 lg:px-8">
       <Breadcrumbs items={[{ name: 'Home', path: '/' }, { name: 'Wishlist', path: '/shortlist' }]} />
-      <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
+      <div className="mt-4 flex flex-wrap items-end justify-between gap-5 border-b border-line pb-6">
         <div>
-          <h1 className="font-serif text-3xl">{shared ? 'A shared wishlist' : 'Your wishlist'}</h1>
-          <p className="mt-1 text-ink-muted">{items.length} {items.length === 1 ? 'project' : 'projects'}{shared ? '' : ' saved to your account'}</p>
+          <h1 className="font-serif text-[2.4rem] leading-[1.05] sm:text-[3rem]">{shared ? 'A shared wishlist' : 'Your wishlist'}</h1>
+          <p className="mt-2 text-ink-muted">{items.length} {items.length === 1 ? 'project' : 'projects'}{shared ? '' : ' saved to your account'}</p>
         </div>
         {items.length > 0 && (
           <div className="flex flex-wrap gap-2">
@@ -110,10 +112,12 @@ export function ShortlistView({ properties, whatsapp, advisorName }: { propertie
           ))}
         </ul>
       ) : (
-        <div className="panel mt-8 flex flex-col items-start gap-3 p-8">
-          <Heart className="h-8 w-8 text-ink-muted" aria-hidden="true" />
-          <p className="font-serif text-2xl">Nothing shortlisted yet</p>
-          <p className="max-w-md text-ink-muted">Tap the heart on any project to keep it here, then compare or send the list to the advisor in one go.</p>
+        <div className="panel mt-8 flex flex-col items-center gap-3 px-6 py-14 text-center sm:py-20">
+          <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-surface-2 text-ink-muted">
+            <Heart className="h-6 w-6" aria-hidden="true" />
+          </span>
+          <p className="mt-2 font-serif text-[2rem] leading-tight">Nothing shortlisted yet</p>
+          <p className="max-w-md text-[0.95rem] leading-relaxed text-ink-muted">Tap the heart on any project to keep it here, then compare or send the list to the advisor in one go.</p>
           <Link href="/properties" className="btn-primary mt-2">Browse listings</Link>
         </div>
       )}

@@ -2,9 +2,9 @@
 
 import { usePathname } from 'next/navigation';
 
-// A faint architectural drawing behind every page: drafting grid, dimension lines and an
-// isometric mid-rise. The outline draws once on load and then stays still (nothing repaints
-// while scrolling).
+// A faint architectural drawing in the bottom corner of every page (the ground itself stays
+// flat): an isometric mid-rise and a tower crane. The outline draws once on load and then stays
+// still (nothing repaints while scrolling).
 
 const S = 17; // px per model unit
 const W = 10; // building width (x)
@@ -74,36 +74,6 @@ export function BlueprintBackdrop() {
 
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden" style={{ opacity: 'var(--backdrop-opacity)', color: 'rgb(var(--backdrop-ink))' }}>
-      <svg className="absolute inset-0 h-full w-full">
-        <defs>
-          <pattern id="bp-grid" width="24" height="24" patternUnits="userSpaceOnUse">
-            <path d="M24 0H0V24" fill="none" stroke="currentColor" strokeWidth="0.5" />
-          </pattern>
-          <pattern id="bp-grid-major" width="120" height="120" patternUnits="userSpaceOnUse">
-            <path d="M120 0H0V120" fill="none" stroke="currentColor" strokeWidth="1" />
-          </pattern>
-          <pattern id="bp-ticks-h" width="24" height="16" patternUnits="userSpaceOnUse">
-            <path d="M0.5 4V12" stroke="currentColor" />
-          </pattern>
-          <pattern id="bp-ticks-v" width="16" height="24" patternUnits="userSpaceOnUse">
-            <path d="M4 0.5H12" stroke="currentColor" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#bp-grid)" />
-        <rect width="100%" height="100%" fill="url(#bp-grid-major)" />
-      </svg>
-
-      {/* Dimension lines along the top and left edges. */}
-      <svg className="absolute left-10 right-10 top-[84px] h-4">
-        <rect width="100%" height="16" fill="url(#bp-ticks-h)" />
-        <line x1="0" y1="8" x2="100%" y2="8" stroke="currentColor" />
-        <line x1="0.5" y1="0" x2="0.5" y2="16" stroke="currentColor" strokeWidth="1.5" />
-      </svg>
-      <svg className="absolute bottom-10 left-3 top-[120px] w-4">
-        <rect width="16" height="100%" fill="url(#bp-ticks-v)" />
-        <line x1="8" y1="0" x2="8" y2="100%" stroke="currentColor" />
-      </svg>
-
       <svg
         viewBox="0 0 560 640"
         className="absolute -bottom-6 right-0 w-[92vw] max-w-[640px] md:w-[48vw]"

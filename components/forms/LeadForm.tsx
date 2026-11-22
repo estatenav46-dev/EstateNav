@@ -48,13 +48,13 @@ function readUtm() {
 function Field({ id, label, error, hint, children }: { id: string; label: string; error?: string; hint?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label htmlFor={id} className="mb-1 block text-xs font-medium text-ink">
+      <label htmlFor={id} className="mb-1.5 block text-[13px] font-semibold text-ink">
         {label}
         {hint && <span className="ml-1 font-normal text-ink-muted">{hint}</span>}
       </label>
       {children}
       {error && (
-        <p id={`${id}-error`} className="mt-1 text-xs text-danger">
+        <p id={`${id}-error`} className="mt-1.5 text-xs font-medium text-danger">
           {error}
         </p>
       )}
@@ -124,13 +124,13 @@ export function LeadForm({ consent, source, whatsapp, advisorName, property, int
   const full = variant === 'full';
 
   return (
-    <form onSubmit={onSubmit} noValidate className={variant === 'inline' ? 'grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto] lg:items-start' : 'space-y-3'}>
+    <form onSubmit={onSubmit} noValidate className={variant === 'inline' ? 'grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto] lg:items-start' : 'space-y-4'}>
       {intentChoices && intentChoices.length > 1 && (
         <fieldset className={variant === 'inline' ? 'sm:col-span-2 lg:col-span-4' : ''}>
-          <legend className="mb-1.5 text-xs font-medium">What do you need?</legend>
+          <legend className="mb-2 text-[13px] font-semibold">What do you need?</legend>
           <div className="flex flex-wrap gap-1.5" role="radiogroup">
             {intentChoices.map((choice) => (
-              <button key={choice} type="button" role="radio" aria-checked={chosen === choice} onClick={() => setValue('intent', choice, { shouldDirty: true })} className="chip min-h-[34px] px-3 text-xs">
+              <button key={choice} type="button" role="radio" aria-checked={chosen === choice} onClick={() => setValue('intent', choice, { shouldDirty: true })} className="chip min-h-[40px] px-3.5 text-[13px]">
                 {INTENT_LABEL[choice]}
               </button>
             ))}
@@ -139,31 +139,31 @@ export function LeadForm({ consent, source, whatsapp, advisorName, property, int
       )}
 
       <Field id={`${uid}-name`} label="Name" error={errors.name?.message}>
-        <input id={`${uid}-name`} className="field min-h-[40px] text-sm" autoComplete="name" aria-invalid={Boolean(errors.name)} aria-describedby={describe('name')} {...register('name')} />
+        <input id={`${uid}-name`} className="field min-h-[48px] text-sm" autoComplete="name" aria-invalid={Boolean(errors.name)} aria-describedby={describe('name')} {...register('name')} />
       </Field>
 
       <Field id={`${uid}-phone`} label="Mobile" error={errors.phone?.message}>
         <div className="flex">
-          <span className="inline-flex min-h-[40px] items-center rounded-l-xl border border-r-0 border-line bg-surface-2 px-2.5 font-mono text-xs text-ink-muted">+91</span>
-          <input id={`${uid}-phone`} type="tel" inputMode="numeric" autoComplete="tel-national" className="field min-h-[40px] rounded-l-none text-sm" aria-invalid={Boolean(errors.phone)} aria-describedby={describe('phone')} {...register('phone')} />
+          <span className="inline-flex min-h-[48px] items-center rounded-l-[var(--radius)] border border-r-0 border-line-strong/70 bg-surface-2 px-3 text-sm font-medium text-ink-muted">+91</span>
+          <input id={`${uid}-phone`} type="tel" inputMode="numeric" autoComplete="tel-national" className="field min-h-[48px] rounded-l-none text-sm focus-visible:rounded-l-none" aria-invalid={Boolean(errors.phone)} aria-describedby={describe('phone')} {...register('phone')} />
         </div>
       </Field>
 
       {(full || variant === 'inline') && (
         <Field id={`${uid}-email`} label="Email" hint="(optional)" error={errors.email?.message}>
-          <input id={`${uid}-email`} type="email" autoComplete="email" className="field min-h-[40px] text-sm" aria-invalid={Boolean(errors.email)} aria-describedby={describe('email')} {...register('email')} />
+          <input id={`${uid}-email`} type="email" autoComplete="email" spellCheck={false} className="field min-h-[48px] text-sm" aria-invalid={Boolean(errors.email)} aria-describedby={describe('email')} {...register('email')} />
         </Field>
       )}
 
       {full && chosen === 'site-visit' && (
         <Field id={`${uid}-date`} label="Preferred visit date" hint="(optional)" error={errors.preferredDate?.message}>
-          <input id={`${uid}-date`} type="date" min={today} className="field min-h-[40px] text-sm" aria-describedby={describe('preferredDate')} {...register('preferredDate')} />
+          <input id={`${uid}-date`} type="date" min={today} className="field min-h-[48px] text-sm" aria-describedby={describe('preferredDate')} {...register('preferredDate')} />
         </Field>
       )}
 
       {full && (
         <Field id={`${uid}-message`} label="Message" hint="(optional)" error={errors.message?.message}>
-          <textarea id={`${uid}-message`} rows={2} className="field min-h-[64px] py-2 text-sm" placeholder={messagePlaceholder ?? (property ? `Questions about ${property.title}` : 'Budget, preferred corridor, timeline')} {...register('message')} />
+          <textarea id={`${uid}-message`} rows={3} className="field min-h-[84px] py-3 text-sm" placeholder={messagePlaceholder ?? (property ? `Questions about ${property.title}…` : 'Budget, preferred corridor, timeline…')} {...register('message')} />
         </Field>
       )}
 
@@ -173,14 +173,14 @@ export function LeadForm({ consent, source, whatsapp, advisorName, property, int
         </label>
       </div>
 
-      <div className={variant === 'inline' ? 'lg:pt-[30px]' : ''}>
+      <div className={variant === 'inline' ? 'lg:pt-[30px]' : 'pt-1'}>
         <div className={`mb-1.5 ${variant === 'inline' ? 'sr-only' : ''}`}>
-          <p className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-2.5 py-1 text-[11px] font-semibold text-accent-ink">
+          <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-accent-ink">
             <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /> Zero-spam privacy shield
           </p>
-          <p className="mt-1 text-2xs leading-snug text-ink-muted">{consent.privacyNote}</p>
+          <p className="mt-1 text-2xs leading-relaxed text-ink-muted">{consent.privacyNote}</p>
         </div>
-        <button type="submit" disabled={isSubmitting} className="btn-primary min-h-[42px] w-full text-sm disabled:opacity-60">
+        <button type="submit" disabled={isSubmitting} className="btn-primary mt-1 min-h-[48px] w-full text-sm disabled:opacity-60">
           {isSubmitting ? 'Sending…' : submitLabel ?? (chosen === 'price-sheet' ? 'Unlock direct developer pricing sheet' : chosen === 'site-visit' ? 'Schedule guided VIP site visit' : 'Send request')}
         </button>
       </div>

@@ -74,13 +74,13 @@ function UrlSync({ onChange }: { onChange: (query: string) => void }) {
 function Thumb({ property, label }: { property?: Property; label: string }) {
   if (!property) {
     return (
-      <span aria-hidden="true" className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-2 text-sm font-bold text-ink-muted">
+      <span aria-hidden="true" className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] bg-surface-2 font-serif text-base text-ink-muted">
         {label.charAt(0)}
       </span>
     );
   }
   return (
-    <span aria-hidden="true" className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-surface-2">
+    <span aria-hidden="true" className="relative h-11 w-11 shrink-0 overflow-hidden rounded-[10px] bg-surface-2">
       <Image src={property.media.cover.url} alt="" fill sizes="44px" quality={40} className="object-cover" />
     </span>
   );
@@ -88,36 +88,36 @@ function Thumb({ property, label }: { property?: Property; label: string }) {
 
 function Rail({ items, back, label, tools }: { items: RailItem[]; back?: { label: string; onSelect: () => void }; label: string; tools?: React.ReactNode }) {
   return (
-    <nav aria-label={label} className="no-scrollbar sticky top-[60px] h-[calc(100dvh-60px)] w-[88px] shrink-0 overflow-y-auto overscroll-contain border-r border-line bg-surface/60 pb-24 sm:w-[210px] lg:w-[250px] md:pb-6">
+    <nav aria-label={label} className="no-scrollbar sticky top-[60px] h-[calc(100dvh-60px)] w-[88px] shrink-0 overflow-y-auto overscroll-contain border-r border-line pb-24 sm:w-[220px] lg:w-[260px] md:pb-6">
+      <p className="hidden px-4 pb-1 pt-5 text-2xs font-semibold uppercase tracking-[0.14em] text-ink-muted sm:block">{label}</p>
       {back && (
-        <button type="button" onClick={back.onSelect} className="flex min-h-[48px] w-full items-center justify-center gap-1 border-b border-line px-2 text-xs font-semibold text-accent-ink hover:bg-surface-2 sm:justify-start sm:px-4 sm:text-sm">
+        <button type="button" onClick={back.onSelect} className="flex min-h-[48px] w-full items-center justify-center gap-1.5 px-2 text-xs font-semibold text-accent-ink hover:text-ink sm:justify-start sm:px-4 sm:text-sm">
           <ArrowLeft className="h-4 w-4 shrink-0" strokeWidth={2} aria-hidden="true" />
           <span className="truncate">{back.label}</span>
         </button>
       )}
-      <ul className="py-1">
+      <ul className="space-y-0.5 px-1.5 py-1 sm:px-2.5">
         {items.map((item) => (
           <li key={item.key}>
             <button
               type="button"
               onClick={item.onSelect}
               aria-current={item.active ? 'true' : undefined}
-              className={`relative flex w-full flex-col items-center gap-1.5 px-1.5 py-3 text-center transition-colors duration-fast sm:flex-row sm:gap-3 sm:px-4 sm:text-left ${
-                item.active ? 'bg-accent-soft/70 text-ink' : 'text-ink-muted hover:bg-surface-2 hover:text-ink'
+              className={`relative flex w-full flex-col items-center gap-1.5 rounded-[12px] px-1 py-2.5 text-center transition-colors duration-fast sm:flex-row sm:gap-3 sm:px-2 sm:text-left ${
+                item.active ? 'bg-surface text-ink shadow-[0_1px_2px_rgb(var(--shadow)/0.08)] ring-1 ring-line' : 'text-ink-muted hover:bg-surface-2/70 hover:text-ink'
               }`}
             >
-              {item.active && <span aria-hidden="true" className="absolute inset-y-2 right-0 w-1 rounded-l-full bg-accent sm:left-0 sm:right-auto sm:rounded-l-none sm:rounded-r-full" />}
               {item.visual}
               <span className="min-w-0 flex-1">
                 <span className={`block text-[11px] leading-tight sm:truncate sm:text-sm ${item.active ? 'font-bold' : 'font-medium'}`}>{item.label}</span>
                 {item.sub && <span className="mt-0.5 hidden truncate text-xs text-ink-muted sm:block">{item.sub}</span>}
               </span>
-              <span className={`text-[10px] font-semibold sm:rounded-full sm:px-2 sm:py-0.5 sm:text-xs ${item.count ? 'sm:bg-surface-2' : 'opacity-60'} ${item.active ? 'text-accent-ink' : ''}`}>{item.count}</span>
+              <span className={`tabular text-[10px] font-semibold sm:text-xs ${item.count ? '' : 'opacity-60'} ${item.active ? 'text-accent-ink' : ''}`}>{item.count}</span>
             </button>
           </li>
         ))}
       </ul>
-      {tools && <div className="hidden border-t border-line p-4 lg:block">{tools}</div>}
+      {tools && <div className="mx-4 hidden border-t border-line pb-4 pt-5 lg:block">{tools}</div>}
     </nav>
   );
 }
@@ -275,7 +275,8 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
     update({ approvals: state.approvals.includes(key) ? state.approvals.filter((a) => a !== key) : [...state.approvals, key] });
   const benchmarkCorridor = area?.id ?? (singleArea ? zoneCorridors[0]?.id : undefined);
   const benchmark = benchmarkCorridor ? latestSnapshots(snapshots).find((s) => s.corridorId === benchmarkCorridor) : undefined;
-  const suggestions = results.length === 0 ? relaxSuggestions(properties, state) : [];
+  // With no match, or only one or two, offer the filters to relax that bring in more projects.
+  const suggestions = results.length <= 2 ? relaxSuggestions(properties, state).filter((s) => s.count > results.length) : [];
 
   const [one, many] = state.seg ? SEGMENT_NOUN[state.seg] : ['project', 'projects'];
   const title = state.loc || area?.name || zone?.name || 'All of Bengaluru';
@@ -321,7 +322,7 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
         tools={
           <div className="space-y-5">
             <fieldset>
-              <legend className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted">
+              <legend className="flex items-center gap-1.5 text-2xs font-semibold uppercase tracking-[0.14em] text-ink-muted">
                 <ShieldCheck className="h-3.5 w-3.5 text-accent-ink" strokeWidth={1.75} aria-hidden="true" /> RERA audit checklist
               </legend>
               <div className="mt-2 space-y-0.5">
@@ -329,13 +330,13 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
                   <label key={o.value} className="flex min-h-[40px] cursor-pointer items-center gap-2.5 text-sm">
                     <input type="checkbox" checked={state.approvals.includes(o.value)} onChange={() => toggleApproval(o.value)} className="h-4 w-4 shrink-0 accent-[rgb(var(--accent))]" />
                     <span className="flex-1">{o.label}</span>
-                    <span className="text-xs text-ink-muted">{countWith({ approvals: Array.from(new Set([...state.approvals, o.value])) })}</span>
+                    <span className="tabular text-xs text-ink-muted">{countWith({ approvals: Array.from(new Set([...state.approvals, o.value])) })}</span>
                   </label>
                 ))}
                 <label className="flex min-h-[40px] cursor-pointer items-center gap-2.5 text-sm">
                   <input type="checkbox" checked={state.verified} onChange={() => update({ verified: !state.verified })} className="h-4 w-4 shrink-0 accent-[rgb(var(--accent))]" />
                   <span className="flex-1">K-RERA number shown</span>
-                  <span className="text-xs text-ink-muted">{countWith({ verified: true })}</span>
+                  <span className="tabular text-xs text-ink-muted">{countWith({ verified: true })}</span>
                 </label>
               </div>
             </fieldset>
@@ -353,20 +354,20 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
         }
       />
 
-      <div ref={top} className="min-w-0 flex-1 scroll-mt-[60px] px-3 pb-28 pt-3 sm:px-5 lg:px-8 md:pb-16">
+      <div ref={top} className="min-w-0 flex-1 scroll-mt-[60px] px-3 pb-28 pt-4 sm:px-5 sm:pt-6 lg:px-8 md:pb-20">
         <div className="hidden sm:block">
           <Breadcrumbs items={crumbs} />
         </div>
 
         <div className="flex items-start gap-2 sm:mt-1">
           {zone && (
-            <button type="button" onClick={up} className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-line bg-surface hover:bg-surface-2 sm:hidden" aria-label="Go back one level">
+            <button type="button" onClick={up} className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-line bg-surface hover:border-ink/40 sm:hidden" aria-label="Go back one level">
               <ArrowLeft className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
             </button>
           )}
           <div className="min-w-0 flex-1">
-            <h1 className="truncate font-serif text-xl leading-tight sm:text-3xl">{title}</h1>
-            <p className="mt-0.5 truncate text-xs text-ink-muted sm:text-sm" aria-live="polite">
+            <h1 className="truncate font-serif text-[1.6rem] leading-tight sm:text-[2.4rem] lg:text-[2.75rem]">{title}</h1>
+            <p className="mt-1 truncate text-[13px] text-ink-muted sm:text-[0.95rem]" aria-live="polite">
               <strong className="text-ink">{results.length}</strong> {results.length === 1 ? one : many}
               {context ? ` · ${context}` : ''}
             </p>
@@ -383,15 +384,15 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
               </p>
             )}
           </div>
-          <label className="relative hidden w-56 shrink-0 md:block lg:w-72">
+          <label className="relative hidden w-56 shrink-0 self-center md:block lg:w-72">
             <span className="sr-only">Search in these results</span>
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" strokeWidth={1.75} aria-hidden="true" />
-            <input value={state.q} onChange={(e) => update({ q: e.target.value })} placeholder="Search project or builder" className="field min-h-[44px] rounded-full pl-9 text-sm" />
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" strokeWidth={1.75} aria-hidden="true" />
+            <input value={state.q} onChange={(e) => update({ q: e.target.value })} placeholder="Search project or builder…" className="field min-h-[44px] pl-10 text-sm" />
           </label>
         </div>
 
         {/* Toolbar: what kind of property, then budget, filters and sort. */}
-        <div className="sticky top-[60px] z-20 -mx-3 mt-3 border-b border-line bg-bg px-3 py-2 sm:-mx-5 sm:px-5 lg:-mx-8 lg:px-8">
+        <div className="sticky top-[60px] z-20 -mx-3 mt-4 border-b border-line bg-bg/95 px-3 py-2.5 backdrop-blur-md sm:-mx-5 sm:mt-5 sm:px-5 lg:-mx-8 lg:px-8">
           <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 py-0.5" role="group" aria-label="Property type">
             {typeChips.map((t) => (
               <button
@@ -421,7 +422,7 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
                   if (b) update({ min: b.min, max: b.max });
                 }}
                 icon={<IndianRupee className="hidden h-4 w-4 text-accent-ink sm:block" aria-hidden="true" />}
-                className="h-12 min-w-0 flex-1 gap-1.5 rounded-full border border-line bg-surface pl-4 pr-1.5 text-[13px] font-semibold sm:gap-2.5 hover:border-line-strong data-[open=true]:border-ink sm:h-10 sm:w-52 sm:flex-none sm:text-sm"
+                className="h-12 min-w-0 flex-1 gap-1.5 rounded-full border border-line bg-surface pl-4 pr-1.5 text-[13px] font-semibold sm:gap-2.5 hover:border-ink/40 data-[open=true]:border-ink sm:h-10 sm:w-52 sm:flex-none sm:text-sm"
               />
             )}
             <Select
@@ -438,12 +439,12 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
                   <span className="hidden sm:inline">{state.sort === 'relevance' ? 'Featured first' : SORT_OPTIONS.find((o) => o.value === state.sort)?.label}</span>
                 </span>
               }
-              className={`h-12 w-12 shrink-0 justify-center rounded-full border text-sm font-semibold sm:h-10 sm:w-auto sm:px-4 ${state.sort !== 'relevance' ? 'border-accent-ink bg-accent-soft text-accent-ink' : 'border-line bg-surface text-ink hover:border-line-strong'}`}
+              className={`h-12 w-12 shrink-0 justify-center rounded-full border text-sm font-semibold sm:h-10 sm:w-auto sm:px-4 ${state.sort !== 'relevance' ? 'border-ink bg-ink text-bg' : 'border-line bg-surface text-ink hover:border-ink/40'}`}
             />
             <button
               type="button"
               onClick={() => setSheet(true)}
-              className={`relative inline-flex h-12 w-12 shrink-0 items-center justify-center gap-1.5 rounded-full text-sm font-semibold transition-colors active:scale-[0.96] sm:h-10 sm:w-auto sm:px-4 ${chips.length ? 'bg-ink text-bg' : 'border border-line bg-surface text-ink hover:border-line-strong'}`}
+              className={`relative inline-flex h-12 w-12 shrink-0 items-center justify-center gap-1.5 rounded-full text-sm font-semibold transition-colors active:scale-[0.96] sm:h-10 sm:w-auto sm:px-4 ${chips.length ? 'bg-ink text-bg' : 'border border-line bg-surface text-ink hover:border-ink/40'}`}
             >
               <SlidersHorizontal className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
               <span className="hidden sm:inline">More filters</span>
@@ -469,7 +470,7 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
 
         {lensChips.length > 0 && (
           <div className="no-scrollbar -mx-1 mt-3 flex items-center gap-2 overflow-x-auto px-1" role="group" aria-label="Buyer lens">
-            <span className="shrink-0 text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted">For</span>
+            <span className="shrink-0 text-2xs font-semibold uppercase tracking-[0.14em] text-ink-muted">For</span>
             <button type="button" aria-pressed={!state.lens.length} onClick={() => update({ lens: [] })} className="chip min-h-[48px] shrink-0 px-3.5 text-sm sm:min-h-[40px]">
               Everyone
             </button>
@@ -510,14 +511,14 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
           </ul>
         )}
 
-        <section id="listing-results" aria-label="Matching properties" className="mt-4">
+        <section id="listing-results" aria-label="Matching properties" className="mt-5 sm:mt-6">
           {results.length === 0 ? (
-            <div className="flex flex-col items-center rounded-2xl border border-dashed border-line-strong bg-surface px-5 py-10 text-center">
-              <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-soft text-accent-ink ring-1 ring-accent/20">
+            <div className="flex flex-col items-center rounded-card border border-line bg-surface px-5 py-14 text-center sm:py-16">
+              <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-accent-soft text-accent-ink">
                 <Search className="h-6 w-6" strokeWidth={1.75} aria-hidden="true" />
               </span>
-              <h2 className="mt-4 font-serif text-xl sm:text-2xl">Nothing listed here yet</h2>
-              <p className="mt-1 max-w-md text-sm text-ink-muted">Our advisor often knows of launches and resale units before they are listed. Ask, or widen the search.</p>
+              <h2 className="mt-5 font-serif text-2xl sm:text-[2rem]">Nothing listed here yet</h2>
+              <p className="mt-2 max-w-md text-[0.95rem] leading-relaxed text-ink-muted">Our advisor often knows of launches and resale units before they are listed. Ask, or widen the search.</p>
               {suggestions.length > 0 && (
                 <div className="mt-5 flex flex-wrap justify-center gap-2">
                   {suggestions.map((s) => (
@@ -532,25 +533,46 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
               </a>
             </div>
           ) : (
-            <ul key={`${state.zone}|${state.corridors.join()}|${state.loc}|${state.seg}`} className="stagger grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+            <ul key={`${state.zone}|${state.corridors.join()}|${state.loc}|${state.seg}`} className="stagger grid grid-cols-2 gap-2.5 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
               {shown.map((p, i) => (
-                <li key={p.id} style={{ '--i': Math.min(i, 8) } as React.CSSProperties}>
+                <li key={p.id} style={{ '--i': Math.min(i, 8) } as React.CSSProperties} className={results.length === 1 ? 'col-span-2 sm:col-span-1' : undefined}>
                   <ExploreCard property={p} priority={i < 2} />
                 </li>
               ))}
+              {results.length <= 2 && (
+                <li className={results.length === 1 ? 'col-span-2 sm:col-span-1 lg:col-span-2 xl:col-span-3' : 'col-span-2 lg:col-span-1 xl:col-span-2'}>
+                  <div className="flex h-full flex-col justify-center rounded-card border border-dashed border-line-strong bg-surface/60 p-6 sm:p-8">
+                    <p className="sheet-label">Only {results.length} {results.length === 1 ? one : many} here</p>
+                    <h2 className="mt-2 font-serif text-[1.6rem] leading-tight">Want more options?</h2>
+                    <p className="mt-2 max-w-md text-sm leading-relaxed text-ink-muted">Widen the search, or ask the advisor about launches and resale units that are not listed yet.</p>
+                    {suggestions.length > 0 && (
+                      <div className="mt-5 flex flex-wrap gap-2">
+                        {suggestions.map((s) => (
+                          <button key={s.label} type="button" onClick={() => update(s.patch, Boolean(s.patch.zone !== undefined || s.patch.corridors || s.patch.loc !== undefined))} className="chip active:scale-[0.96]">
+                            {s.label} <span className="text-xs text-ink-muted">{s.count}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <a href={whatsAppLink(askText)} target="_blank" rel="noopener noreferrer" className="btn-secondary mt-5 self-start">
+                      <MessageCircle className="h-4 w-4 text-accent-ink" strokeWidth={1.75} aria-hidden="true" /> Ask the area advisor
+                    </a>
+                  </div>
+                </li>
+              )}
             </ul>
           )}
 
           {results.length > limit && (
             <div className="mt-8 text-center">
-              <button type="button" onClick={() => setLimit((n) => n + PAGE)} className="btn-secondary rounded-full">
+              <button type="button" onClick={() => setLimit((n) => n + PAGE)} className="btn-secondary">
                 Show {Math.min(PAGE, results.length - limit)} more
               </button>
             </div>
           )}
 
           {!zone && results.length > 0 && comingSoonZones(properties).length > 0 && (
-            <p className="mt-6 text-center text-xs text-ink-muted">
+            <p className="mt-10 text-center text-sm text-ink-muted">
               {comingSoonZones(properties)
                 .map((z) => z.name)
                 .join(' and ')}{' '}

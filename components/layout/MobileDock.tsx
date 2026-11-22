@@ -25,7 +25,10 @@ const CostStudio = dynamic(() => import('@/components/property/CostStudio'), {
 type Props = { settings: SiteSettings; consent: ConsentInfo };
 
 const tab =
-  'flex h-16 flex-1 flex-col items-center justify-center gap-1 text-[11px] text-ink-muted active:scale-[0.96] transition-[transform,color] duration-fast';
+  'relative flex h-16 flex-1 flex-col items-center justify-center gap-1 text-[11px] font-medium text-ink-muted active:scale-[0.96] transition-[transform,color] duration-fast';
+
+// The open tab: ink label, green icon and a short green bar along the top edge.
+const ON = 'font-semibold !text-ink [&_svg]:text-accent-ink before:absolute before:top-0 before:h-[3px] before:w-8 before:rounded-b-full before:bg-accent';
 
 // Phone-only bottom dock: Home · Explore · Calculator · Wishlist · Concierge
 export function MobileDock({ settings, consent }: Props) {
@@ -43,26 +46,26 @@ export function MobileDock({ settings, consent }: Props) {
 
       <nav
         aria-label="Quick navigation"
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface safe-bottom shadow-[0_-12px_30px_-24px_rgb(var(--shadow)/0.5)] md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 backdrop-blur-md safe-bottom shadow-[0_-12px_30px_-24px_rgb(var(--shadow)/0.5)] md:hidden"
         style={{ transform: visible ? 'none' : 'translateY(110%)', transition: 'transform var(--dur-base) var(--ease)' }}
       >
         <div className="flex px-1">
-          <Link href="/" className={`${tab} ${pathname === '/' ? 'text-accent-ink font-semibold' : ''}`}>
+          <Link href="/" className={`${tab} ${pathname === '/' ? ON : ''}`}>
             <Home className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
             Home
           </Link>
 
-          <Link href="/properties" className={`${tab} ${pathname === '/properties' ? 'text-accent-ink font-semibold' : ''}`}>
+          <Link href="/properties" className={`${tab} ${pathname === '/properties' ? ON : ''}`}>
             <Compass className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
             Explore
           </Link>
 
-          <button type="button" onClick={() => setSheet('calculator')} className={`${tab} ${sheet === 'calculator' ? 'text-accent-ink font-semibold' : ''}`}>
+          <button type="button" onClick={() => setSheet('calculator')} className={`${tab} ${sheet === 'calculator' ? ON : ''}`}>
             <Calculator className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
             Calculator
           </button>
 
-          <Link href="/shortlist" className={`${tab} ${pathname === '/shortlist' ? 'text-accent-ink font-semibold' : ''}`}>
+          <Link href="/shortlist" className={`${tab} ${pathname === '/shortlist' ? ON : ''}`}>
             <span className="relative">
               <Heart className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
               {shortlist.length > 0 && (
@@ -74,7 +77,7 @@ export function MobileDock({ settings, consent }: Props) {
             Wishlist
           </Link>
 
-          <button type="button" onClick={() => setSheet('advisor')} className={`${tab} ${sheet === 'advisor' ? 'text-accent-ink font-semibold' : ''}`}>
+          <button type="button" onClick={() => setSheet('advisor')} className={`${tab} ${sheet === 'advisor' ? ON : ''}`}>
             <ConciergeBell className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
             Concierge
           </button>
@@ -103,7 +106,7 @@ export function MobileDock({ settings, consent }: Props) {
             </a>
           </div>
 
-          <div className="rounded-xl border border-line bg-surface-2/60 p-3">
+          <div className="rounded-[14px] border border-line bg-surface-2/60 p-3.5">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold text-ink">Karnataka Cost & EMI Studio</p>
@@ -112,7 +115,7 @@ export function MobileDock({ settings, consent }: Props) {
               <button
                 type="button"
                 onClick={() => setSheet('calculator')}
-                className="inline-flex items-center gap-1 rounded-lg bg-surface px-2.5 py-1.5 text-xs font-medium text-accent-ink shadow-xs border border-line hover:border-accent"
+                className="inline-flex min-h-[40px] items-center gap-1.5 rounded-[10px] border border-line bg-surface px-3 text-xs font-semibold text-accent-ink hover:border-ink/40"
               >
                 <Calculator className="h-3.5 w-3.5" />
                 <span>Open</span>

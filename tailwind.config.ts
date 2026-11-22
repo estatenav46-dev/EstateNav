@@ -31,7 +31,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-geist-sans)', 'Manrope', 'system-ui', 'sans-serif'],
-        serif: ['var(--font-serif)', 'var(--font-geist-sans)', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-serif)', 'Georgia', 'var(--font-geist-sans)', 'serif'],
         mono: ['var(--font-geist-mono)', 'ui-monospace', 'monospace'],
       },
       fontSize: {
@@ -43,9 +43,10 @@ const config: Config = {
         '2xl': ['1.75rem', { lineHeight: '1.2' }],
         '3xl': ['2.5rem', { lineHeight: '1.08' }],
         '4xl': ['3.5rem', { lineHeight: '1.04' }],
+        '5xl': ['4.5rem', { lineHeight: '1' }],
       },
       maxWidth: { container: '1360px' },
-      borderRadius: { card: '16px', slide: '20px' },
+      borderRadius: { card: '18px', slide: '24px' },
       transitionDuration: { fast: '150ms', base: '240ms', slow: '400ms' },
       transitionTimingFunction: { out: 'cubic-bezier(0.22, 1, 0.36, 1)' },
       spacing: { header: '72px' },

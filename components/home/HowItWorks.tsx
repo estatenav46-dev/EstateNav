@@ -8,7 +8,7 @@ const STEPS = [
 export function HowItWorks() {
   return (
     <section className="mx-auto max-w-container px-4 py-6" aria-label="How it works">
-      <div className="rounded-2xl border border-line bg-surface p-4 sm:p-6">
+      <div className="rounded-card border border-line bg-surface p-4 sm:p-6">
         <h2 className="mb-4 text-base font-bold text-ink sm:text-lg">How EstateNav works</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
           {STEPS.map((step) => (

@@ -90,10 +90,10 @@ export function ConfigExplorer({ property }: { property: Property }) {
                 setG(i);
                 setV(0);
               }}
-              className={`min-w-[6.25rem] shrink-0 rounded-xl border px-3.5 py-2 text-left transition-[background-color,border-color,box-shadow] duration-base ${active ? 'border-accent bg-accent text-accent-on shadow-[0_10px_24px_-14px_rgb(var(--accent)/0.9)]' : 'border-line bg-surface hover:border-line-strong'}`}
+              className={`min-w-[7rem] shrink-0 rounded-[12px] border px-4 py-2.5 text-left transition-[background-color,border-color,color] duration-base ${active ? 'border-ink bg-ink text-bg' : 'border-line bg-surface hover:border-ink/40'}`}
             >
               <span className="block text-sm font-semibold">{item.label}</span>
-              <span className={`block text-xs ${active ? 'text-accent-on/80' : 'text-ink-muted'}`}>
+              <span className={`tabular block text-xs ${active ? 'text-bg/75' : 'text-ink-muted'}`}>
                 {from ?? `${item.items.length} ${item.items.length === 1 ? 'size' : 'sizes'}`}
               </span>
             </button>
@@ -101,12 +101,12 @@ export function ConfigExplorer({ property }: { property: Property }) {
         })}
       </div>
 
-      <div role="tabpanel" aria-label={group.label} className="mt-3 overflow-hidden rounded-xl border border-line bg-surface">
+      <div role="tabpanel" aria-label={group.label} className="mt-4 overflow-hidden rounded-card border border-line bg-surface">
         {group.items.length > 1 && (
-          <div className="flex flex-wrap items-center gap-1.5 border-b border-line bg-surface-2/50 px-3 py-2">
+          <div className="flex flex-wrap items-center gap-1.5 border-b border-line px-4 py-3 sm:px-5">
             <span className="mr-1 text-xs text-ink-muted">{group.items.length} sizes:</span>
             {group.items.map((c, i) => (
-              <button key={c.id} type="button" onClick={() => setV(i)} aria-pressed={i === v} className="chip min-h-[30px] px-2.5 text-xs">
+              <button key={c.id} type="button" onClick={() => setV(i)} aria-pressed={i === v} className="chip min-h-[36px] px-3 text-xs">
                 {formatUnitSqft(c.carpetSqftMin, c.carpetSqftMax) ?? formatUnitSqft(c.superSqftMin, c.superSqftMax) ?? c.label}{c.tower ? ` · ${c.tower}` : ''}
               </button>
             ))}
@@ -114,16 +114,16 @@ export function ConfigExplorer({ property }: { property: Property }) {
         )}
 
         <div className="grid gap-0 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-          <div className="p-3.5 sm:p-4">
+          <div className="p-4 sm:p-5">
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-base font-semibold">{unit.label}</h3>
+              <h3 className="font-serif text-[1.35rem] leading-tight">{unit.label}</h3>
               {status && <span className="rounded-full bg-amber-500/15 px-2.5 py-0.5 text-xs font-semibold text-amber-800 dark:text-amber-300">{status}</span>}
             </div>
             {unit.notes && <p className="mt-0.5 text-sm text-ink-muted">{unit.notes}</p>}
 
-            <p className="mt-3 text-xs text-ink-muted">{rent ? 'Monthly rent' : 'Price'}</p>
+            <p className="mt-4 text-2xs font-semibold uppercase tracking-[0.12em] text-ink-muted">{rent ? 'Monthly rent' : 'Price'}</p>
             {price ? (
-              <p className="tabular font-serif text-[1.35rem] leading-tight">
+              <p className="tabular mt-0.5 text-[1.4rem] font-semibold leading-tight tracking-[-0.015em]">
                 {price}
                 <sup className="ml-0.5 text-sm text-brass">*</sup>
               </p>
@@ -136,10 +136,10 @@ export function ConfigExplorer({ property }: { property: Property }) {
               </p>
             ) : null}
 
-            <dl className="mt-3 grid grid-cols-2 gap-2">
+            <dl className="mt-4 grid grid-cols-2 gap-2">
               {rows.map(({ icon: Icon, label, value }) => (
-                <div key={label} className="rounded-lg bg-surface-2/70 px-3 py-2">
-                  <dt className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-ink-muted">
+                <div key={label} className="rounded-[10px] bg-surface-2/70 px-3 py-2.5">
+                  <dt className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">
                     <Icon className="h-3.5 w-3.5" aria-hidden="true" /> {label}
                   </dt>
                   <dd className="tabular mt-0.5 text-sm font-semibold">{value ?? 'Ask advisor'}</dd>
@@ -147,7 +147,7 @@ export function ConfigExplorer({ property }: { property: Property }) {
               ))}
             </dl>
 
-            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
               <button type="button" onClick={() => ask('price-sheet')} className="btn-primary">
                 <FileText className="h-4 w-4" aria-hidden="true" /> {price ? 'Get price sheet' : 'Get the price'}
               </button>
@@ -157,16 +157,16 @@ export function ConfigExplorer({ property }: { property: Property }) {
             </div>
           </div>
 
-          <div className="border-t border-line bg-white p-3 md:border-l md:border-t-0">
+          <div className={`border-t border-line p-4 md:border-l md:border-t-0 ${plan ? 'bg-white' : 'bg-surface'}`}>
             {plan ? (
-              <button type="button" onClick={() => setViewer(planIndex)} className="group relative block h-[160px] w-full overflow-hidden rounded-lg sm:h-[190px]" aria-label={`Open the ${unit.label} floor plan`}>
+              <button type="button" onClick={() => setViewer(planIndex)} className="group relative block h-[200px] w-full overflow-hidden rounded-[10px] sm:h-full sm:min-h-[260px]" aria-label={`Open the ${unit.label} floor plan`}>
                 <Image src={plan.url} alt={plan.alt} fill sizes="(min-width: 768px) 30vw, 100vw" className="object-contain" />
                 <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-full bg-black/65 px-2.5 py-1 text-xs font-semibold text-white">
                   <Maximize2 className="h-3.5 w-3.5" aria-hidden="true" /> Floor plan
                 </span>
               </button>
             ) : (
-              <div className="flex h-[160px] flex-col items-center justify-center gap-2 rounded-lg border border-dashed sm:h-[190px] border-line-strong bg-surface-2/50 p-4 text-center">
+              <div className="flex h-[200px] flex-col items-center justify-center gap-2 rounded-[10px] border border-dashed border-line-strong bg-surface-2/50 p-4 text-center sm:h-full sm:min-h-[260px]">
                 <svg viewBox="0 0 120 80" className="h-14 w-20 text-ink-muted" fill="none" stroke="currentColor" aria-hidden="true">
                   <path d="M6 6h108v68H6zM6 40h46M52 6v68M80 40h34M80 40v34M52 56h28" />
                 </svg>
@@ -182,7 +182,7 @@ export function ConfigExplorer({ property }: { property: Property }) {
 
       {property.configurations.length > 1 && (
         <div className="mt-4">
-          <button type="button" onClick={() => setTable((t) => !t)} aria-expanded={table} className="inline-flex min-h-[34px] items-center gap-2 text-sm font-semibold text-accent-ink hover:underline">
+          <button type="button" onClick={() => setTable((t) => !t)} aria-expanded={table} className="inline-flex min-h-[44px] items-center gap-2 text-sm font-semibold text-accent-ink">
             <Table2 className="h-4 w-4" aria-hidden="true" /> {table ? 'Hide' : 'Compare'} all {property.configurations.length} sizes in a table
           </button>
           {table && (

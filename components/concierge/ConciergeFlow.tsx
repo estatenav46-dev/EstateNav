@@ -123,7 +123,7 @@ function Tile({ selected, onPick, index, children, className = '' }: { selected:
       aria-pressed={selected}
       data-ripple
       style={{ '--i': index } as CSSProperties}
-      className={`group relative flex w-full items-center gap-3 rounded-[20px] border p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-base ease-out active:scale-[0.97] sm:p-3.5 ${
+      className={`group relative flex w-full items-center gap-3 rounded-[14px] border p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-base ease-out active:scale-[0.97] sm:p-3.5 ${
         selected
           ? 'border-accent bg-accent-soft shadow-[0_16px_30px_-20px_rgb(var(--accent)/0.9)]'
           : 'border-line bg-surface hover:-translate-y-0.5 hover:border-line-strong hover:shadow-[0_16px_30px_-24px_rgb(var(--shadow)/0.6)]'
@@ -247,14 +247,12 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
   );
 
   return (
-    <div className={`grid overflow-hidden bg-surface ${inline ? 'rounded-[22px] border border-line shadow-[0_30px_60px_-45px_rgb(var(--shadow)/0.6)] md:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]' : 'rounded-[32px] shadow-[0_60px_120px_-40px_rgb(0_0_0/0.6)] md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]'}`}>
+    <div className={`grid overflow-hidden bg-surface ${inline ? 'rounded-card border border-line shadow-[0_30px_60px_-48px_rgb(var(--shadow)/0.6)] md:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]' : 'rounded-slide shadow-[0_60px_120px_-40px_rgb(0_0_0/0.6)] md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]'}`}>
       <aside className={`relative isolate flex flex-col overflow-hidden bg-forest text-forest-on ${inline ? 'p-5 sm:p-6' : 'p-5 sm:p-7 md:min-h-[520px] md:p-8'}`}>
-        <div aria-hidden="true" className="absolute -right-24 -top-24 -z-10 h-72 w-72 rounded-full bg-brass/25 blur-3xl" />
-        <div aria-hidden="true" className="absolute inset-0 -z-10 opacity-[0.08] [background-image:linear-gradient(rgb(var(--on-forest))_1px,transparent_1px),linear-gradient(90deg,rgb(var(--on-forest))_1px,transparent_1px)] [background-size:40px_40px]" />
-        <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.14em] text-forest-on/70">
-          <span aria-hidden="true" className="h-px w-8 bg-brass" /> EstateNav concierge
+        <p className="flex items-center gap-2.5 text-2xs font-semibold uppercase tracking-[0.16em] text-forest-on/70">
+          <span aria-hidden="true" className="h-px w-8 bg-brass/70" /> EstateNav concierge
         </p>
-        <p className={`mt-3 font-serif leading-[1.08] tracking-[-0.03em] text-forest-on ${inline ? 'text-[1.4rem] sm:text-[1.6rem]' : 'text-[1.65rem] sm:text-[2.1rem]'}`}>
+        <p className={`mt-3 font-serif leading-[1.08] text-forest-on ${inline ? 'text-[1.6rem] sm:text-[1.85rem]' : 'text-[1.8rem] sm:text-[2.3rem]'}`}>
           Tell us what you&apos;re after. <span className="text-brass">We&apos;ll do the shortlisting.</span>
         </p>
 
@@ -280,9 +278,9 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
             <div
               key={`${p.id}-${matches.length}`}
               className="absolute bottom-0 h-[150px] w-[46%]"
-              style={{ left: `${i * 26}%`, transform: `rotate(${(i - 1) * 6}deg) translateY(${i === 1 ? -12 : 0}px)`, zIndex: i === 1 ? 3 : 2 - i }}
+              style={{ left: `${i * 27}%`, transform: `translateY(${i === 1 ? -14 : 0}px)`, zIndex: i === 1 ? 3 : 2 - i }}
             >
-              <div className="slide-up relative h-full w-full overflow-hidden rounded-2xl shadow-[0_20px_40px_-16px_rgb(0_0_0/0.6)] ring-4 ring-forest" style={{ animationDelay: `${i * 70}ms` }}>
+              <div className="slide-up relative h-full w-full overflow-hidden rounded-card shadow-[0_20px_40px_-16px_rgb(0_0_0/0.6)] ring-4 ring-forest" style={{ animationDelay: `${i * 70}ms` }}>
                 <Image src={p.img} alt="" fill sizes="200px" quality={50} className="object-cover" />
               </div>
             </div>
@@ -309,7 +307,7 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
               <ol className="flex flex-1 gap-1.5" aria-hidden="true">
                 {Array.from({ length: questions }, (_, i) => (
                   <li key={i} className="h-1 flex-1 overflow-hidden rounded-full bg-surface-2">
-                    <span className={`block h-full origin-left rounded-full bg-gradient-to-r from-accent to-brass transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${i <= step ? 'scale-x-100' : 'scale-x-0'}`} />
+                    <span className={`block h-full origin-left rounded-full bg-accent transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${i <= step ? 'scale-x-100' : 'scale-x-0'}`} />
                   </li>
                 ))}
               </ol>
@@ -332,7 +330,7 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
               <div className={`stagger grid gap-2.5 sm:grid-cols-2 ${inline ? 'mt-4 xl:grid-cols-3' : 'mt-5'}`}>
                 {GOALS.map((g, i) => (
                   <Tile key={g.id} index={i} selected={answers.goal === g.id} onPick={() => pick('goal', g.id)} className={g.id === 'browsing' ? 'sm:col-span-2' : ''}>
-                    <span className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl transition-colors duration-base ${answers.goal === g.id ? 'bg-accent text-accent-on' : 'bg-sand text-forest group-hover:bg-accent group-hover:text-accent-on dark:text-brass'}`}>
+                    <span className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] transition-colors duration-base ${answers.goal === g.id ? 'bg-accent text-accent-on' : 'bg-accent-soft text-accent-ink group-hover:bg-accent group-hover:text-accent-on'}`}>
                       <NeedIcon name={g.icon} className="h-[22px] w-[22px]" />
                     </span>
                     <span className="min-w-0">
@@ -403,7 +401,7 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
                     autoComplete="name"
                     placeholder=" "
                     aria-invalid={error?.field === 'name'}
-                    className="peer h-[60px] w-full rounded-2xl border border-line bg-surface px-4 pt-5 text-base text-ink outline-none transition-[border-color,box-shadow] duration-base focus:border-accent-ink focus:shadow-[0_0_0_4px_rgb(var(--accent)/0.12)] aria-[invalid=true]:border-danger"
+                    className="peer h-[60px] w-full rounded-card border border-line bg-surface px-4 pt-5 text-base text-ink outline-none transition-[border-color,box-shadow] duration-base focus:border-accent-ink focus:shadow-[0_0_0_4px_rgb(var(--accent)/0.12)] aria-[invalid=true]:border-danger"
                   />
                   <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-base text-ink-muted transition-all duration-base peer-focus:top-[17px] peer-focus:text-[11px] peer-focus:font-semibold peer-[:not(:placeholder-shown)]:top-[17px] peer-[:not(:placeholder-shown)]:text-[11px] peer-[:not(:placeholder-shown)]:font-semibold">
                     Your name
@@ -418,7 +416,7 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
                     autoComplete="tel-national"
                     placeholder=" "
                     aria-invalid={error?.field === 'phone'}
-                    className="peer h-[60px] w-full rounded-2xl border border-line bg-surface pl-[3.4rem] pr-4 pt-5 text-base text-ink outline-none transition-[border-color,box-shadow] duration-base focus:border-accent-ink focus:shadow-[0_0_0_4px_rgb(var(--accent)/0.12)] aria-[invalid=true]:border-danger"
+                    className="peer h-[60px] w-full rounded-card border border-line bg-surface pl-[3.4rem] pr-4 pt-5 text-base text-ink outline-none transition-[border-color,box-shadow] duration-base focus:border-accent-ink focus:shadow-[0_0_0_4px_rgb(var(--accent)/0.12)] aria-[invalid=true]:border-danger"
                   />
                   <span className="pointer-events-none absolute left-4 top-[17px] text-[11px] font-semibold text-ink-muted">Mobile (WhatsApp)</span>
                 </label>

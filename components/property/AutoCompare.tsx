@@ -34,27 +34,27 @@ export function AutoCompare({ base, suggested, pool }: { base: Property; suggest
   if (!others.length) return null;
 
   return (
-    <section aria-labelledby="auto-compare-title" className="mt-12">
-      <p className="flex items-center gap-3 text-sm font-medium text-ink-muted">
+    <section aria-labelledby="auto-compare-title" className="mt-12 border-t border-line pt-10 sm:mt-14 sm:pt-12">
+      <p className="flex items-center gap-2.5 text-2xs font-semibold uppercase tracking-[0.16em] text-ink-muted">
         <span aria-hidden="true" className="h-px w-8 bg-brass/60" /> Compared for you
       </p>
-      <h2 id="auto-compare-title" className="mt-2 font-serif text-[1.75rem] leading-tight tracking-[-0.02em] sm:text-3xl">
-        {base.title} <span className="text-ink-muted">vs</span> {others.length === 1 ? 'a close match' : 'two close matches'}
+      <h2 id="auto-compare-title" className="mt-3 font-serif text-[2rem] leading-[1.05] sm:text-[2.5rem]">
+        {base.title} <em className="text-ink-muted">vs</em> {others.length === 1 ? 'a close match' : 'two close matches'}
       </h2>
 
-      <ul className="mt-5 grid gap-2 sm:grid-cols-3">
+      <ul className="mt-6 grid gap-3 sm:grid-cols-3">
         {insights.map((i) => (
-          <li key={i.label} className="rounded-2xl border border-line bg-sand/60 px-4 py-3">
+          <li key={i.label} className="rounded-card border border-line bg-surface px-5 py-4">
             <p className="flex items-center gap-1.5 text-xs font-semibold text-brass">
               <Sparkles className="h-3.5 w-3.5" aria-hidden="true" /> {i.label}
             </p>
-            <p className="mt-1 text-sm font-medium">{i.value}</p>
+            <p className="mt-1.5 text-[0.95rem] font-medium">{i.value}</p>
           </li>
         ))}
       </ul>
 
-      <div className="no-scrollbar relative -mx-4 mt-5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-        <table className="w-full min-w-[620px] border-separate border-spacing-0 overflow-hidden rounded-2xl border border-line bg-surface text-sm">
+      <div className="no-scrollbar relative -mx-4 mt-6 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+        <table className="w-full min-w-[620px] border-separate border-spacing-0 overflow-hidden rounded-card border border-line bg-surface text-sm">
           <caption className="sr-only">Comparison of {columns.map((p) => p.title).join(', ')}</caption>
           <thead>
             <tr>
@@ -80,7 +80,7 @@ export function AutoCompare({ base, suggested, pool }: { base: Property; suggest
                       className="h-9 rounded-full border border-line bg-surface pl-3 pr-1 text-xs font-semibold hover:border-line-strong data-[open=true]:border-ink"
                     />
                   )}
-                  <a href={`/properties/${p.slug}`} target="_blank" rel="noopener noreferrer" className="group mt-2 flex items-start gap-1 font-serif text-lg font-semibold leading-tight hover:text-accent-ink">
+                  <a href={`/properties/${p.slug}`} target="_blank" rel="noopener noreferrer" className="group mt-2 flex items-start gap-1 font-serif text-xl leading-tight hover:text-accent-ink">
                     {p.title}
                     <ArrowUpRight className="mt-1 h-3.5 w-3.5 shrink-0 opacity-60 group-hover:opacity-100" aria-hidden="true" />
                   </a>

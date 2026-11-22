@@ -38,28 +38,28 @@ export function PropertyActions({ property, settings, advisorCard, layout = 'sid
         </div>
       ) : (
       <div className="hidden lg:block">
-        <div className="sticky top-20 space-y-3">
-          <div className="rounded-2xl border border-line bg-surface p-3.5 shadow-[0_20px_40px_-32px_rgb(var(--shadow)/0.5)]">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-muted">{property.transaction === 'rent' ? 'Monthly rent' : 'Price'}</p>
-            <p className="tabular mt-0.5 font-serif text-[1.45rem] leading-tight">
+        <div className="sticky top-28 space-y-3">
+          <div className="rounded-card border border-line bg-surface p-6 shadow-[0_30px_60px_-44px_rgb(var(--shadow)/0.6)]">
+            <p className="text-2xs font-semibold uppercase tracking-[0.12em] text-ink-muted">{property.transaction === 'rent' ? 'Monthly rent' : 'Price'}</p>
+            <p className="tabular mt-1.5 text-[1.75rem] font-semibold leading-tight tracking-[-0.02em]">
               {priceLabel(property)}
-              {!property.priceOnRequest && <sup className="ml-0.5 text-xs text-brass">*</sup>}
+              {!property.priceOnRequest && <sup className="ml-0.5 text-sm text-brass">*</sup>}
             </p>
             {(rate || property.priceNote) && (
-              <p className="mt-0.5 text-xs text-ink-muted">{[rate, property.priceOnRequest ? null : property.priceNote].filter(Boolean).join(' · ')}</p>
+              <p className="mt-1 text-sm text-ink-muted">{[rate, property.priceOnRequest ? null : property.priceNote].filter(Boolean).join(' · ')}</p>
             )}
-            <div className="mt-3 grid gap-1.5">
-              <button type="button" onClick={() => openLeadSheet('site-visit')} className="btn-primary min-h-[40px] w-full">
+            <div className="mt-5 grid gap-2">
+              <button type="button" onClick={() => openLeadSheet('site-visit')} className="btn-primary min-h-[46px] w-full">
                 <CalendarDays className="h-4 w-4" aria-hidden="true" /> Book a site visit
               </button>
-              <button type="button" onClick={() => openLeadSheet('price-sheet')} className="btn-secondary min-h-[40px] w-full">
+              <button type="button" onClick={() => openLeadSheet('price-sheet')} className="btn-secondary min-h-[46px] w-full">
                 <FileText className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Get the price sheet
               </button>
-              <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="btn-ghost min-h-[34px] w-full text-sm">
+              <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="btn-ghost min-h-[42px] w-full text-sm">
                 <MessageCircle className="h-4 w-4 text-accent-ink" aria-hidden="true" /> WhatsApp the advisor
               </a>
             </div>
-            <p className="mt-2.5 border-t border-line pt-2.5 text-[11px] leading-relaxed text-ink-muted">
+            <p className="mt-4 border-t border-line pt-4 text-xs leading-relaxed text-ink-muted">
               {property.priceOnRequest ? 'Prices on request. ' : '*Approximate developer guide price; T&C apply. '}Zero buyer brokerage · {settings.agent.name}, K-RERA registered agent.
             </p>
           </div>
@@ -68,7 +68,7 @@ export function PropertyActions({ property, settings, advisorCard, layout = 'sid
       </div>
       )}
 
-      <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-[1fr_1fr_auto] gap-2 border-t border-line bg-surface px-3 pt-2 safe-bottom lg:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-[1fr_1fr_auto] gap-2 border-t border-line bg-surface/95 px-3 pt-2.5 shadow-[0_-12px_30px_-24px_rgb(var(--shadow)/0.5)] backdrop-blur-md safe-bottom lg:hidden">
         <button type="button" onClick={() => openLeadSheet('site-visit')} className="btn-primary px-3">
           VIP site visit
         </button>
