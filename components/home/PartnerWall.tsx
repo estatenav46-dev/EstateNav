@@ -25,7 +25,7 @@ function Tile({ partner, decorative = false }: { partner: Partner; decorative?: 
       sizes="160px"
       quality={85}
       unoptimized={logo.src.toLowerCase().split('?')[0].endsWith('.svg')}
-      className="object-contain grayscale transition-[filter,opacity] duration-base group-hover:grayscale-0 group-focus-visible:grayscale-0 [@media(hover:hover)]:opacity-90 [@media(hover:hover)]:group-hover:opacity-100"
+      className="object-contain"
     />
   ) : null;
   const body = logo?.withName ? (
