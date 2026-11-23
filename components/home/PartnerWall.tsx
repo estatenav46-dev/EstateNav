@@ -6,27 +6,35 @@ import { useState } from 'react';
 import { Pause, Play } from 'lucide-react';
 import type { Developer, Property } from '@/lib/data/types';
 import { useReducedMotionPreference } from '@/lib/ui/hooks';
+import { partnerLogo } from '@/lib/partnerLogos';
 import { SectionHeading } from './SectionHeading';
 
-type Partner = { id: string; name: string; logo: Developer['logo']; projects: number };
+/** `src` is the uploaded logo (admin) or, failing that, the logo bundled in public/partners. */
+type Partner = { id: string; name: string; logo: { src: string; withName?: boolean } | null; projects: number };
 
 // From this many partners the wall becomes two slow, opposite-moving rows; fewer sit still.
 const MARQUEE_FROM = 8;
 
 function Tile({ partner, decorative = false }: { partner: Partner; decorative?: boolean }) {
   const { logo, name, projects } = partner;
-  const body = logo?.url ? (
-    <span className="relative block h-full w-full">
-      <Image
-        src={logo.url}
-        alt={decorative ? '' : `${name} logo`}
-        fill
-        sizes="160px"
-        quality={80}
-        unoptimized={logo.url.toLowerCase().split('?')[0].endsWith('.svg')}
-        className="object-contain grayscale transition-[filter,opacity] duration-base group-hover:grayscale-0 group-focus-visible:grayscale-0 [@media(hover:hover)]:opacity-75 [@media(hover:hover)]:group-hover:opacity-100"
-      />
+  const image = logo ? (
+    <Image
+      src={logo.src}
+      alt={decorative ? '' : `${name} logo`}
+      fill
+      sizes="160px"
+      quality={85}
+      unoptimized={logo.src.toLowerCase().split('?')[0].endsWith('.svg')}
+      className="object-contain grayscale transition-[filter,opacity] duration-base group-hover:grayscale-0 group-focus-visible:grayscale-0 [@media(hover:hover)]:opacity-90 [@media(hover:hover)]:group-hover:opacity-100"
+    />
+  ) : null;
+  const body = logo?.withName ? (
+    <span className="flex h-full w-full flex-col items-center justify-center gap-1">
+      <span className="relative block h-9 w-full">{image}</span>
+      <span className="text-center text-[11px] font-semibold uppercase tracking-[0.08em] text-neutral-700">{name}</span>
     </span>
+  ) : logo ? (
+    <span className="relative block h-full w-full">{image}</span>
   ) : (
     <span className="line-clamp-2 text-center font-serif text-[1.05rem] leading-tight text-neutral-800">{name}</span>
   );
@@ -65,14 +73,20 @@ function Row({ partners, reverse, paused }: { partners: Partner[]; reverse?: boo
   );
 }
 
-// Channel partners (developer records in Firestore, managed on the admin's Partners page): their
-// uploaded logos, or the name when no logo is uploaded yet. Hidden partners never reach here.
+// Channel partners (developer records in Firestore, managed on the admin's Partners page): the logo
+// uploaded there, else the official logo bundled in public/partners (lib/partnerLogos.ts), else the
+// name. Hidden partners never reach here.
 export function PartnerWall({ developers, properties }: { developers: Developer[]; properties: Property[] }) {
   const [paused, setPaused] = useState(false);
   const reduced = useReducedMotionPreference();
   const partners: Partner[] = developers
-    .map((d) => ({ id: d.id, name: d.name, logo: d.logo, projects: properties.filter((p) => p.developerId === d.id).length }))
-    .sort((a, b) => Number(Boolean(b.logo?.url)) - Number(Boolean(a.logo?.url)) || b.projects - a.projects || a.name.localeCompare(b.name));
+    .map((d) => {
+      // An uploaded logo wins; otherwise the official logo bundled with the site, if we have one.
+      const bundled = partnerLogo(d.id, d.name);
+      const logo = d.logo?.url ? { src: d.logo.url } : bundled;
+      return { id: d.id, name: d.name, logo, projects: properties.filter((p) => p.developerId === d.id).length };
+    })
+    .sort((a, b) => Number(Boolean(b.logo)) - Number(Boolean(a.logo)) || b.projects - a.projects || a.name.localeCompare(b.name));
   if (!partners.length) return null;
   // Reduced motion: one still, centred wall instead of the two moving rows.
   const moving = partners.length >= MARQUEE_FROM && !reduced;
