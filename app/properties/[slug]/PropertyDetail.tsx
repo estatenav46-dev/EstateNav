@@ -14,6 +14,10 @@ import type { SimilarMatch } from '@/lib/similar';
 import { ExploreCard } from '@/components/explore/ExploreCard';
 import { AutoCompare } from '@/components/property/AutoCompare';
 import { TrackView } from '@/components/property/TrackView';
+import { WhatsAppTopic } from '@/components/contact/WhatsAppTopic';
+import { projectEnquiryLink, projectEnquiryText } from '@/lib/contact';
+import { WhatsAppGlyph } from '@/components/contact/WhatsAppGlyph';
+import { enquiryFromProperty } from '@/lib/enquiry';
 import { DetailsOnRequest } from '@/components/property/DetailsOnRequest';
 import { SectionNav } from '@/components/property/SectionNav';
 import { ConfigExplorer } from '@/components/property/ConfigExplorer';
@@ -136,6 +140,7 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
   return (
     <main id="main" className="mx-auto max-w-container px-4 pb-24 pt-4 sm:px-6 sm:pt-6 lg:px-8 lg:pb-16">
       <TrackView property={property} />
+      <WhatsAppTopic text={projectEnquiryText(enquiryFromProperty(property), settings.agent.name)} />
       <div className="hidden sm:block">
         <Breadcrumbs items={crumbs} />
       </div>
@@ -171,6 +176,20 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
             <p className="mt-0.5 text-sm text-ink-muted">{[rate, property.priceOnRequest ? null : property.priceNote].filter(Boolean).join(' · ')}</p>
           )}
           <ReraRow property={property} className="mt-1.5 md:justify-end" />
+          {/* The project's own enquiry, visible as soon as the page opens (phones have it in the bottom bar). */}
+          <a
+            href={projectEnquiryLink(enquiryFromProperty(property), settings.agent.name, settings.contact.whatsapp)}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track="cta"
+            data-track-kind="whatsapp-project"
+            className="btn-whatsapp mt-3 hidden md:inline-flex"
+          >
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white">
+              <WhatsAppGlyph size={18} />
+            </span>
+            Enquire now on WhatsApp
+          </a>
         </div>
       </header>
 

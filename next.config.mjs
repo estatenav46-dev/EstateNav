@@ -1,6 +1,17 @@
+// The site's public address (canonical links, sitemap, share links, WhatsApp enquiry links). A
+// deployment on Vercel must never publish a localhost address: if NEXT_PUBLIC_SITE_URL is unset or
+// points at localhost there, fall back to the project's production domain that Vercel provides.
+const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
+const vercelDomain = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+const siteUrl =
+  process.env.VERCEL && vercelDomain && (!configuredSiteUrl || /localhost|127\.0\.0\.1/.test(configuredSiteUrl))
+    ? `https://${vercelDomain}`
+    : configuredSiteUrl;
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  ...(siteUrl ? { env: { NEXT_PUBLIC_SITE_URL: siteUrl } } : {}),
   poweredByHeader: false,
   // Keep the development server's output separate from production builds.
   // Next writes both outputs into distDir, so sharing it can leave either

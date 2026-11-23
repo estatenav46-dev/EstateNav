@@ -98,3 +98,7 @@ export const compareSheetStore = createStore<boolean>(false);
 /** Opens the property lead sheet (site visit, price sheet) from anywhere on a detail page. */
 export const leadSheetStore = createStore<{ open: boolean; intent: 'site-visit' | 'price-sheet'; message: string }>({ open: false, intent: 'site-visit', message: '' });
 export const openLeadSheet = (intent: 'site-visit' | 'price-sheet', message = '') => leadSheetStore.set({ open: true, intent, message });
+
+/** The WhatsApp message for the page on show (a project page sets its enquiry); the header and the
+ *  floating WhatsApp button send this instead of the general greeting. */
+export const whatsAppTopicStore = createStore<string | null>(null);

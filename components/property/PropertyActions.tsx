@@ -1,12 +1,13 @@
 'use client';
 
-import { CalendarDays, FileText, MessageCircle } from 'lucide-react';
+import { CalendarDays, FileText } from 'lucide-react';
 import type { Property, SiteSettings } from '@/lib/data/types';
 import dynamic from 'next/dynamic';
 import { LazySheet as Sheet } from '@/components/ui/LazySheet';
 import { priceLabel, rateLabel } from '@/lib/property';
-import { propertyWhatsApp } from '@/lib/contact';
-import { absoluteUrl } from '@/lib/site';
+import { projectEnquiryLink } from '@/lib/contact';
+import { enquiryFromProperty } from '@/lib/enquiry';
+import { WhatsAppGlyph } from '@/components/contact/WhatsAppGlyph';
 import { useMediaQuery } from '@/lib/ui/hooks';
 import { leadSheetStore, openLeadSheet } from '@/lib/ui/stores';
 
@@ -19,7 +20,13 @@ export function PropertyActions({ property, settings, advisorCard, layout = 'sid
   const lead = leadSheetStore.useValue();
   const desktop = useMediaQuery('(min-width: 1024px)');
   const consent = { text: settings.consentText, version: settings.consentVersion, privacyNote: settings.privacyNote };
-  const whatsapp = propertyWhatsApp({ title: property.title, url: absoluteUrl(`/properties/${property.slug}`) }, settings.contact.whatsapp);
+  // Opens WhatsApp to the official number with this project's name, builder and key facts filled in.
+  const whatsapp = projectEnquiryLink(enquiryFromProperty(property), settings.agent.name, settings.contact.whatsapp);
+  const waDisc = (
+    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white">
+      <WhatsAppGlyph size={18} />
+    </span>
+  );
   const rate = rateLabel(property);
 
   return (
@@ -32,8 +39,8 @@ export function PropertyActions({ property, settings, advisorCard, layout = 'sid
           <button type="button" onClick={() => openLeadSheet('price-sheet')} className="btn-secondary">
             <FileText className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Price sheet
           </button>
-          <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="icon-btn" aria-label="Ask the area advisor on WhatsApp">
-            <MessageCircle className="h-5 w-5 text-accent-ink" aria-hidden="true" />
+          <a href={whatsapp} target="_blank" rel="noopener noreferrer" data-track="cta" data-track-kind="whatsapp-project" className="icon-btn" aria-label={`Enquire about ${property.title} on WhatsApp`}>
+            <WhatsAppGlyph size={22} />
           </a>
         </div>
       ) : (
@@ -49,15 +56,16 @@ export function PropertyActions({ property, settings, advisorCard, layout = 'sid
               <p className="mt-1 text-sm text-ink-muted">{[rate, property.priceOnRequest ? null : property.priceNote].filter(Boolean).join(' · ')}</p>
             )}
             <div className="mt-5 grid gap-2">
-              <button type="button" onClick={() => openLeadSheet('site-visit')} className="btn-primary min-h-[46px] w-full">
-                <CalendarDays className="h-4 w-4" aria-hidden="true" /> Book a site visit
+              <a href={whatsapp} target="_blank" rel="noopener noreferrer" data-track="cta" data-track-kind="whatsapp-project" className="btn-whatsapp min-h-[48px] w-full">
+                {waDisc} Enquire now on WhatsApp
+              </a>
+              <p className="pb-1 text-center text-xs text-ink-muted">Opens WhatsApp with this project&apos;s details filled in.</p>
+              <button type="button" onClick={() => openLeadSheet('site-visit')} className="btn-secondary min-h-[46px] w-full">
+                <CalendarDays className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Book a site visit
               </button>
-              <button type="button" onClick={() => openLeadSheet('price-sheet')} className="btn-secondary min-h-[46px] w-full">
+              <button type="button" onClick={() => openLeadSheet('price-sheet')} className="btn-ghost min-h-[42px] w-full text-sm">
                 <FileText className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Get the price sheet
               </button>
-              <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="btn-ghost min-h-[42px] w-full text-sm">
-                <MessageCircle className="h-4 w-4 text-accent-ink" aria-hidden="true" /> WhatsApp the advisor
-              </a>
             </div>
             <p className="mt-4 border-t border-line pt-4 text-xs leading-relaxed text-ink-muted">
               {property.priceOnRequest ? 'Prices on request. ' : '*Approximate developer guide price; T&C apply. '}Zero buyer brokerage · {settings.agent.name}, K-RERA registered agent.
@@ -68,16 +76,16 @@ export function PropertyActions({ property, settings, advisorCard, layout = 'sid
       </div>
       )}
 
-      <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-[1fr_1fr_auto] gap-2 border-t border-line bg-surface/95 px-3 pt-2.5 shadow-[0_-12px_30px_-24px_rgb(var(--shadow)/0.5)] backdrop-blur-md safe-bottom lg:hidden">
-        <button type="button" onClick={() => openLeadSheet('site-visit')} className="btn-primary px-3">
-          VIP site visit
-        </button>
-        <button type="button" onClick={() => openLeadSheet('price-sheet')} className="btn-secondary px-3">
-          Pricing sheet
-        </button>
-        <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="icon-btn" aria-label="Connect with dedicated area advisor on WhatsApp">
-          <MessageCircle className="h-5 w-5 text-accent-ink" aria-hidden="true" />
+      <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_auto] gap-2 border-t border-line bg-surface/95 px-3 pt-2.5 shadow-[0_-12px_30px_-24px_rgb(var(--shadow)/0.5)] backdrop-blur-md safe-bottom lg:hidden">
+        <a href={whatsapp} target="_blank" rel="noopener noreferrer" data-track="cta" data-track-kind="whatsapp-project" className="btn-whatsapp gap-2 px-3" aria-label={`Enquire about ${property.title} on WhatsApp`}>
+          {waDisc} Enquire now
         </a>
+        <button type="button" onClick={() => openLeadSheet('site-visit')} className="btn-secondary px-3">
+          Site visit
+        </button>
+        <button type="button" onClick={() => openLeadSheet('price-sheet')} className="icon-btn" aria-label="Get the price sheet">
+          <FileText className="h-5 w-5 text-accent-ink" aria-hidden="true" />
+        </button>
       </div>
 
       <Sheet

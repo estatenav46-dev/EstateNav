@@ -9,7 +9,8 @@ import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { LazySheet as Sheet } from '@/components/ui/LazySheet';
 import { UserMenu } from '@/components/auth/UserMenu';
 import { NeedIcon, type NeedIconName } from '@/components/icons/NeedIcons';
-import { shortlistStore } from '@/lib/ui/stores';
+import { shortlistStore, whatsAppTopicStore } from '@/lib/ui/stores';
+import { WhatsAppGlyph } from '@/components/contact/WhatsAppGlyph';
 import { useAuth } from '@/lib/auth/context';
 import { whatsAppLink } from '@/lib/contact';
 
@@ -118,10 +119,14 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, agentName, agentRera
   const [drawer, setDrawer] = useState(false);
   const [mega, setMega] = useState(false);
   const shortlist = shortlistStore.useValue();
+  const topic = whatsAppTopicStore.useValue();
   const { user } = useAuth();
   const hoverTimer = useRef<ReturnType<typeof setTimeout>>();
   const megaRef = useRef<HTMLDivElement>(null);
   const tel = `tel:${phone.replace(/[^0-9+]/g, '')}`;
+  // On a project page this carries the project's enquiry; elsewhere a general hello.
+  const waHref = whatsAppLink(topic ?? `Hi ${agentName}, I'm browsing EstateNav and have a question.`, whatsapp);
+  const waLabel = topic ? `Enquire about this project with ${agentName} on WhatsApp` : `Chat with ${agentName} on WhatsApp`;
 
   useEffect(() => {
     let frame = 0;
@@ -209,6 +214,9 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, agentName, agentRera
                 <Search className="h-[18px] w-[18px]" strokeWidth={1.9} aria-hidden="true" />
               </Link>
             )}
+            <a href={waHref} target="_blank" rel="noopener noreferrer" data-track="cta" data-track-kind="whatsapp-header" aria-label={waLabel} title="WhatsApp" className="inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-surface-2 lg:hidden">
+              <WhatsAppGlyph size={24} />
+            </a>
             <Link
               href="/shortlist"
               className={`relative inline-flex h-11 items-center justify-center gap-2 rounded-full text-ink transition-colors ${user ? 'border border-line px-3 hover:border-ink md:px-4' : 'w-11 hover:bg-surface-2'}`}
@@ -233,6 +241,18 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, agentName, agentRera
             <div className="ml-1 hidden sm:inline-flex">
               <UserMenu />
             </div>
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-track="cta"
+              data-track-kind="whatsapp-header"
+              aria-label={waLabel}
+              className="ml-1 hidden min-h-[44px] items-center gap-2 rounded-[var(--radius)] border border-line-strong bg-surface px-3 text-sm font-semibold text-ink transition-[border-color,transform] hover:-translate-y-px hover:border-ink/40 active:scale-[0.97] lg:inline-flex xl:px-4"
+            >
+              <WhatsAppGlyph size={20} />
+              <span className="hidden xl:inline">WhatsApp</span>
+            </a>
             <Link href="/contact?intent=site-visit" className="btn-primary ml-2 hidden min-h-[44px] px-5 lg:inline-flex">
               Book a site visit <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>

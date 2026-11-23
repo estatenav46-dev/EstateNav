@@ -22,6 +22,8 @@ import { SiteFooter } from '@/components/layout/SiteFooter';
 import { HideOnAdmin } from '@/components/layout/HideOnAdmin';
 import { MobileDock } from '@/components/layout/MobileDock';
 import { CompareTray } from '@/components/listings/CompareTray';
+import { ContactSync } from '@/components/contact/ContactSync';
+import { WhatsAppFloat } from '@/components/contact/WhatsAppFloat';
 import { getCorridors, getPublishedProperties, getSettings } from '@/lib/data/cached';
 import { SITE_URL } from '@/lib/site';
 
@@ -82,6 +84,7 @@ export default async function RootLayout({ children, modal }: { children: React.
   return (
     <html lang="en-IN" suppressHydrationWarning className={`${sans.variable} ${mono.variable} ${serif.variable}`}>
       <body className="flex min-h-screen flex-col">
+        <ContactSync whatsapp={settings.contact.whatsapp} />
         <Providers>
           <AuthProvider>
             <a href="#content" className="sr-only z-[100] rounded-lg bg-surface px-4 py-3 text-ink focus:not-sr-only focus:fixed focus:left-4 focus:top-4">
@@ -105,6 +108,7 @@ export default async function RootLayout({ children, modal }: { children: React.
               <SiteFooter settings={settings} corridors={corridors} />
             </HideOnAdmin>
             <CompareTray />
+            <WhatsAppFloat agentName={settings.agent.name} />
             <MobileDock settings={settings} consent={consent} />
             <AuthModal />
             <WishlistSync />

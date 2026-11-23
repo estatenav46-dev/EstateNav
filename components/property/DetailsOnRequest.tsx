@@ -2,14 +2,14 @@
 
 import { FileText, MessageCircle } from 'lucide-react';
 import type { Property, SiteSettings } from '@/lib/data/types';
-import { propertyWhatsApp } from '@/lib/contact';
-import { absoluteUrl } from '@/lib/site';
+import { projectEnquiryLink } from '@/lib/contact';
+import { enquiryFromProperty } from '@/lib/enquiry';
 import { openLeadSheet } from '@/lib/ui/stores';
 
 // A slim strip at the end of the details: what the advisor can still send, with two ways to ask.
 // The enquiry form itself opens in the side sheet (PropertyActions), not inline.
 export function DetailsOnRequest({ property, settings }: { property: Property; settings: SiteSettings }) {
-  const whatsapp = propertyWhatsApp({ title: property.title, url: absoluteUrl(`/properties/${property.slug}`) }, settings.contact.whatsapp);
+  const whatsapp = projectEnquiryLink(enquiryFromProperty(property), settings.agent.name, settings.contact.whatsapp);
   const items = [
     'Latest price sheet',
     property.media.floorPlans.length === 0 ? 'Floor plans' : null,

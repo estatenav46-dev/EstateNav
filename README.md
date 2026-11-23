@@ -68,6 +68,15 @@ What the site implements from the blueprint, and what stays hidden until verifie
 
 Not added: the deck's sample figures (corridor ₹/sq.ft, ~79,200 unsold units, absorption, yields, developer track record) and "Abhee Urban Glen" are unsourced or not in the catalogue. Commute filtering waits for measured drive times on listings.
 
+## WhatsApp enquiries
+
+Every WhatsApp link goes to the official number in **Admin → Settings → contact** (recorded for the browser by `components/contact/ContactSync.tsx`; `ADVISOR_WHATSAPP` in `lib/contact.ts` is only a fallback).
+
+- **Header:** a WhatsApp button beside "Book a site visit" (logo, with the word from 1280px), and a WhatsApp icon on tablets and phones.
+- **Floating button** (`components/contact/WhatsAppFloat.tsx`): bottom right; on phones above the bottom dock, moving up while the wishlist bar or compare tray shows. On project pages it shows from 1024px up (phones have the bottom bar instead).
+- **Project pages:** "Enquire now on WhatsApp" under the price, at the top of the price card, and as "Enquire now" in the phone bottom bar. The message is built from the listing itself (`lib/enquiry.ts` → `projectEnquiryText`): project name and builder partner, location, options, price shown, possession, K-RERA number and the page link, so every listing, including new ones, gets its own message with no setup. On a project page the header and floating buttons send the same project message.
+- The page link inside messages uses `NEXT_PUBLIC_SITE_URL`; a Vercel build never publishes a localhost address (it falls back to the project's production domain, see `next.config.mjs`).
+
 ## Visitors, consent and personalisation
 
 - **Cookie banner** (`components/privacy/CookieBanner.tsx`): "Accept all", "Essential only" or "Customise" (essential always on, personalisation as a switch), reopened from "Cookie settings" in the footer. Nothing is tracked until personalisation is allowed; choosing "Essential only" clears the personalisation data on the device.
