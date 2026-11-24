@@ -21,13 +21,13 @@ export function getWhatsAppUrl(property?: ContactProperty | null): string {
 
   if (!property) {
     const text = encodeURIComponent(
-      `Hi ${ADVISOR_NAME}, I am browsing EstateNav and would like to discuss homes, plots or workspaces in Bengaluru.`
+      `Hi EstateNav, I am browsing EstateNav and would like to discuss homes, plots or workspaces in Bengaluru.`
     );
     return `${base}?text=${text}`;
   }
 
   const text = encodeURIComponent(
-    `Hi ${ADVISOR_NAME}, I am interested in ${property.title} (${property.locality || 'Bengaluru'}, ${property.priceLabel || 'Direct Pricing'}). Please share floor plans, availability and the official developer pricing sheet.`
+    `Hi EstateNav, I am interested in ${property.title} (${property.locality || 'Bengaluru'}, ${property.priceLabel || 'Direct Pricing'}). Please share floor plans, availability and the official developer pricing sheet.`
   );
   return `${base}?text=${text}`;
 }
@@ -39,14 +39,14 @@ export function getEmailUrl(property?: ContactProperty | null): string {
   if (!property) {
     const subject = encodeURIComponent('EstateNav Advisory Inquiry - Bengaluru Real Estate');
     const body = encodeURIComponent(
-      `Hello ${ADVISOR_NAME},\n\nI am looking for a property in Bengaluru. Please contact me to discuss available listings.\n\nThank you.`
+      `Hello EstateNav,\n\nI am looking for a property in Bengaluru. Please contact me to discuss available listings.\n\nThank you.`
     );
     return `mailto:${ADVISOR_EMAIL}?subject=${subject}&body=${body}`;
   }
 
   const subject = encodeURIComponent(`Property enquiry: ${property.title} - EstateNav`);
   const body = encodeURIComponent(
-    `Hello ${ADVISOR_NAME},\n\nI am reviewing ${property.title} (${property.locality || 'Bengaluru'}) listed on EstateNav at ${property.priceLabel || 'guide price'}. Please contact me with more information.\n\nThank you.`
+    `Hello EstateNav,\n\nI am reviewing ${property.title} (${property.locality || 'Bengaluru'}) listed on EstateNav at ${property.priceLabel || 'guide price'}. Please contact me with more information.\n\nThank you.`
   );
   return `mailto:${ADVISOR_EMAIL}?subject=${subject}&body=${body}`;
 }
@@ -111,5 +111,5 @@ export function projectEnquiryLink(p: EnquiryProject, agentName?: string, number
 
 /** Prefilled WhatsApp message naming the project and linking to it. */
 export function propertyWhatsApp(project: { title: string; url: string }, number?: string): string {
-  return whatsAppLink(`Hi ${ADVISOR_NAME}, I'd like details on ${project.title}: ${project.url} — floor plans, availability and the developer price sheet, please.`, number);
+  return whatsAppLink(`Hi EstateNav, I'd like details on ${project.title}: ${project.url} — floor plans, availability and the developer price sheet, please.`, number);
 }

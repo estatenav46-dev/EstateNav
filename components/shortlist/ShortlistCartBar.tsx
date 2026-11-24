@@ -18,7 +18,7 @@ export function ShortlistCartBar() {
   const count = shortlist.length;
   // The official number from the site settings (see ContactSync).
   const whatsappUrl = whatsAppLink(
-    `Hi ${ADVISOR_NAME}, I have shortlisted ${count} ${count === 1 ? 'property' : 'properties'} on EstateNav and would like to receive the pricing sheets and schedule a site visit.`,
+    `Hi EstateNav, I have shortlisted ${count} ${count === 1 ? 'property' : 'properties'} on EstateNav and would like to receive the pricing sheets and schedule a site visit.`,
   );
 
   return (

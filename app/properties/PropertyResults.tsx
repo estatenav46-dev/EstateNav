@@ -309,7 +309,7 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
     </div>
   );
 
-  const askText = `Hi ${ADVISOR_NAME}, I'm looking for ${state.seg ? SEGMENT_NOUN[state.seg][1] : 'property'} in ${title} on EstateNav and couldn't find a match. Do you have anything coming up there?`;
+  const askText = `Hi EstateNav, I'm looking for ${state.seg ? SEGMENT_NOUN[state.seg][1] : 'property'} in ${title} on EstateNav and couldn't find a match. Do you have anything coming up there?`;
 
   return (
     <main id="main" className="mx-auto flex max-w-container">
