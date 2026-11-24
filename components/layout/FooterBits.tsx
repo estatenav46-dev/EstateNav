@@ -7,7 +7,8 @@ import { whatsAppLink } from '@/lib/contact';
 import { Reveal, Words } from '@/components/Reveal';
 
 /** Closing call to action; the home page already ends on the advisory band, so it is skipped there. */
-export function FooterCta({ agentName, whatsapp }: { agentName: string; whatsapp: string }) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function FooterCta({ agentName: _agentName, whatsapp }: { agentName: string; whatsapp: string }) {
   const pathname = usePathname();
   if (pathname === '/') return null;
   return (
@@ -25,7 +26,7 @@ export function FooterCta({ agentName, whatsapp }: { agentName: string; whatsapp
           Book a site visit <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
         <a
-          href={whatsAppLink(`Hi ${agentName}, I'm browsing EstateNav and would like some advice.`, whatsapp)}
+          href={whatsAppLink(`Hi EstateNav, I'm browsing the site and would like some advice.`, whatsapp)}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex min-h-[52px] items-center gap-2 rounded-[var(--radius)] px-6 text-sm font-semibold text-[rgb(var(--on-night))] ring-1 ring-[rgb(var(--on-night)/0.25)] transition-[background-color,transform] hover:-translate-y-px hover:bg-[rgb(var(--on-night)/0.08)] active:scale-[0.97]"

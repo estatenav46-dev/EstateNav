@@ -41,7 +41,7 @@ export function SiteFooter({ settings, corridors }: { settings: SiteSettings; co
               <a href={`tel:${contact.phone.replace(/[^0-9+]/g, '')}`} className={`${link} gap-2 font-mono`}>
                 <Phone className="h-4 w-4 text-brass" aria-hidden="true" /> {contact.phoneDisplay}
               </a>
-              <a href={whatsAppLink(`Hi ${agent.name}, I'm browsing EstateNav and would like some advice.`, contact.whatsapp)} target="_blank" rel="noopener noreferrer" className={`${link} gap-2`}>
+              <a href={whatsAppLink(`Hi EstateNav, I'm browsing the site and would like some advice.`, contact.whatsapp)} target="_blank" rel="noopener noreferrer" className={`${link} gap-2`}>
                 <MessageCircle className="h-4 w-4 text-brass" aria-hidden="true" /> Connect with dedicated area advisor
               </a>
             </div>
@@ -139,6 +139,7 @@ export function SiteFooter({ settings, corridors }: { settings: SiteSettings; co
         </div>
 
         <div className="mt-6 max-w-4xl space-y-2 text-xs leading-relaxed text-[rgb(var(--on-night)/0.55)]">
+          <h2 className="text-sm font-semibold text-[rgb(var(--on-night)/0.9)]">Disclaimer</h2>
           <p className="text-[rgb(var(--on-night)/0.75)]">{settings.disclaimers.portal}</p>
           <p>{settings.disclaimers.listing}</p>
         </div>

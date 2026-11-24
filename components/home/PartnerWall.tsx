@@ -2,8 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
-import { Pause, Play } from 'lucide-react';
 import type { Developer, Property } from '@/lib/data/types';
 import { useReducedMotionPreference } from '@/lib/ui/hooks';
 import { partnerLogo } from '@/lib/partnerLogos';
@@ -56,7 +54,7 @@ function Tile({ partner, decorative = false }: { partner: Partner; decorative?: 
 function Row({ partners, reverse, paused }: { partners: Partner[]; reverse?: boolean; paused: boolean }) {
   // Two copies make the loop seamless; the copy is hidden from assistive tech and the tab order.
   return (
-    <div className="logo-marquee overflow-hidden py-1.5" data-paused={paused}>
+    <div className="logo-marquee overflow-hidden py-1.5" data-paused={false}>
       <ul className="logo-track flex w-max gap-3" data-reverse={reverse || undefined} style={{ ['--dur' as string]: `${Math.max(36, partners.length * 7)}s` }}>
         {partners.map((p) => (
           <li key={p.id}>
@@ -77,9 +75,10 @@ function Row({ partners, reverse, paused }: { partners: Partner[]; reverse?: boo
 // uploaded there, else the official logo bundled in public/partners (lib/partnerLogos.ts), else the
 // name. Hidden partners never reach here.
 export function PartnerWall({ developers, properties }: { developers: Developer[]; properties: Property[] }) {
-  const [paused, setPaused] = useState(false);
   const reduced = useReducedMotionPreference();
+  // Partners switched off on the admin's "Channel partner logos" page stay off the wall.
   const partners: Partner[] = developers
+    .filter((d) => d.showOnLogoWall !== false)
     .map((d) => {
       // An uploaded logo wins; otherwise the official logo bundled with the site, if we have one.
       const bundled = partnerLogo(d.id, d.name);
@@ -96,30 +95,14 @@ export function PartnerWall({ developers, properties }: { developers: Developer[
   return (
     <section aria-labelledby="partners-title" className="pt-12 sm:pt-14 lg:pt-16">
       <div className="mx-auto max-w-container px-4 sm:px-6 lg:px-8">
-        <SectionHeading
-          kicker="Channel partners"
-          id="partners-title"
-          title="The developers we work with"
-          action={
-            moving ? (
-              <button
-                type="button"
-                onClick={() => setPaused((p) => !p)}
-                aria-pressed={paused}
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-line bg-surface px-4 text-sm font-semibold text-ink transition-colors hover:border-ink/40"
-              >
-                {paused ? <Play className="h-4 w-4" aria-hidden="true" /> : <Pause className="h-4 w-4" aria-hidden="true" />}
-                {paused ? 'Play' : 'Pause'} logos
-              </button>
-            ) : undefined
-          }
-        />
+        {/* The rows pause on hover and keyboard focus, and stand still with reduced motion (globals.css). */}
+        <SectionHeading kicker="The developers we work with" id="partners-title" title="Official channel partners" />
       </div>
 
       {moving ? (
         <div className="mt-6 space-y-1.5 sm:mt-7">
-          <Row partners={rows[0]} paused={paused} />
-          <Row partners={rows[1]} reverse paused={paused} />
+          <Row partners={rows[0]} paused={false} />
+          <Row partners={rows[1]} reverse paused={false} />
         </div>
       ) : centred ? (
         <ul className="mx-auto mt-6 flex max-w-container flex-wrap justify-center gap-3 px-4 sm:mt-7 sm:px-6 lg:px-8">

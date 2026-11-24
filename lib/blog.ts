@@ -25,3 +25,8 @@ export function suggestedPosts(current: BlogPost, all: BlogPost[], count = 4): B
     .slice(0, count)
     .map((x) => x.p);
 }
+
+/** Posts written as the agent are credited to EstateNav: the agent's name appears only in the site footer. */
+export function publicAuthor(author: { name: string; role: string }): { name: string; role: string } {
+  return /praveen/i.test(author.name) ? { name: 'EstateNav Advisory', role: '' } : author;
+}

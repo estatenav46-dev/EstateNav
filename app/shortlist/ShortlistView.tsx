@@ -44,7 +44,7 @@ export function ShortlistView({ properties, whatsapp, advisorName }: { propertie
     compareSheetStore.set(true);
   };
 
-  const message = `Hi ${advisorName}, here is my EstateNav shortlist:\n${items.map((p, i) => `${i + 1}. ${p.title} (${p.locality}, ${priceLabel(p)}) ${absoluteUrl(`/properties/${p.slug}`)}`).join('\n')}\nCan we discuss these?`;
+  const message = `Hi EstateNav, here is my shortlist:\n${items.map((p, i) => `${i + 1}. ${p.title} (${p.locality}, ${priceLabel(p)}) ${absoluteUrl(`/properties/${p.slug}`)}`).join('\n')}\nCan we discuss these?`;
 
   if (!shared && (loading || !user)) {
     return (

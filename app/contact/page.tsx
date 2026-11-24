@@ -11,7 +11,7 @@ import { realEstateAgentJsonLd } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'Contact the advisor',
-  description: 'Schedule a site visit, get a developer price sheet or ask about home loans with SV Praveen, K-RERA registered agent.',
+  description: 'Schedule a site visit, get a developer price sheet or ask about home loans with EstateNav, a K-RERA registered advisory.',
   alternates: { canonical: '/contact' },
 };
 
@@ -32,7 +32,7 @@ export default async function ContactPage({ searchParams }: { searchParams: { pr
           <p className="text-sm font-medium text-ink-muted">Enquiry</p>
           <h1 id="contact-title" className="mt-1 font-serif text-[2rem] leading-[1.08] sm:text-[2.5rem]">Talk to <span className="text-accent-ink">the advisor</span></h1>
           <p className="mt-3 max-w-xl leading-relaxed text-ink-muted">
-            {property ? `About ${property.title}. ` : ''}Tell us what you need — a site visit, the developer’s price sheet or help with a home loan. {agent.name} replies personally.
+            {property ? `About ${property.title}. ` : ''}Tell us what you need — a site visit, the developer’s price sheet or help with a home loan. Your advisor replies personally.
           </p>
           <div className="panel mt-6 p-5 shadow-[0_30px_60px_-48px_rgb(var(--shadow)/0.6)] sm:p-7">
             <LeadForm consent={consent} source="contact" property={property ? { slug: property.slug, title: property.title } : null} intent={intent} intentChoices={INTENTS} whatsapp={contact.whatsapp} advisorName={agent.name} />
@@ -42,7 +42,7 @@ export default async function ContactPage({ searchParams }: { searchParams: { pr
         <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start" aria-label="Advisor details">
           <AdvisorTitleBlock settings={settings} />
           <div className="grid grid-cols-2 gap-2">
-            <a href={whatsAppLink(`Hi ${agent.name}, I'd like some advice${property ? ` on ${property.title}` : ''}.`, contact.whatsapp)} target="_blank" rel="noopener noreferrer" className="btn-primary">
+            <a href={whatsAppLink(`Hi EstateNav, I'd like some advice${property ? ` on ${property.title}` : ''}.`, contact.whatsapp)} target="_blank" rel="noopener noreferrer" className="btn-primary">
               <MessageCircle className="h-4 w-4" aria-hidden="true" /> WhatsApp
             </a>
             <a href={`tel:${contact.phone.replace(/[^0-9+]/g, '')}`} className="btn-secondary">

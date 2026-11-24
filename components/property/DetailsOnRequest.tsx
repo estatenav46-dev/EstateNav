@@ -34,7 +34,7 @@ export function DetailsOnRequest({ property, settings }: { property: Property; s
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-sm text-forest-on/70">{settings.agent.name.split(' ')[0]} replies on WhatsApp, usually the same day.</p>
+          <p className="mt-3 text-sm text-forest-on/70">Our advisor replies on WhatsApp, usually the same day.</p>
         </div>
         <div className="grid shrink-0 gap-2 sm:w-60">
           <button

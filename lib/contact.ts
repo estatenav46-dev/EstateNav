@@ -86,7 +86,9 @@ export type EnquiryProject = {
 };
 
 /** The prefilled WhatsApp message for one project: name, builder partner and the key facts. */
-export function projectEnquiryText(p: EnquiryProject, agentName = ADVISOR_NAME): string {
+/** WhatsApp text for a project. The greeting names EstateNav; the agent's name appears only in the site footer. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function projectEnquiryText(p: EnquiryProject, _agentName = ADVISOR_NAME): string {
   const place = [p.locality, p.corridorName].filter(Boolean).join(', ');
   const facts = [
     place ? `• Location: ${place}` : null,
@@ -97,7 +99,7 @@ export function projectEnquiryText(p: EnquiryProject, agentName = ADVISOR_NAME):
     `• Link: ${p.url}`,
   ].filter(Boolean);
   return [
-    `Hi ${agentName}, I'm interested in ${p.title}${p.developerName ? ` by ${p.developerName}` : ''} (found on EstateNav).`,
+    `Hi EstateNav, I'm interested in ${p.title}${p.developerName ? ` by ${p.developerName}` : ''} (found on EstateNav).`,
     facts.join('\n'),
     'Please share availability, floor plans and the latest price sheet.',
   ].join('\n\n');

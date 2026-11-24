@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { publicAuthor } from '@/lib/blog';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -41,7 +42,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       description,
       publishedTime: post.publishedAt ?? undefined,
       modifiedTime: post.updatedAt,
-      authors: [post.author.name],
+      authors: [publicAuthor(post.author).name],
       images: post.cover ? [{ url: post.cover.url, alt: post.cover.alt }] : undefined,
     },
   };
@@ -74,7 +75,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           image: post.cover ? [post.cover.url] : undefined,
           datePublished: post.publishedAt,
           dateModified: post.updatedAt,
-          author: { '@type': 'Person', name: post.author.name },
+          author: { '@type': publicAuthor(post.author).name === 'EstateNav Advisory' ? 'Organization' : 'Person', name: publicAuthor(post.author).name },
           publisher: { '@type': 'Organization', name: 'EstateNav', logo: { '@type': 'ImageObject', url: absoluteUrl('/logo.png') } },
           mainEntityOfPage: url,
           keywords: post.tags.join(', ') || undefined,
@@ -92,8 +93,8 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             {post.excerpt && <p className="mt-4 text-lg leading-relaxed text-ink-muted sm:text-xl">{post.excerpt}</p>}
             <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-line pt-4 text-sm text-ink-muted">
               <span className="font-semibold text-ink">
-                {post.author.name}
-                {post.author.role && <span className="font-normal text-ink-muted"> · {post.author.role}</span>}
+                {publicAuthor(post.author).name}
+                {publicAuthor(post.author).role && <span className="font-normal text-ink-muted"> · {publicAuthor(post.author).role}</span>}
               </span>
               <span className="inline-flex items-center gap-1">
                 <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" /> {blogDate(post.publishedAt)}
@@ -172,9 +173,9 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
           <section className="rounded-card bg-forest p-6 text-forest-on">
             <p className="font-serif text-xl leading-tight">Questions about a project?</p>
-            <p className="mt-2 text-sm leading-relaxed text-forest-on/75">{settings.agent.name} answers on WhatsApp, usually the same day. Zero buyer brokerage.</p>
+            <p className="mt-2 text-sm leading-relaxed text-forest-on/75">Our advisor answers on WhatsApp, usually the same day. Zero buyer brokerage.</p>
             <div className="mt-4 grid gap-2">
-              <a href={whatsAppLink(`Hi ${settings.agent.name}, I read "${post.title}" on EstateNav and have a question.`, settings.contact.whatsapp)} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-[var(--radius)] bg-forest-on px-4 text-sm font-semibold text-forest transition-transform hover:-translate-y-px active:scale-[0.97]">
+              <a href={whatsAppLink(`Hi EstateNav, I read "${post.title}" on EstateNav and have a question.`, settings.contact.whatsapp)} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-[var(--radius)] bg-forest-on px-4 text-sm font-semibold text-forest transition-transform hover:-translate-y-px active:scale-[0.97]">
                 <MessageCircle className="h-4 w-4" aria-hidden="true" /> Ask on WhatsApp
               </a>
               <Link href="/properties" className="inline-flex min-h-[46px] items-center justify-center gap-2 rounded-[var(--radius)] px-4 text-sm font-semibold text-forest-on ring-1 ring-forest-on/30 transition-[background-color,transform] hover:-translate-y-px hover:bg-forest-on/10 active:scale-[0.97]">

@@ -18,7 +18,6 @@ const PROMISES = [
 export function AdvisoryBand({ settings }: { settings: SiteSettings }) {
   const { agent, contact } = settings;
   const [callback, setCallback] = useState(false);
-  const initials = agent.name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2);
   const consent = { text: settings.consentText, version: settings.consentVersion, privacyNote: settings.privacyNote };
 
   return (
@@ -48,28 +47,18 @@ export function AdvisoryBand({ settings }: { settings: SiteSettings }) {
           <div className="rounded-card bg-forest-on/[0.06] p-6 ring-1 ring-forest-on/15 sm:p-8">
             <div className="flex items-center gap-4">
               <span className="inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-forest-on/10 font-serif text-xl ring-2 ring-brass ring-offset-4 ring-offset-forest">
-                {initials}
+                EN
               </span>
               <div className="min-w-0">
-                <p className="text-xl font-semibold">{agent.name}</p>
+                <p className="text-xl font-semibold">Your EstateNav advisor</p>
                 <p className="flex items-center gap-1.5 text-sm text-forest-on/70">
                   <ShieldCheck className="h-4 w-4 text-brass" aria-hidden="true" /> K-RERA registered agent
                 </p>
               </div>
             </div>
-            <dl className="mt-4 space-y-2 border-y border-forest-on/15 py-3 text-sm">
-              <div className="flex justify-between gap-4">
-                <dt className="text-forest-on/60">K-RERA no.</dt>
-                <dd className="break-all text-right font-mono text-xs">{agent.reraNumber}</dd>
-              </div>
-              <div className="flex justify-between gap-4">
-                <dt className="text-forest-on/60">Valid</dt>
-                <dd className="font-mono text-xs">{agent.validFrom} to {agent.validTo}</dd>
-              </div>
-            </dl>
             <div className="mt-4 grid gap-2">
               <a
-                href={whatsAppLink(`Hi ${agent.name}, I'm browsing EstateNav and would like advice on Bengaluru properties.`, contact.whatsapp)}
+                href={whatsAppLink(`Hi EstateNav, I'm browsing the site and would like advice on Bengaluru properties.`, contact.whatsapp)}
                 target="_blank"
                 rel="noopener noreferrer"
                 data-ripple

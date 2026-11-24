@@ -113,7 +113,7 @@ function MegaMenu({ menu, onNavigate }: { menu: HeaderMenu; onNavigate: () => vo
   );
 }
 
-export function SiteHeader({ phone, phoneDisplay, whatsapp, agentName, agentRera, menu }: HeaderProps) {
+export function SiteHeader({ phone, phoneDisplay, whatsapp, menu }: HeaderProps) {
   const pathname = usePathname();
   const [compact, setCompact] = useState(false);
   const [drawer, setDrawer] = useState(false);
@@ -125,8 +125,8 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, agentName, agentRera
   const megaRef = useRef<HTMLDivElement>(null);
   const tel = `tel:${phone.replace(/[^0-9+]/g, '')}`;
   // On a project page this carries the project's enquiry; elsewhere a general hello.
-  const waHref = whatsAppLink(topic ?? `Hi ${agentName}, I'm browsing EstateNav and have a question.`, whatsapp);
-  const waLabel = topic ? `Enquire about this project with ${agentName} on WhatsApp` : `Chat with ${agentName} on WhatsApp`;
+  const waHref = whatsAppLink(topic ?? `Hi EstateNav, I'm browsing the site and have a question.`, whatsapp);
+  const waLabel = topic ? 'Enquire about this project on WhatsApp' : 'Chat with EstateNav on WhatsApp';
 
   useEffect(() => {
     let frame = 0;
@@ -324,7 +324,7 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, agentName, agentRera
               Book a site visit <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
             <div className="grid grid-cols-2 gap-2">
-              <a href={whatsAppLink(`Hi ${agentName}, I'm browsing EstateNav and would like some advice.`, whatsapp)} target="_blank" rel="noopener noreferrer" className="btn-secondary px-3">
+              <a href={whatsAppLink(`Hi EstateNav, I'm browsing the site and would like some advice.`, whatsapp)} target="_blank" rel="noopener noreferrer" className="btn-secondary px-3">
                 <MessageCircle className="h-4 w-4" aria-hidden="true" /> WhatsApp
               </a>
               <a href={tel} className="btn-secondary px-3">
@@ -338,7 +338,7 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, agentName, agentRera
             <p className="flex items-start gap-2 pt-1 text-xs leading-relaxed text-ink-muted">
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-accent-ink" aria-hidden="true" />
               <span>
-                K-RERA agent {agentName} · <span className="font-mono">{agentRera}</span>
+                K-RERA registered agent · direct-developer pricing
               </span>
             </p>
           </section>

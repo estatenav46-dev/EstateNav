@@ -172,7 +172,6 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
   const matches = useMemo(() => matching(catalogue, answers), [catalogue, answers]);
   const photos = (matches.length ? matches : catalogue).slice(0, 3);
   const firstName = name.trim().split(/\s+/)[0];
-  const advisorFirst = advisorName.split(' ')[0];
   const chosen = [
     GOALS.find((g) => g.id === answers.goal)?.label,
     REGIONS.find((r) => r.id === answers.region && r.id !== 'any')?.label,
@@ -287,10 +286,10 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
 
         <p className={`flex items-center gap-2.5 border-t border-forest-on/15 pt-4 text-xs text-forest-on/75 ${inline ? 'mt-auto pt-3 md:mt-6' : 'mt-6'}`}>
           <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-forest-on/10 text-[11px] font-bold ring-2 ring-brass">
-            {advisorName.split(/\s+/).map((w) => w[0]).join('').slice(0, 2)}
+            EN
           </span>
           <span>
-            <strong className="font-semibold text-forest-on">{advisorName}</strong> · K-RERA registered agent, replies on WhatsApp
+            <strong className="font-semibold text-forest-on">EstateNav advisory</strong> · K-RERA registered agent, replies on WhatsApp
           </span>
         </p>
       </aside>
@@ -389,7 +388,7 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
               {heading(STEP_TITLE.details)}
               <p className="mt-1.5 text-sm text-ink-muted">
                 {matches.length > 0 ? `${matches.length} ${matches.length === 1 ? 'home fits' : 'homes fit'} so far. ` : 'Nothing listed yet, but we can look for you. '}
-                {advisorFirst} will share them on WhatsApp.
+                Our advisor will share them on WhatsApp.
               </p>
               <div className="mt-5 grid gap-3">
                 <label className="relative block">

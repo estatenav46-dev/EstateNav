@@ -12,7 +12,7 @@ const TRUST_PILLARS = [
     icon: CheckCircle2,
     title: 'K-RERA Certified',
     sub: 'License: ...007810',
-    detail: 'Operated by SV Praveen, K-RERA agent registered through September 2031.',
+    detail: 'Operated by a K-RERA registered agent; registration details are in the footer.',
   },
   {
     icon: Tag,

@@ -431,6 +431,7 @@ export const seedDevelopers: Developer[] = [
     constructionTech: 'Mivan aluminium formwork',
     projectsDelivered: null,
     hidden: false,
+    showOnLogoWall: true,
     headquarters: null,
     sources: [],
     website: 'https://www.abheeventures.co.in/',
@@ -446,6 +447,7 @@ export const seedDevelopers: Developer[] = [
     constructionTech: null,
     projectsDelivered: null,
     hidden: false,
+    showOnLogoWall: true,
     headquarters: null,
     sources: [],
     website: null,
@@ -461,6 +463,7 @@ export const seedDevelopers: Developer[] = [
     constructionTech: null,
     projectsDelivered: null,
     hidden: false,
+    showOnLogoWall: true,
     headquarters: null,
     sources: [],
     website: null,
@@ -488,7 +491,7 @@ export const seedOfficeHubs: OfficeHub[] = [
 ];
 
 export const CONSENT_TEXT =
-  'By submitting this form, you consent to registering your inquiry through SV Praveen, K-RERA registered agent, an authorised channel partner of the developers listed on EstateNav. Communication will be coordinated under direct-developer pricing terms.';
+  'By submitting this form, you consent to EstateNav registering your enquiry through its K-RERA registered agent and authorised channel partner. Communication will be coordinated under direct-developer pricing terms.';
 
 export const seedSettings: SiteSettings = {
   contact: {

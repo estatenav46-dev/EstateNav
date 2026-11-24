@@ -15,12 +15,6 @@ export function realEstateAgentJsonLd(settings: SiteSettings, corridors: string[
     email: settings.contact.email,
     areaServed: corridors.map((name) => ({ '@type': 'Place', name: `${name}, Bengaluru` })),
     address: { '@type': 'PostalAddress', addressLocality: 'Bengaluru', addressRegion: 'Karnataka', addressCountry: 'IN' },
-    employee: {
-      '@type': 'Person',
-      name: settings.agent.name,
-      jobTitle: settings.agent.title,
-      identifier: { '@type': 'PropertyValue', propertyID: 'K-RERA agent registration', value: settings.agent.reraNumber },
-    },
     contactPoint: { '@type': 'ContactPoint', telephone: settings.contact.phoneDisplay, contactType: 'sales', areaServed: 'IN', availableLanguage: ['English', 'Kannada', 'Hindi'] },
   };
 }

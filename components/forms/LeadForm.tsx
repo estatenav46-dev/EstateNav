@@ -105,13 +105,13 @@ export function LeadForm({ consent, source, whatsapp, advisorName, property, int
   });
 
   if (done) {
-    const text = `Hi ${advisorName}, I've just registered a ${INTENT_LABEL[done.intent].toLowerCase()} request on EstateNav${property ? ` for ${property.title}` : ''}. My name is ${done.name}.`;
+    const text = `Hi EstateNav, I've just registered a ${INTENT_LABEL[done.intent].toLowerCase()} request on EstateNav${property ? ` for ${property.title}` : ''}. My name is ${done.name}.`;
     return (
       <div role="status" className="flex flex-col items-center gap-4 py-4 text-center">
         <Stamp />
         <div>
           <p className="font-serif text-2xl">Request registered</p>
-          <p className="mt-1 text-sm text-ink-muted">{advisorName} will call you back. For a quicker reply, continue the conversation on WhatsApp.</p>
+          <p className="mt-1 text-sm text-ink-muted">Our advisor will call you back. For a quicker reply, continue the conversation on WhatsApp.</p>
         </div>
         <a href={whatsAppLink(text, whatsapp)} target="_blank" rel="noopener noreferrer" className="btn-primary">
           <MessageCircle className="h-4 w-4" aria-hidden="true" /> Continue on WhatsApp

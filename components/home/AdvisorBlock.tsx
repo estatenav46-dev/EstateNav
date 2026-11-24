@@ -11,11 +11,11 @@ import { Reveal } from '@/components/Reveal';
 export function AdvisorTitleBlock({ settings, compact = false }: { settings: SiteSettings; compact?: boolean }) {
   const { agent, contact } = settings;
   const rows = [
-    ['Advisor', agent.name],
+    ['Advisor', 'Your EstateNav advisor'],
     ['Role', agent.title],
-    ['K-RERA reg.', agent.reraNumber],
-    ['Validity', `${agent.validFrom} to ${agent.validTo}`],
+    ['Pricing', 'Direct-developer, zero buyer brokerage'],
     ['Phone', contact.phoneDisplay],
+    ['Email', contact.email],
   ];
   return (
     <div className={`grid overflow-hidden rounded-card border border-line bg-surface text-sm ${compact ? 'grid-cols-1' : 'grid-cols-[96px_minmax(0,1fr)] sm:grid-cols-[132px_minmax(0,1fr)]'}`}>
@@ -26,7 +26,7 @@ export function AdvisorTitleBlock({ settings, compact = false }: { settings: Sit
       {rows.slice(0, compact ? 4 : rows.length).map(([label, value], i) => (
         <div key={label} className={`grid grid-cols-[96px_minmax(0,1fr)] ${i ? 'border-t border-line' : ''}`}>
           <span className="px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">{label}</span>
-          <span className={`px-3 py-2.5 ${label === 'K-RERA reg.' || label === 'Phone' || label === 'Validity' ? 'break-all font-mono text-2xs leading-5' : ''}`}>{value}</span>
+          <span className={`px-3 py-2.5 ${label === 'Phone' || label === 'Email' ? 'break-all font-mono text-2xs leading-5' : ''}`}>{value}</span>
         </div>
       ))}
     </div>
@@ -64,7 +64,7 @@ export function AdvisorBlock({ settings }: { settings: SiteSettings }) {
                       <span>K-RERA Certified</span>
                     </span>
                   </div>
-                  <h2 className="mt-1 font-serif text-xl font-bold text-ink sm:text-2xl">{agent.name}</h2>
+                  <h2 className="mt-1 font-serif text-xl font-bold text-ink sm:text-2xl">Your EstateNav advisor</h2>
                   <p className="mt-0.5 font-mono text-xs text-ink-muted">
                     License: {agent.reraNumber} · Valid: {agent.validFrom} to {agent.validTo}
                   </p>
@@ -78,7 +78,7 @@ export function AdvisorBlock({ settings }: { settings: SiteSettings }) {
               <div className="flex flex-wrap items-center gap-2.5 shrink-0">
                 <a
                   href={whatsAppLink(
-                    `Hi ${agent.name}, I am browsing EstateNav and would like advice on Bengaluru properties.`,
+                    `Hi EstateNav, I am browsing the site and would like advice on Bengaluru properties.`,
                     contact.whatsapp
                   )}
                   target="_blank"

@@ -68,7 +68,7 @@ export function PropertyActions({ property, settings, advisorCard, layout = 'sid
               </button>
             </div>
             <p className="mt-4 border-t border-line pt-4 text-xs leading-relaxed text-ink-muted">
-              {property.priceOnRequest ? 'Prices on request. ' : '*Approximate developer guide price; T&C apply. '}Zero buyer brokerage · {settings.agent.name}, K-RERA registered agent.
+              {property.priceOnRequest ? 'Prices on request. ' : '*Approximate developer guide price; T&C apply. '}Zero buyer brokerage · K-RERA registered agent.
             </p>
           </div>
           {advisorCard}

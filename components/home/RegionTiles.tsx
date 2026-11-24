@@ -106,12 +106,12 @@ export function RegionTiles({ properties, advisorName, whatsapp }: { properties:
       <p className="mt-5 flex flex-wrap items-center gap-x-1.5 text-sm text-ink-muted">
         Not sure which side of the city suits you?
         <a
-          href={whatsAppLink(`Hi ${advisorName}, I'm not sure which part of Bengaluru suits me. Can you help?`, whatsapp)}
+          href={whatsAppLink(`Hi EstateNav, I'm not sure which part of Bengaluru suits me. Can you help?`, whatsapp)}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex min-h-[44px] items-center gap-1.5 font-semibold text-accent-ink"
         >
-          <MessageCircle className="h-4 w-4" aria-hidden="true" /> <span className="link-draw">Ask {advisorName.split(' ')[0]} on WhatsApp</span>
+          <MessageCircle className="h-4 w-4" aria-hidden="true" /> <span className="link-draw">Ask an advisor on WhatsApp</span>
         </a>
       </p>
     </section>

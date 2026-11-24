@@ -88,13 +88,13 @@ export function MobileDock({ settings, consent }: Props) {
       <Sheet
         open={sheet === 'advisor'}
         onOpenChange={(open) => setSheet(open ? 'advisor' : null)}
-        title={`Talk to ${agent.name}`}
+        title="Talk to an advisor"
         description="K-RERA registered agent · direct-developer pricing"
       >
         <div className="space-y-4 pb-6">
           <div className="grid gap-2">
             <a
-              href={whatsAppLink(`Hi ${agent.name}, I'm browsing EstateNav and would like some advice.`, contact.whatsapp)}
+              href={whatsAppLink(`Hi EstateNav, I'm browsing the site and would like some advice.`, contact.whatsapp)}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary"
