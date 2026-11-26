@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import { ArrowRight, ArrowUpRight, ChevronDown, Heart, Menu, MessageCircle, Phone, Search, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Building2, ChevronDown, Heart, Menu, MessageCircle, Phone, Search, ShieldCheck } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { LazySheet as Sheet } from '@/components/ui/LazySheet';
 import { UserMenu } from '@/components/auth/UserMenu';
@@ -12,7 +12,7 @@ import { NeedIcon, type NeedIconName } from '@/components/icons/NeedIcons';
 import { shortlistStore, whatsAppTopicStore } from '@/lib/ui/stores';
 import { WhatsAppGlyph } from '@/components/contact/WhatsAppGlyph';
 import { useAuth } from '@/lib/auth/context';
-import { whatsAppLink } from '@/lib/contact';
+import { LIST_PROPERTY_PATH, whatsAppLink } from '@/lib/contact';
 
 export type HeaderMenu = {
   zones: { id: string; name: string; short: string; areas: string; count: number; cover: string | null }[];
@@ -311,6 +311,12 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, menu }: HeaderProps)
                   <Heart className="h-5 w-5 text-accent-ink" aria-hidden="true" />
                   <span className="flex-1">Your wishlist</span>
                   {shortlist.length > 0 && <span className="rounded-full bg-accent px-2 text-xs font-semibold text-accent-on">{shortlist.length}</span>}
+                </Link>
+              </li>
+              <li>
+                <Link href={LIST_PROPERTY_PATH} className="flex min-h-[52px] items-center gap-3 text-base font-medium">
+                  <Building2 className="h-5 w-5 text-accent-ink" aria-hidden="true" />
+                  <span className="flex-1">List your property</span>
                 </Link>
               </li>
               <li>

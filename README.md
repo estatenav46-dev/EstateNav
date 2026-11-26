@@ -21,10 +21,31 @@ To open the admin preview locally, set `NEXT_PUBLIC_ADMIN_PREVIEW=true` and visi
 | `/properties` | Explore page, app-style: a left rail goes region → area → location, with type chips (Apartments, Plots, Offices), budget, sort, a "More filters" sheet and compact cards. From 1024px a "What's around" panel beside the headline (`components/explore/PlaceSnapshot.tsx`, data in `lib/placeGuides.ts`) describes the region or area on show: a one-line summary plus its work hubs, transport, schools and hospitals, compiled from public sources (names only, no distances); tablets show the one-line summary. The search box sits at the end of the filter row there. URL-backed (`?zone=east&corridor=whitefield&loc=…`); each region or area step is a history entry, so Back goes up a level. Opening a card shows the quick-view sheet |
 | `/properties/[slug]` | Full detail page. Property cards, the carousel and search open it in a new tab; clicking a card photo opens the photo viewer instead |
 | `/contact` | Enquiry form (`?intent=site-visit|price-sheet|loan-help|general&property=slug`) |
+| `/bangalore/…` | Search pages by area and type (see “Search pages and AI search” below) |
+| `/llms.txt` | Plain-text site map for AI assistants |
 | `/shortlist` | The signed-in visitor's saved homes (wishlist), share link, compare, send to WhatsApp. Guests are asked to sign in |
 | `/admin/*` | Mock-backed admin: properties, enquiries, developers, corridors, settings (preview flag required; `noindex`) |
 
 Links from the previous site (`?for=`, `?category=`, `?locality=`, `?budgetMin=` …) are still understood by `lib/listingFilters.ts`.
+
+## Testing
+
+| Command | What it runs |
+| --- | --- |
+| `npm run typecheck` | TypeScript over the app and the tests |
+| `npm test` | Unit tests (`tests/unit`: search pages, on-site search, prices, SEO, forms, data) and component tests (`tests/component`: list-your-property menu, lead form, breadcrumbs, JSON-LD) with Vitest |
+| `npm run test:e2e` | End-to-end QA with Playwright (`tests/e2e`) on desktop Chrome and a Pixel 7: every sitemap page (status, one H1, title, description, canonical, JSON-LD, image alt), 404s, cookie banner, welcome concierge, search, filters, photo viewer, image loading, WhatsApp links, contact and list-your-property forms, no sideways scrolling, theme switch, phone menu. Fails on any JavaScript or console error |
+| `npm run test:all` | All three |
+
+The end-to-end suite builds the site into `.next_e2e` and serves it on port 3100 with `NEXT_PUBLIC_DATA_SOURCE=mock` (the nine sample listings in `lib/data/adapters/mock/seed.ts`), so it never reads or writes the live Firestore. Enquiry emails are never sent in mock mode (`app/actions/enquiries.ts`). The HTML report is in `playwright-report/`.
+
+## Search pages and AI search (SEO and GEO)
+
+- **Search pages** (`lib/landing.ts`, `components/landing/LandingView.tsx`, `app/bangalore/`): `/bangalore` (all areas), `/bangalore/{area}` (e.g. `whitefield`), `/bangalore/{region}-bangalore`, city-wide searches (`/bangalore/flats`, `plots`, `offices`, `flats-for-rent`, `2-bhk-flats`, `3-bhk-flats`, `4-bhk-flats`, `ready-to-move-flats`, `new-launch-projects`, `flats-under-1-crore`, `flats-under-2-crore`) and area + search (`/bangalore/whitefield/2-bhk-flats`). A page exists only while listings match it (one for an area or city-wide search, two for area + search), so publishing listings in the admin creates pages and the sitemap follows. Each page has the listing cards, a comparison table, the area guide, buyer FAQs answered from the data, related searches and CollectionPage, ItemList, FAQPage and BreadcrumbList data.
+- **Project pages** get a fallback title and description when the admin leaves them blank (project name first, then builder, area and "Bangalore", within 65 characters), a visible FAQ section (price, location, developer, configurations, possession, RERA) and Product, Place (address and map pin), FAQPage and BreadcrumbList data. Breadcrumbs go Home → Bangalore → area page → project.
+- **Site-wide**: WebSite and Organization data, `geo.region` meta, footer links to the search pages and a "Popular searches" block, `robots.txt` open to search and AI crawlers (`/admin`, `/shortlist`, `/api/` closed), `sitemap.xml` with every search page and listing, and `/llms.txt` (a plain-text map of the site and every listing for AI assistants).
+- **On-site search** (`lib/listingFilters.ts`): searching a project's name puts it first; filler words ("in", "flats", "Bangalore"), punctuation, accents and "2bhk"/"2 BHK" are understood; type words ("plots", "offices", "villas", "rent") filter by type.
+- After launch: verify the domain in Google Search Console and Bing Webmaster Tools and submit `https://estatenav.in/sitemap.xml` to both.
 
 ## Design system
 
@@ -58,7 +79,7 @@ What the site implements from the blueprint, and what stays hidden until verifie
 | Spotlight carousel with K-RERA badge, highlight and "Inspect allocation deck"; jump link to the partner section | `components/home/HeroCarousel.tsx` |
 | Fold 2 corridor telemetry ticker | `components/home/MarketTicker.tsx` — shows only figures saved in **Admin → Market data** (each requires a source and as-of date, printed beside it). Hidden while there are none. |
 | Fold 3 inline partner section (no logo) | `components/home/PartnerShowcase.tsx` — track record and construction facts appear only when the developer record has a source for them (**Admin → Developers**) |
-| Fold 4 workspace: buyer-lens chips, RERA audit checklist with live counts, Cost & EMI studio and Compare in the desktop rail, sourced area benchmark | `app/properties/PropertyResults.tsx` |
+| Fold 4 workspace: buyer-lens chips, RERA audit checklist with live counts, Cost & EMI studio and Compare in the desktop rail, sourced area benchmark | `app/properties/(list)/PropertyResults.tsx` |
 | Financial studio: ₹60 L–₹3.5 Cr, 10/20/30 % down, 15/20/25 yrs, EMI, stamp duty, registration, Section 24(b) year-1 deduction | `components/property/CostStudio.tsx` |
 | Mobile bottom nav: Home · Explore · Calculator · Shortlist · Concierge; calculator in an 85 %-height sheet | `components/layout/MobileDock.tsx` |
 | CTA wording: "Inspect allocation deck", "Unlock direct developer pricing sheet", "Schedule guided VIP site visit", "Connect with dedicated area advisor" | cards, carousel, detail actions, forms, header, advisor blocks |

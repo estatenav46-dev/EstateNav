@@ -18,6 +18,10 @@ import { NavProgress } from '@/components/ui/NavProgress';
 import { ZoneRegistry } from '@/components/layout/ZoneRegistry';
 import { BlueprintBackdrop } from '@/components/layout/BlueprintBackdrop';
 import { SiteHeader, type HeaderMenu } from '@/components/layout/SiteHeader';
+import { ListPropertyBar } from '@/components/layout/ListPropertyBar';
+import { allLandingPages, landingHeading } from '@/lib/landing';
+import { siteJsonLd } from '@/lib/seo';
+import { JsonLd } from '@/components/ui/JsonLd';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { HideOnAdmin } from '@/components/layout/HideOnAdmin';
 import { MobileDock } from '@/components/layout/MobileDock';
@@ -48,6 +52,8 @@ export const metadata: Metadata = {
     locale: 'en_IN',
     type: 'website',
   },
+  // Local signals for regional search engines (Google ignores these; Bing and others read them).
+  other: { 'geo.region': 'IN-KA', 'geo.placename': 'Bengaluru' },
   robots: { index: true, follow: true },
   icons: { icon: '/logo.png', apple: '/logo.png' },
 };
@@ -62,11 +68,18 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export default async function RootLayout({ children, modal }: { children: React.ReactNode; modal: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const [settings, corridors, properties] = await Promise.all([getSettings(), getCorridors(), getPublishedProperties()]);
   const consent = { text: settings.consentText, version: settings.consentVersion, privacyNote: settings.privacyNote };
   // A tiny summary so the welcome concierge can count matches and show photos without loading listings.
   const catalogue = properties.map((p) => ({ id: p.id, zone: zoneOfCorridor(p.corridorId), seg: p.segment, rent: p.transaction === 'rent', price: p.priceMin, img: p.media.cover.url, title: p.title }));
+  // Search pages that exist right now, for the footer's links (see lib/landing.ts).
+  const landing = allLandingPages(properties, corridors);
+  const searches = landing
+    .filter((p) => p.place.kind !== 'region')
+    .sort((a, b) => b.listings.length - a.listings.length)
+    .slice(0, 24)
+    .map((p) => ({ label: landingHeading(p).replace(/ for sale/i, ''), path: p.path }));
   const ranked = sortListings(properties, 'relevance');
   const lead = ranked.find((p) => p.featured) ?? ranked[0];
   const menu: HeaderMenu = {
@@ -91,7 +104,11 @@ export default async function RootLayout({ children, modal }: { children: React.
               Skip to content
             </a>
             <ZoneRegistry zones={corridors.flatMap((c) => (c.zone ? [{ id: c.id, zone: c.zone }] : []))} />
+            <JsonLd data={siteJsonLd(settings)} />
             <BlueprintBackdrop />
+            <HideOnAdmin>
+              <ListPropertyBar whatsapp={settings.contact.whatsapp} />
+            </HideOnAdmin>
             <SiteHeader
               phone={settings.contact.phone}
               phoneDisplay={settings.contact.phoneDisplay}
@@ -103,9 +120,8 @@ export default async function RootLayout({ children, modal }: { children: React.
             <div id="content" className="flex-1">
               {children}
             </div>
-            {modal}
             <HideOnAdmin>
-              <SiteFooter settings={settings} corridors={corridors} />
+              <SiteFooter settings={settings} corridors={corridors} pages={landing.map((p) => p.path)} searches={searches} />
             </HideOnAdmin>
             <CompareTray />
             <WhatsAppFloat agentName={settings.agent.name} />

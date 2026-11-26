@@ -1,5 +1,6 @@
 'use client';
 
+import { nameTokens, searchText } from '@/lib/listingFilters';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
@@ -71,8 +72,10 @@ export function QuickSearch({ properties, corridors, id = 'quick-search', classN
   const q = query.trim().toLowerCase();
   const results = useMemo(() => {
     if (!q) return index.filter((s) => s.group === 'Regions');
-    const tokens = q.split(/\s+/);
-    const hits = index.filter((s) => tokens.every((t) => `${s.label} ${s.hint}`.toLowerCase().includes(t)));
+    // Same word handling as the results ("2bhk", "flats in whitefield", accents, punctuation).
+    const tokens = nameTokens(q);
+    if (!tokens.length) return index.filter((s) => s.group === 'Regions');
+    const hits = index.filter((s) => tokens.every((t) => searchText(`${s.label} ${s.hint}`).includes(t)));
     // Keep the list short: a few of each kind.
     const perGroup: Record<string, number> = {};
     return hits.filter((s) => (perGroup[s.group] = (perGroup[s.group] ?? 0) + 1) <= 4);

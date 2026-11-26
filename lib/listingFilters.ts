@@ -84,11 +84,69 @@ const STATUS_FROM_CHIP: Record<ReturnType<typeof statusChip>, StatusKey> = {
 
 export const statusKey = (property: Property): StatusKey => STATUS_FROM_CHIP[statusChip(property)];
 
+// Words people type that say nothing about which project they mean ("flats in bangalore").
+const STOP_WORDS = new Set(['in', 'at', 'near', 'on', 'for', 'the', 'a', 'of', 'and', 'by', 'to', 'sale', 'buy', 'new', 'bangalore', 'bengaluru', 'blr', 'project', 'projects', 'property', 'properties', 'home', 'homes']);
+// Type words match the listing's kind instead of its text.
+const TYPE_WORDS: Record<string, (p: Property) => boolean> = {
+  flat: (p) => p.segment === 'residential', flats: (p) => p.segment === 'residential',
+  apartment: (p) => p.segment === 'residential', apartments: (p) => p.segment === 'residential',
+  plot: (p) => p.segment === 'plot', plots: (p) => p.segment === 'plot', land: (p) => p.segment === 'plot',
+  office: (p) => p.segment === 'commercial', offices: (p) => p.segment === 'commercial', commercial: (p) => p.segment === 'commercial',
+  villa: (p) => ['villa', 'row-house', 'villament'].includes(p.propertyType), villas: (p) => ['villa', 'row-house', 'villament'].includes(p.propertyType),
+  rent: (p) => p.transaction === 'rent', rental: (p) => p.transaction === 'rent',
+};
+
+const normalise = (text: string) =>
+  text
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/(\d)\s*bhk/g, '$1bhk')
+    .replace(/[^a-z0-9.]+/g, ' ')
+    .trim();
+
+/** The words of a search, without filler; "3 BHK" becomes one token "3bhk". */
+export function queryTokens(q: string): string[] {
+  return normalise(q)
+    .split(' ')
+    .filter((t) => t && !STOP_WORDS.has(t));
+}
+
+/** Search words that name something (place, builder, project), without type words like "flats". */
+export function nameTokens(q: string): string[] {
+  return queryTokens(q).filter((t) => !TYPE_WORDS[t]);
+}
+
+/** Lower-case, accent-free, punctuation-free text for matching against queryTokens(). */
+export const searchText = (text: string) => ` ${normalise(text)} `;
+
+function haystack(property: Property) {
+  const configs = property.configurations.map((c) => c.label).join(' ');
+  const bhk = property.bhkOptions.map((b) => `${Math.floor(b)}bhk`).join(' ');
+  return ` ${normalise(`${property.title} ${property.phase ?? ''} ${property.locality} ${property.corridorName} ${property.developerName} ${property.address} ${configs} ${property.rera.number ?? ''}`)} ${bhk} `;
+}
+
 function matchesQuery(property: Property, q: string) {
-  const tokens = q.toLowerCase().split(/[\s,]+/).filter(Boolean);
+  const tokens = queryTokens(q);
   if (!tokens.length) return true;
-  const haystack = `${property.title} ${property.locality} ${property.corridorName} ${property.developerName} ${property.address}`.toLowerCase();
-  return tokens.every((token) => haystack.includes(token));
+  const text = haystack(property);
+  return tokens.every((token) => (TYPE_WORDS[token] ? TYPE_WORDS[token](property) : text.includes(token)));
+}
+
+/** How well a listing answers a search: its own name first, then builder, then place. */
+export function queryScore(property: Property, q: string): number {
+  const query = normalise(q);
+  const tokens = queryTokens(q).filter((t) => !TYPE_WORDS[t]);
+  if (!tokens.length) return 0;
+  const title = normalise(property.title);
+  let score = 0;
+  if (title === query) score += 100;
+  else if (title.startsWith(query) || query.startsWith(title)) score += 60;
+  else if (title.includes(query)) score += 40;
+  score += tokens.filter((t) => title.includes(t)).length * 10;
+  score += tokens.filter((t) => normalise(property.developerName).includes(t)).length * 3;
+  score += tokens.filter((t) => normalise(`${property.locality} ${property.corridorName}`).includes(t)).length * 2;
+  return score;
 }
 
 function overlaps(min: number | null, max: number | null, from: number | null, to: number | null) {
@@ -150,7 +208,12 @@ export function sortListings(properties: Property[], sort: ListingSort): Propert
 }
 
 export function applyListing(properties: Property[], state: ListingState): Property[] {
-  return sortListings(properties.filter((p) => matchesListing(p, state)), state.sort);
+  const sorted = sortListings(properties.filter((p) => matchesListing(p, state)), state.sort);
+  // A search by name puts that project first when the visitor has not picked another order.
+  if (state.q.trim() && state.sort === 'relevance') {
+    return sorted.map((p, i) => ({ p, i, score: queryScore(p, state.q) })).sort((a, b) => b.score - a.score || a.i - b.i).map((x) => x.p);
+  }
+  return sorted;
 }
 
 export function countActiveFilters(s: ListingState): number {

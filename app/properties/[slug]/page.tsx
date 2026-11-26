@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import PropertyDetail from './PropertyDetail';
 import { JsonLd } from '@/components/ui/JsonLd';
 import { getCorridors, getDevelopers, getListingCards, getOfficeHubs, getPublishedProperties, getPublishedProperty, getSettings } from '@/lib/data/cached';
-import { breadcrumbJsonLd, propertyBreadcrumbs, propertyJsonLd } from '@/lib/seo';
+import { breadcrumbJsonLd, faqJsonLd, propertyBreadcrumbs, propertyFaqs, propertyJsonLd, propertyPlaceJsonLd, propertySeo } from '@/lib/seo';
 import { similarProperties } from '@/lib/similar';
 
 export const revalidate = 60;
@@ -15,13 +15,14 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const property = await getPublishedProperty(params.slug);
-  if (!property) return { title: 'Property not found' };
-  const title = property.seo.title || property.title;
+  // Not found here, before the page streams, so the response is a real 404 (not a soft 404).
+  if (!property) notFound();
+  const { title, description } = propertySeo(property);
   return {
     title: { absolute: `${title} | EstateNav` },
-    description: property.seo.description,
+    description,
     alternates: { canonical: `/properties/${property.slug}` },
-    openGraph: { title, description: property.seo.description, images: [{ url: property.media.cover.url, alt: property.media.cover.alt }] },
+    openGraph: { title, description, type: 'website', url: `/properties/${property.slug}`, images: [{ url: property.media.cover.url, alt: property.media.cover.alt }] },
   };
 }
 
@@ -35,8 +36,7 @@ export default async function PropertyPage({ params }: { params: { slug: string 
 
   return (
     <>
-      <JsonLd data={propertyJsonLd(property)} />
-      <JsonLd data={breadcrumbJsonLd(propertyBreadcrumbs(property))} />
+      <JsonLd data={[propertyJsonLd(property), propertyPlaceJsonLd(property), faqJsonLd(propertyFaqs(property)), breadcrumbJsonLd(propertyBreadcrumbs(property, corridors))]} />
       <PropertyDetail
         property={property}
         developer={developers.find((d) => d.id === property.developerId) ?? null}

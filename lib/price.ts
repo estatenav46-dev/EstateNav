@@ -6,8 +6,10 @@ export function formatINR(amount: number): string {
     return `₹${Number(crore.toFixed(crore % 1 === 0 ? 0 : 2))} Cr`;
   }
   if (amount >= 100_000) {
-    const lakh = amount / 100_000;
-    return `₹${Number(lakh.toFixed(lakh % 1 === 0 ? 0 : 2))} L`;
+    const lakh = Number((amount / 100_000).toFixed(2));
+    // 99,99,999 rounds to "100 L": show it as the crore it reads as.
+    if (lakh >= 100) return formatINR(10_000_000);
+    return `₹${lakh} L`;
   }
   return `₹${Math.round(amount).toLocaleString('en-IN')}`;
 }

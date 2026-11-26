@@ -10,6 +10,13 @@
 /.next/
 /.next_build/
 /.next_dev/
+/.next_e2e/
+/.next_mockdev/
+
+# test output
+/test-results/
+/playwright-report/
+/coverage/
 /.next-estatenav/
 /build-output/
 /out/

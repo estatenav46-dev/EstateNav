@@ -7,7 +7,7 @@ import { GalleryMosaic } from '@/components/property/GalleryMosaic';
 import { PropertyActions } from '@/components/property/PropertyActions';
 import { ReraRow, StatusChip } from '@/components/property/PropertyCard';
 import { zoneById, zoneOfCorridor } from '@/lib/regions';
-import { propertyBreadcrumbs } from '@/lib/seo';
+import { propertyBreadcrumbs, propertyFaqs } from '@/lib/seo';
 import { activeOffer, priceLabel, rateLabel, sizeLabel } from '@/lib/property';
 import { NEARBY_CATEGORY_LABEL, NEARBY_GROUPS, PROPERTY_TYPE_LABEL, groupAmenities } from '@/lib/listingMeta';
 import type { SimilarMatch } from '@/lib/similar';
@@ -62,8 +62,9 @@ type Props = {
   settings: SiteSettings;
 };
 
-export default function PropertyDetail({ property, developer, hubs, similar, allProperties, settings }: Props) {
-  const crumbs = propertyBreadcrumbs(property);
+export default function PropertyDetail({ property, developer, corridors, hubs, similar, allProperties, settings }: Props) {
+  const crumbs = propertyBreadcrumbs(property, corridors);
+  const faqs = propertyFaqs(property);
   const f = property.facts;
   const facts = [
     ['Property type', PROPERTY_TYPE_LABEL[property.propertyType]],
@@ -120,6 +121,7 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
     property.documents.length > 0 && { id: 'documents', label: 'Documents' },
     extraGroups.length > 0 && { id: 'more', label: 'More details' },
     developer && (developer.about || developerFacts.length > 0) && { id: 'developer', label: 'Developer' },
+    { id: 'faq', label: 'FAQs' },
   ].filter((s): s is { id: string; label: string } => Boolean(s));
   const keyFacts = [
     ['Configurations', property.configurations.map((c) => c.label).join(', ') || null],
@@ -413,6 +415,16 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
           </Section>
         )}
 
+          <Section id="faq" title={`${property.title}: common questions`}>
+            <div className="divide-y divide-line border-y border-line">
+              {faqs.map((f) => (
+                <div key={f.q} className="py-4">
+                  <h3 className="text-base font-semibold">{f.q}</h3>
+                  <p className="mt-1.5 max-w-[68ch] text-[0.95rem] leading-relaxed text-ink-muted">{f.a}</p>
+                </div>
+              ))}
+            </div>
+          </Section>
 
           <DetailsOnRequest property={property} settings={settings} />
         </div>
@@ -431,7 +443,7 @@ export default function PropertyDetail({ property, developer, hubs, similar, all
                 </Words>
               </h2>
             </div>
-            <Link href={`/properties?zone=${zoneOfCorridor(property.corridorId)}`} className="arrow-host group inline-flex min-h-[44px] items-center gap-2 text-sm font-semibold text-ink hover:text-accent-ink">
+            <Link href={zone && zone.id !== 'other' ? `/bangalore/${zone.id}-bangalore` : '/bangalore'} className="arrow-host group inline-flex min-h-[44px] items-center gap-2 text-sm font-semibold text-ink hover:text-accent-ink">
               More in {zone?.short ?? 'this region'}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>

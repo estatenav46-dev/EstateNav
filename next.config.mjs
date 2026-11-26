@@ -16,8 +16,11 @@ const nextConfig = {
   // Keep the development server's output separate from production builds.
   // Next writes both outputs into distDir, so sharing it can leave either
   // process with incomplete manifests and vendor chunks.
+  // NEXT_DIST_DIR lets the test suite build into its own folder (.next_e2e).
   distDir: process.env.VERCEL
     ? '.next'
+    : process.env.NEXT_DIST_DIR
+      ? process.env.NEXT_DIST_DIR
     : process.env.NODE_ENV === 'development'
       ? '.next_dev'
       : '.next_build',

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { AdminShell } from '@/components/admin/AdminShell';
 import { AdminAuthGate } from '@/components/admin/AdminAuthGate';
 import { isAdminPreview } from '@/lib/admin';
@@ -8,15 +9,9 @@ export const metadata: Metadata = { title: { default: 'Admin', template: '%s · 
 export const dynamic = 'force-dynamic';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  if (!isAdminPreview()) {
-    return (
-      <main id="main" className="mx-auto flex min-h-[70vh] max-w-lg flex-col justify-center px-4">
-        <p className="sheet-label">Restricted</p>
-        <h1 className="mt-2 font-serif text-3xl">Admin is not available</h1>
-        <p className="mt-2 text-ink-muted">Set NEXT_PUBLIC_ADMIN_PREVIEW=true to open the admin panel.</p>
-      </main>
-    );
-  }
+  // Without the preview flag the old in-site admin does not exist (a plain 404, no hint about how
+  // to open it). The real admin is the separate EstateNav-admin app.
+  if (!isAdminPreview()) notFound();
   return (
     <AdminAuthGate>
       <AdminShell dataSource={dataSource}>{children}</AdminShell>

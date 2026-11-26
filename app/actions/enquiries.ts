@@ -1,7 +1,7 @@
 'use server';
 
 import { enquiryInputSchema } from '@/lib/data/schemas';
-import { getRepos } from '@/lib/data';
+import { dataSource, getRepos } from '@/lib/data';
 import { sendEnquiryEmailNotification } from '@/lib/email/emailjs';
 import type { Property } from '@/lib/data/types';
 import { getListingCards } from '@/lib/data/cached';
@@ -44,10 +44,13 @@ export async function submitEnquiry(input: unknown): Promise<EnquiryResult> {
     utm: data.utm,
   });
 
-  // Send real-time email notification via EmailJS (non-blocking)
-  sendEnquiryEmailNotification(enquiry).catch((err) => {
-    console.error('[Enquiries] Failed to dispatch email notification:', err);
-  });
+  // Send real-time email notification via EmailJS (non-blocking). Never for the in-memory sample
+  // data (local testing and the automated test suite), so test enquiries do not reach the inbox.
+  if (dataSource !== 'mock') {
+    sendEnquiryEmailNotification(enquiry).catch((err) => {
+      console.error('[Enquiries] Failed to dispatch email notification:', err);
+    });
+  }
 
   return { ok: true, id: enquiry.id };
 }

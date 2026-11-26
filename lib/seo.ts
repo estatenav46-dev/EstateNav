@@ -1,6 +1,6 @@
-import type { Property, SiteSettings } from './data/types';
+import type { Corridor, Property, SiteSettings } from './data/types';
+import { priceLabel } from './property';
 import { absoluteUrl, SITE_URL } from './site';
-import { SEGMENT_LABEL } from './property';
 
 export function realEstateAgentJsonLd(settings: SiteSettings, corridors: string[]) {
   return {
@@ -27,14 +27,66 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
   };
 }
 
-export function propertyBreadcrumbs(property: Property) {
-  const segment = property.transaction === 'rent' ? 'rent' : property.segment;
+/** Home → Bangalore → area page → project; the area page exists whenever the area has a listing. */
+export function propertyBreadcrumbs(property: Property, corridors: Pick<Corridor, 'id' | 'slug'>[] = []) {
+  const corridor = corridors.find((c) => c.id === property.corridorId);
   return [
     { name: 'Home', path: '/' },
-    { name: SEGMENT_LABEL[segment], path: `/properties?seg=${segment}` },
-    { name: property.corridorName, path: `/properties?seg=${segment}&corridor=${property.corridorId}` },
+    { name: 'Bangalore', path: '/bangalore' },
+    { name: property.corridorName, path: corridor ? `/bangalore/${corridor.slug}` : `/properties?corridor=${property.corridorId}` },
     { name: property.title, path: `/properties/${property.slug}` },
   ];
+}
+
+const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1).trimEnd()}…` : s);
+
+/** Title and description, falling back to a searchable pattern when the admin left them blank. */
+export function propertySeo(property: Property) {
+  const place = [property.locality, property.corridorName].filter(Boolean).join(', ');
+  const builder = property.developerName && !property.title.toLowerCase().includes(property.developerName.toLowerCase().split(' ')[0]) ? ` by ${property.developerName}` : '';
+  // Longest useful title that fits Google's ~65 characters: drop the builder, then the locality,
+  // before ever cutting the project name or "Bangalore".
+  const candidates = [
+    `${property.title}${builder} | ${place}, Bangalore`,
+    `${property.title}${builder} | ${property.corridorName}, Bangalore`,
+    `${property.title} | ${property.locality}, Bangalore`,
+    `${property.title} | ${property.corridorName}, Bangalore`,
+    `${property.title}, Bangalore`,
+  ];
+  // The admin importer saves titles cut at 70 characters with "…"; those read badly, so use ours.
+  const own = property.seo.title?.trim();
+  const title = (own && !own.endsWith('…') ? own : '') || candidates.find((t) => t.length <= 65) || clip(property.title, 65);
+  const configs = Array.from(new Set(property.configurations.map((c) => c.label))).slice(0, 3).join(', ');
+  const description =
+    property.seo.description?.trim() ||
+    clip(
+      `${property.title}${builder} in ${place}, Bengaluru${configs ? `: ${configs}` : ''}. ${property.priceOnRequest ? 'Price on request' : `Guide price ${priceLabel(property)}`}, ${property.possession.label.toLowerCase()}. Floor plans and K-RERA details on EstateNav.`,
+      160,
+    );
+  return { title, description };
+}
+
+/** Plain answers to what buyers search about a project ("X price", "X location", "X possession"). */
+export function propertyFaqs(property: Property): { q: string; a: string }[] {
+  const place = `${property.locality}, ${property.corridorName}, Bengaluru`;
+  const configs = Array.from(new Set(property.configurations.map((c) => c.label)));
+  const faqs = [
+    { q: `Where is ${property.title} located?`, a: `${property.title} is in ${place}${property.address ? ` (${property.address})` : ''}.` },
+    {
+      q: `What is the price of ${property.title}?`,
+      a: property.priceOnRequest
+        ? `The price of ${property.title} is shared on request. Ask your EstateNav advisor for the developer's latest price sheet.`
+        : `The developer's guide price for ${property.title} is ${priceLabel(property)}. This is an approximate starting price; ask your EstateNav advisor for the latest price sheet at direct-developer pricing.`,
+    },
+    { q: `Who is the developer of ${property.title}?`, a: `${property.title} is developed by ${property.developerName}. EstateNav is an authorised channel partner, so buyers pay no brokerage.` },
+  ];
+  if (configs.length) faqs.push({ q: `What configurations are available in ${property.title}?`, a: `${property.title} offers ${configs.join(', ')}. Sizes, floor plans and prices for each unit type are listed on this page.` });
+  faqs.push({ q: `What is the possession date of ${property.title}?`, a: `Possession status: ${property.possession.label}.` });
+  faqs.push({
+    q: `Is ${property.title} RERA registered?`,
+    a: property.rera.number ? `Yes. ${property.title} is registered with Karnataka RERA under ${property.rera.number}.` : `RERA details for ${property.title} are shared on request by your EstateNav advisor.`,
+  });
+  return faqs;
 }
 
 export function propertyJsonLd(property: Property) {
@@ -64,4 +116,45 @@ export function propertyJsonLd(property: Property) {
       { '@type': 'PropertyValue', name: 'Possession', value: property.possession.label },
     ],
   };
+}
+
+/** The project as a place (address and map pin), so local and AI search can tie it to the area. */
+export function propertyPlaceJsonLd(property: Property) {
+  const type = property.segment === 'commercial' ? 'Place' : property.segment === 'plot' ? 'Landform' : 'ApartmentComplex';
+  return {
+    '@context': 'https://schema.org',
+    '@type': type === 'Landform' ? 'Place' : type,
+    name: property.title,
+    url: absoluteUrl(`/properties/${property.slug}`),
+    address: {
+      '@type': 'PostalAddress',
+      ...(property.address ? { streetAddress: property.address } : {}),
+      addressLocality: `${property.locality}, Bengaluru`,
+      addressRegion: 'Karnataka',
+      addressCountry: 'IN',
+    },
+    ...(property.geo ? { geo: { '@type': 'GeoCoordinates', latitude: property.geo.lat, longitude: property.geo.lng } } : {}),
+    containedInPlace: { '@type': 'Place', name: `${property.corridorName}, Bengaluru` },
+  };
+}
+
+export function faqJsonLd(faqs: { q: string; a: string }[]) {
+  return { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+}
+
+/** Site name and organisation for the knowledge panel and AI engines (on every page). */
+export function siteJsonLd(settings: SiteSettings) {
+  return [
+    { '@context': 'https://schema.org', '@type': 'WebSite', name: 'EstateNav', alternateName: 'EstateNav Bengaluru', url: SITE_URL, inLanguage: 'en-IN' },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: 'EstateNav',
+      url: SITE_URL,
+      logo: absoluteUrl('/logo.png'),
+      email: settings.contact.email,
+      telephone: settings.contact.phoneDisplay,
+      areaServed: { '@type': 'City', name: 'Bengaluru', alternateName: 'Bangalore' },
+    },
+  ];
 }

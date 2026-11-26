@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/lib/auth/context';
-import { conciergeStore } from '@/lib/ui/visitor';
+import { conciergeStore, consentStore } from '@/lib/ui/visitor';
 import { ConciergeCard, nextConciergeAt, writeConciergeState, type CatalogueItem, type ConsentCopy } from './ConciergeFlow';
 
 // The welcome concierge as a centred dialog. It opens by itself 5 seconds after a visitor
@@ -14,6 +14,8 @@ export function WelcomeConcierge({ consent, advisorName, catalogue }: { consent:
   const pathname = usePathname() ?? '';
   const { user, loading } = useAuth();
   const requested = conciergeStore.useValue();
+  // The cookie banner comes first: a modal opening over it would block its buttons.
+  const consentDecided = Boolean(consentStore.useValue());
   const [open, setOpen] = useState(false);
   const [closing, setClosing] = useState(false);
   const [session, setSession] = useState(0);
@@ -26,7 +28,7 @@ export function WelcomeConcierge({ consent, advisorName, catalogue }: { consent:
   }, []);
 
   useEffect(() => {
-    if (open || loading || user || pathname.startsWith('/admin') || SKIP.includes(pathname)) return;
+    if (open || loading || user || !consentDecided || pathname.startsWith('/admin') || SKIP.includes(pathname)) return;
     const due = nextConciergeAt(landedAt.current || Date.now());
     if (due == null) return;
     let timer = 0;
@@ -45,7 +47,7 @@ export function WelcomeConcierge({ consent, advisorName, catalogue }: { consent:
     };
     timer = window.setTimeout(attempt, Math.max(0, due - Date.now()));
     return () => window.clearTimeout(timer);
-  }, [open, pathname, loading, user]);
+  }, [open, pathname, loading, user, consentDecided]);
 
   useEffect(() => {
     if (!requested) return;

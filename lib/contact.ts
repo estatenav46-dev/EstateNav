@@ -72,6 +72,15 @@ export function whatsAppLink(text: string, number?: string): string {
   return `https://wa.me/${(number || officialWhatsApp()).replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`;
 }
 
+/** "List your property": the starter text for WhatsApp and the contact form, so owners send the basics. */
+export const LIST_PROPERTY_PATH = '/contact?intent=list-property';
+export const LIST_PROPERTY_MESSAGE = `I'd like to list my property with EstateNav.
+Property type (flat / plot / villa / office):
+Location in Bengaluru:
+Size (sq.ft):
+Expected price:`;
+export const listPropertyWhatsApp = (number?: string) => whatsAppLink(`Hi EstateNav, ${LIST_PROPERTY_MESSAGE}`, number);
+
 /** What a project enquiry needs to say, so the advisor knows the project from the first message. */
 export type EnquiryProject = {
   title: string;

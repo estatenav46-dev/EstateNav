@@ -6,21 +6,26 @@ import { ZONES } from '@/lib/regions';
 import { CookieSettingsLink } from '@/components/privacy/CookieSettingsLink';
 import { BackToTop, FooterCta } from './FooterBits';
 
+// Each link goes to its search page (/bangalore/…) when that page exists, else to the explore filter.
 const TYPES = [
-  { label: 'Apartments', href: '/properties?seg=residential' },
-  { label: 'Plots', href: '/properties?seg=plot' },
-  { label: 'Offices', href: '/properties?seg=commercial' },
-  { label: 'New launches', href: '/properties?status=pre-launch,new-launch' },
-  { label: 'Ready to move', href: '/properties?pos=ready' },
+  { label: 'Apartments', page: '/bangalore/flats', href: '/properties?seg=residential' },
+  { label: 'Plots', page: '/bangalore/plots', href: '/properties?seg=plot' },
+  { label: 'Offices', page: '/bangalore/offices', href: '/properties?seg=commercial' },
+  { label: 'New launches', page: '/bangalore/new-launch-projects', href: '/properties?status=pre-launch,new-launch' },
+  { label: 'Ready to move', page: '/bangalore/ready-to-move-flats', href: '/properties?pos=ready' },
 ];
+
+export type FooterSearch = { label: string; path: string };
 
 const link = 'inline-flex min-h-[40px] items-center text-[rgb(var(--on-night)/0.72)] transition-colors hover:text-[rgb(var(--on-night))] lg:min-h-[34px]';
 const heading = 'text-2xs font-semibold uppercase tracking-[0.16em] text-brass';
 
 // Statutory footer. The agent block, registration number, validity and the portal
 // disclosure are mandatory on every public page.
-export function SiteFooter({ settings, corridors }: { settings: SiteSettings; corridors: Corridor[] }) {
+export function SiteFooter({ settings, corridors, pages = [], searches = [] }: { settings: SiteSettings; corridors: Corridor[]; pages?: string[]; searches?: FooterSearch[] }) {
   const { agent, contact } = settings;
+  const has = new Set(pages);
+  const to = (page: string, fallback: string) => (has.has(page) ? page : fallback);
   const live = ZONES.filter((z) => z.available);
   const soon = ZONES.filter((z) => !z.available);
 
@@ -51,11 +56,11 @@ export function SiteFooter({ settings, corridors }: { settings: SiteSettings; co
             <p className={heading}>Regions</p>
             <ul className="mt-3 grid">
               <li>
-                <Link href="/properties" className={link}>All of Bengaluru</Link>
+                <Link href="/bangalore" className={link}>All of Bengaluru</Link>
               </li>
               {live.map((z) => (
                 <li key={z.id}>
-                  <Link href={`/properties?zone=${z.id}`} className={link}>{z.name}</Link>
+                  <Link href={to(`/bangalore/${z.id}-bangalore`, `/properties?zone=${z.id}`)} className={link}>{z.name}</Link>
                 </li>
               ))}
               {soon.map((z) => (
@@ -71,7 +76,7 @@ export function SiteFooter({ settings, corridors }: { settings: SiteSettings; co
             <ul className="mt-3 grid">
               {TYPES.map((t) => (
                 <li key={t.href}>
-                  <Link href={t.href} className={link}>{t.label}</Link>
+                  <Link href={to(t.page, t.href)} className={link}>{t.label}</Link>
                 </li>
               ))}
             </ul>
@@ -82,7 +87,7 @@ export function SiteFooter({ settings, corridors }: { settings: SiteSettings; co
             <ul className="mt-3 grid">
               {corridors.map((c) => (
                 <li key={c.id}>
-                  <Link href={`/properties?corridor=${c.id}`} className={link}>{c.name}</Link>
+                  <Link href={to(`/bangalore/${c.slug}`, `/properties?corridor=${c.id}`)} className={link}>{c.name}</Link>
                 </li>
               ))}
             </ul>
@@ -112,6 +117,19 @@ export function SiteFooter({ settings, corridors }: { settings: SiteSettings; co
             </ul>
           </nav>
         </div>
+
+        {searches.length > 0 && (
+          <nav aria-label="Popular searches" className="mt-10">
+            <p className={heading}>Popular searches in Bangalore</p>
+            <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1">
+              {searches.map((s) => (
+                <li key={s.path}>
+                  <Link href={s.path} className={link}>{s.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
 
         <div className="mt-10 grid gap-4 border-y border-[rgb(var(--on-night)/0.12)] py-6 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:gap-6">
           <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-brass/15 text-brass">
