@@ -3,6 +3,10 @@ import type { BlogPost } from './data/types';
 export const blogDate = (iso: string | null) =>
   iso ? new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' }) : '';
 
+/** A cover's own width / height for CSS aspect-ratio (16:9 when unknown), so covers with text are not cropped. */
+export const coverRatio = (cover: { width: number; height: number } | null | undefined) =>
+  cover && cover.width > 0 && cover.height > 0 ? `${cover.width} / ${cover.height}` : '16 / 9';
+
 /** The post that leads the blog page: the newest featured one, otherwise the newest. */
 export const leadPost = (posts: BlogPost[]) => posts.find((p) => p.featured) ?? posts[0] ?? null;
 

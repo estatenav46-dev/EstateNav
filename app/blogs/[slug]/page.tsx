@@ -10,7 +10,7 @@ import { ArticleBody, articleHeadings } from '@/components/blog/ArticleBody';
 import { BlogCard } from '@/components/blog/BlogCard';
 import { ExploreCard } from '@/components/explore/ExploreCard';
 import { getListingCards, getPublishedBlogs, getSettings } from '@/lib/data/cached';
-import { blogDate, suggestedPosts } from '@/lib/blog';
+import { blogDate, coverRatio, suggestedPosts } from '@/lib/blog';
 import { whatsAppLink } from '@/lib/contact';
 import { breadcrumbJsonLd } from '@/lib/seo';
 import { absoluteUrl } from '@/lib/site';
@@ -106,7 +106,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           </header>
 
           {post.cover && (
-            <div className="relative mt-8 aspect-[16/8] overflow-hidden rounded-card bg-surface-2">
+            <div className="relative mt-8 overflow-hidden rounded-card bg-surface-2" style={{ aspectRatio: coverRatio(post.cover) }}>
               <Image src={post.cover.url} alt={post.cover.alt} fill priority sizes="(min-width: 1024px) 60vw, 100vw" quality={75} className="object-cover" />
             </div>
           )}

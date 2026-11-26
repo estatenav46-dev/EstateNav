@@ -33,7 +33,7 @@ type HeaderProps = {
 const NAV = [
   { label: 'Apartments', href: '/properties?seg=residential' },
   { label: 'Plots', href: '/properties?seg=plot' },
-  { label: 'Offices', href: '/properties?seg=commercial' },
+  { label: 'Offices', href: '/properties?seg=commercial', wide: true },
   { label: 'New launches', href: '/properties?status=pre-launch,new-launch', wide: true },
   { label: 'Blog', href: '/blogs' },
 ];
@@ -196,15 +196,15 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, menu }: HeaderProps)
                 key={item.href}
                 href={item.href}
                 onPointerEnter={() => hover(false)}
-                className={`group relative h-11 items-center whitespace-nowrap rounded-full px-3.5 text-sm font-medium text-ink-muted transition-colors hover:text-ink ${'wide' in item ? 'hidden xl:inline-flex' : 'inline-flex'}`}
+                className={`group relative h-11 items-center whitespace-nowrap rounded-full px-3 text-sm font-medium text-ink-muted transition-colors hover:text-ink ${'wide' in item ? 'hidden xl:inline-flex' : 'inline-flex'}`}
               >
                 {item.label}
-                <span aria-hidden="true" className="absolute inset-x-3.5 bottom-2 h-px origin-left scale-x-0 bg-ink transition-transform duration-slow ease-out group-hover:scale-x-100" />
+                <span aria-hidden="true" className="absolute inset-x-3 bottom-2 h-px origin-left scale-x-0 bg-ink transition-transform duration-slow ease-out group-hover:scale-x-100" />
               </Link>
             ))}
           </nav>
 
-          <div className="ml-auto flex items-center gap-1">
+          <div className="ml-auto flex shrink-0 items-center gap-1">
             {pathname === '/' ? (
               <button type="button" onClick={toSearch} className="hidden h-11 w-11 items-center justify-center rounded-full text-ink transition-colors hover:bg-surface-2 sm:inline-flex" aria-label="Search homes">
                 <Search className="h-[18px] w-[18px]" strokeWidth={1.9} aria-hidden="true" />
@@ -234,9 +234,14 @@ export function SiteHeader({ phone, phoneDisplay, whatsapp, menu }: HeaderProps)
               )}
             </Link>
             <ThemeToggle className="hidden !h-11 !w-11 !rounded-full sm:inline-flex" />
-            <a href={tel} className="hidden h-11 items-center gap-2 whitespace-nowrap rounded-full px-3 font-mono text-sm text-ink transition-colors hover:bg-surface-2 2xl:inline-flex">
-              <Phone className="h-4 w-4 text-accent-ink" strokeWidth={1.75} aria-hidden="true" />
-              {phoneDisplay}
+            {/* Icon only: the header has no room for the number beside every link (it shows on hover). */}
+            <a
+              href={tel}
+              title={`Call ${phoneDisplay}`}
+              aria-label={`Call ${phoneDisplay}`}
+              className="hidden h-11 w-11 items-center justify-center rounded-full text-ink transition-colors hover:bg-surface-2 2xl:inline-flex"
+            >
+              <Phone className="h-[18px] w-[18px] text-accent-ink" strokeWidth={1.9} aria-hidden="true" />
             </a>
             <div className="ml-1 hidden sm:inline-flex">
               <UserMenu />
