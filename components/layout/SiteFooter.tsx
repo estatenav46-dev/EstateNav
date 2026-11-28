@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight, MessageCircle, Phone, ShieldCheck } from 'lucide-react';
 import type { Corridor, SiteSettings } from '@/lib/data/types';
@@ -37,7 +38,8 @@ export function SiteFooter({ settings, corridors, pages = [], searches = [] }: {
 
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 pt-10 sm:grid-cols-3 lg:grid-cols-[minmax(0,1.6fr)_repeat(3,minmax(0,1fr))] lg:gap-8">
           <div className="col-span-2 space-y-5 sm:col-span-3 lg:col-span-1">
-            <p className="font-serif text-[1.75rem] leading-none">
+            <p className="flex items-center gap-3 font-serif text-[1.75rem] leading-none">
+              <Image src="/logo-mark.png" alt="" width={44} height={44} className="h-11 w-11 rounded-full ring-1 ring-white/20" />
               EstateNav
             </p>
             <p className="max-w-xs leading-relaxed text-[rgb(var(--on-night)/0.65)]">

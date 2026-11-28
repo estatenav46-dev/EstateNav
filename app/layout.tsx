@@ -55,7 +55,7 @@ export const metadata: Metadata = {
   // Local signals for regional search engines (Google ignores these; Bing and others read them).
   other: { 'geo.region': 'IN-KA', 'geo.placename': 'Bengaluru' },
   robots: { index: true, follow: true },
-  icons: { icon: '/logo.png', apple: '/logo.png' },
+  icons: { icon: [{ url: '/favicon.ico', sizes: 'any' }, { url: '/icon-512.png', type: 'image/png', sizes: '512x512' }], apple: '/apple-icon.png' },
 };
 
 export const viewport: Viewport = {

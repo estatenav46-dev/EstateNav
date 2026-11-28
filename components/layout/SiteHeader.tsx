@@ -41,8 +41,9 @@ const NAV = [
 function Wordmark() {
   return (
     <Link href="/" className="group flex shrink-0 items-center gap-2.5" aria-label="EstateNav home">
-      <span className="relative h-10 w-10 overflow-hidden rounded-full border border-line bg-surface transition-transform duration-base ease-out group-hover:-translate-y-px">
-        <Image src="/logo.png" alt="" width={40} height={40} className="h-full w-full object-cover" priority />
+      {/* The building mark in white on brand green: clear on the light header and, with a faint ring, on the dark one. */}
+      <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full ring-1 ring-black/5 transition-transform duration-base ease-out group-hover:-translate-y-px dark:ring-white/20">
+        <Image src="/logo-mark.png" alt="" width={40} height={40} className="h-full w-full" priority />
       </span>
       <span className="text-[1.3rem] font-bold tracking-[-0.03em]">
         Estate<span className="text-accent-ink">Nav</span>
