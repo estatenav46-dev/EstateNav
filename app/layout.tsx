@@ -19,6 +19,7 @@ import { ZoneRegistry } from '@/components/layout/ZoneRegistry';
 import { BlueprintBackdrop } from '@/components/layout/BlueprintBackdrop';
 import { SiteHeader, type HeaderMenu } from '@/components/layout/SiteHeader';
 import { ListPropertyBar } from '@/components/layout/ListPropertyBar';
+import { LAUNCH_BANNER, launchBannerActive } from '@/lib/launch';
 import { allLandingPages, landingHeading } from '@/lib/landing';
 import { siteJsonLd } from '@/lib/seo';
 import { JsonLd } from '@/components/ui/JsonLd';
@@ -107,7 +108,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <JsonLd data={siteJsonLd(settings)} />
             <BlueprintBackdrop />
             <HideOnAdmin>
-              <ListPropertyBar whatsapp={settings.contact.whatsapp} />
+              <ListPropertyBar whatsapp={settings.contact.whatsapp} launchUrl={launchBannerActive() ? LAUNCH_BANNER.url : undefined} />
             </HideOnAdmin>
             <SiteHeader
               phone={settings.contact.phone}

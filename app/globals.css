@@ -520,3 +520,21 @@ html { scroll-behavior: smooth; }
   html .min-h-\[48px\] { min-height: 40px; }
   html .min-h-\[44px\] { min-height: 38px; }
 }
+
+/* Grand-launch banner in the top bar (a fixed gold, readable on the green bar in both themes): a soft ping on the badge dot and a light sweeping across the headline. */
+.launch-ping { animation: launch-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite; }
+@keyframes launch-ping { 75%, 100% { transform: scale(2.4); opacity: 0; } }
+.launch-shine {
+  background: linear-gradient(100deg, rgb(var(--on-forest) / 0.9) 40%, #f3dca8 50%, rgb(var(--on-forest) / 0.9) 60%) 0 0 / 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: launch-shine 4.5s ease-in-out infinite;
+}
+@keyframes launch-shine { 0% { background-position: 100% 0; } 55%, 100% { background-position: 0 0; } }
+.launch-badge { box-shadow: 0 0 0 0 rgb(230 199 136 / 0.55); animation: launch-glow 2.6s ease-out infinite; }
+@keyframes launch-glow { 0% { box-shadow: 0 0 0 0 rgb(230 199 136 / 0.5); } 70%, 100% { box-shadow: 0 0 0 7px rgb(230 199 136 / 0); } }
+@media (prefers-reduced-motion: reduce) {
+  .launch-ping, .launch-badge { animation: none; }
+  .launch-shine { animation: none; background: none; color: rgb(var(--on-forest) / 0.88); }
+}
