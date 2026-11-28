@@ -1,5 +1,5 @@
 import { absoluteUrl } from '@/lib/site';
-import type { Property } from './types';
+import type { ImageRef, Property } from './types';
 
 /**
  * What public pages may see. Listings reach client components (cards, compare, the detail
@@ -16,7 +16,8 @@ export function toCardView(property: Property): Property {
     description: '',
     highlights: [],
     specifications: [],
-    nearby: [],
+    // Only the IT-park entries, which the tech-park search (lib/techParks.ts) reads.
+    nearby: property.nearby.filter((n) => n.category === 'it-park' || n.category === 'landmark'),
     documents: [],
     extraDetails: [],
     charges: [],
@@ -35,10 +36,19 @@ export function toPublicProperty(property: Property): Property {
   const planIds = new Set(floorPlans.map((p) => p.id));
   const configurations = property.configurations.map((c) => (c.floorPlanImageId && !planIds.has(c.floorPlanImageId) ? { ...c, floorPlanImageId: null } : c));
   const placeholder = absoluteUrl(`/properties/${property.slug}#documents`);
+  // Blurred previews (~1.2 KB each) are kept for the cover only. On every gallery photo and plan
+  // they made the catalogue too big for Next.js's 2 MB data cache, so it was never cached.
+  const lean = (img: ImageRef): ImageRef => (img.id === liveCover.id ? img : { ...img, blurDataURL: '' });
   return {
     ...property,
     configurations,
-    media: { ...property.media, cover: liveCover },
+    media: {
+      ...property.media,
+      cover: liveCover,
+      gallery: gallery.map(lean),
+      floorPlans: floorPlans.map(lean),
+      masterPlan: property.media.masterPlan ? lean(property.media.masterPlan) : null,
+    },
     documents: property.documents.map((d) => (d.access === 'on-request' ? { ...d, url: placeholder, storagePath: '' } : d)),
   };
 }

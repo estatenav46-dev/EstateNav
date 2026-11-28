@@ -2,6 +2,7 @@ import type { Lens, Property, SearchSegment } from './data/types';
 import { matchesSegment, possessionMonths, statusChip } from './property';
 import { formatINR } from './price';
 import { inZone, ZONE_IDS, zoneOfCorridor } from './regions';
+import { DEFAULT_RADIUS, isNearPark, parkMatch, RADIUS_CHOICES, techParkById } from './techParks';
 
 // One filter engine for home search, the explore page and the "relax filter" suggestions.
 // Filtering runs in memory over the published catalogue.
@@ -34,13 +35,17 @@ export interface ListingState {
   dev: string[];
   /** Property types (apartment, villa, plot…). */
   ptype: Property['propertyType'][];
+  /** Tech park id (lib/techParks.ts): only homes near it, nearest first. */
+  park: string;
+  /** How far from the tech park, in km. */
+  parkKm: number;
   sort: ListingSort;
   view: ListingView;
 }
 
 export const DEFAULT_LISTING_STATE: ListingState = {
   seg: '', q: '', zone: '', corridors: [], loc: '', bhk: [], min: null, max: null, sizeMin: null, sizeMax: null,
-  possession: '', status: [], amenities: [], approvals: [], verified: false, lens: [], dev: [], ptype: [], sort: 'relevance', view: 'grid',
+  possession: '', status: [], amenities: [], approvals: [], verified: false, lens: [], dev: [], ptype: [], park: '', parkKm: DEFAULT_RADIUS, sort: 'relevance', view: 'grid',
 };
 
 export const SALE_BUDGETS = [5_000_000, 7_500_000, 10_000_000, 12_500_000, 15_000_000, 20_000_000, 30_000_000, 50_000_000];
@@ -191,6 +196,10 @@ export function matchesListing(property: Property, s: ListingState): boolean {
   if (s.lens.length && !s.lens.some((l) => property.lenses.includes(l))) return false;
   if (s.dev.length && !s.dev.includes(property.developerId)) return false;
   if (s.ptype.length && !s.ptype.includes(property.propertyType)) return false;
+  if (s.park) {
+    const park = techParkById(s.park);
+    if (park && !isNearPark(property, park, s.parkKm)) return false;
+  }
   return true;
 }
 
@@ -209,6 +218,12 @@ export function sortListings(properties: Property[], sort: ListingSort): Propert
 
 export function applyListing(properties: Property[], state: ListingState): Property[] {
   const sorted = sortListings(properties.filter((p) => matchesListing(p, state)), state.sort);
+  // Near a tech park: nearest first, unless the visitor picked another order.
+  const park = state.park ? techParkById(state.park) : undefined;
+  if (park && state.sort === 'relevance' && !state.q.trim()) {
+    const km = (p: Property) => parkMatch(p, park)?.sortKm ?? Infinity;
+    return sorted.map((p, i) => ({ p, i, km: km(p) })).sort((a, b) => a.km - b.km || a.i - b.i).map((x) => x.p);
+  }
   // A search by name puts that project first when the visitor has not picked another order.
   if (state.q.trim() && state.sort === 'relevance') {
     return sorted.map((p, i) => ({ p, i, score: queryScore(p, state.q) })).sort((a, b) => b.score - a.score || a.i - b.i).map((x) => x.p);
@@ -220,7 +235,7 @@ export function countActiveFilters(s: ListingState): number {
   return (
     (s.seg ? 1 : 0) + (s.q ? 1 : 0) + s.corridors.length + s.bhk.length + (s.min != null || s.max != null ? 1 : 0) +
     (s.sizeMin != null || s.sizeMax != null ? 1 : 0) + (s.possession ? 1 : 0) + s.status.length + s.amenities.length +
-    s.approvals.length + (s.verified ? 1 : 0) + s.lens.length
+    s.approvals.length + (s.verified ? 1 : 0) + s.lens.length + (s.park ? 1 : 0)
   );
 }
 
@@ -245,6 +260,11 @@ export function relaxSuggestions(properties: Property[], s: ListingState) {
   if (s.lens.length) candidates.push({ label: 'Any buyer lens', patch: { lens: [] } });
   if (s.dev.length) candidates.push({ label: 'Any builder', patch: { dev: [] } });
   if (s.ptype.length) candidates.push({ label: 'Any property type', patch: { ptype: [] } });
+  if (s.park) {
+    const wider = RADIUS_CHOICES.find((r) => r > s.parkKm);
+    if (wider) candidates.push({ label: `Within ${wider} km`, patch: { parkKm: wider } });
+    candidates.push({ label: 'Any tech park', patch: { park: '', parkKm: DEFAULT_RADIUS } });
+  }
   if (s.verified) candidates.push({ label: 'Include unverified listings', patch: { verified: false } });
   if (s.q) candidates.push({ label: `Clear “${s.q}”`, patch: { q: '' } });
   if (s.seg) candidates.push({ label: 'All property types', patch: { seg: '' } });
@@ -291,6 +311,9 @@ export function parseListingState(params: URLSearchParams): ListingState {
   s.lens = list(params.get('lens')).filter((v): v is Lens => (LENSES as string[]).includes(v));
   s.dev = list(params.get('dev')).map((d) => d.toLowerCase()).slice(0, 20);
   s.ptype = list(params.get('ptype')).filter((v): v is Property['propertyType'] => (PROPERTY_TYPES as string[]).includes(v));
+  s.park = techParkById(params.get('park') ?? '') ? params.get('park')! : '';
+  const radius = num(params.get('pkm'));
+  s.parkKm = radius != null && (RADIUS_CHOICES as readonly number[]).includes(radius) ? radius : DEFAULT_RADIUS;
   s.sort = oneOf(params.get('sort'), ['relevance', 'price-asc', 'price-desc', 'possession', 'newest'] as const) || 'relevance';
   s.view = oneOf(params.get('view'), ['grid', 'list'] as const) || 'grid';
 
@@ -337,6 +360,8 @@ export function serializeListingState(s: ListingState): string {
   if (s.lens.length) params.set('lens', s.lens.join(','));
   if (s.dev.length) params.set('dev', s.dev.join(','));
   if (s.ptype.length) params.set('ptype', s.ptype.join(','));
+  if (s.park) params.set('park', s.park);
+  if (s.park && s.parkKm !== DEFAULT_RADIUS) params.set('pkm', String(s.parkKm));
   if (s.sort !== 'relevance') params.set('sort', s.sort);
   if (s.view !== 'grid') params.set('view', s.view);
   return params.toString();

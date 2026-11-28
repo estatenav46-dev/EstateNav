@@ -2,6 +2,7 @@ import { unstable_cache, unstable_noStore } from 'next/cache';
 import { getRepos } from '.';
 import { registerCorridorZones } from '@/lib/regions';
 import { toCardView, toPublicProperty } from './publicView';
+import type { Property } from './types';
 
 // Cached reads for public pages (ISR on Vercel). Admin publish actions call
 // revalidateTag('properties' | 'catalogue' | 'settings') through /api/revalidate, so admin changes
@@ -45,16 +46,32 @@ function guard<A extends unknown[], T>(read: (...args: A) => Promise<T>): (...ar
 }
 
 // Published listings that are not hidden and whose partner is not hidden (both set in the admin).
-const cachedProperties = guard(unstable_cache(
-  once('properties', async () => {
-    const repos = getRepos();
-    const [properties, developers] = await Promise.all([repos.properties.list({ status: 'published' }), repos.developers.list()]);
-    const hiddenPartners = new Set(developers.filter((d) => d.hidden).map((d) => d.id));
-    return properties.filter((p) => !p.hidden && !hiddenPartners.has(p.developerId)).map(toPublicProperty);
-  }),
-  ['published-properties-v2'],
-  { tags: ['properties', 'catalogue'], revalidate: REVALIDATE },
-));
+async function loadPublished() {
+  const repos = getRepos();
+  const [properties, developers] = await Promise.all([repos.properties.list({ status: 'published' }), repos.developers.list()]);
+  const hiddenPartners = new Set(developers.filter((d) => d.hidden).map((d) => d.id));
+  return properties.filter((p) => !p.hidden && !hiddenPartners.has(p.developerId)).map(toPublicProperty);
+}
+
+// The catalogue is too large for Next.js's data cache (2 MB per entry; it was ~3 MB, so it was never
+// stored and every page view re-read Firestore). It is kept in this server's memory instead, keyed
+// by a tiny version stamp that does live in the data cache: an admin publish (revalidateTag) or the
+// hourly refresh gives a new stamp, and the next request reloads the listings once.
+const catalogueVersion = unstable_cache(async () => new Date().toISOString(), ['catalogue-version'], { tags: ['properties', 'catalogue'], revalidate: REVALIDATE });
+let catalogue: { version: string; data: Promise<Property[]> } | null = null;
+const cachedProperties = guard(async () => {
+  const version = await catalogueVersion();
+  if (!catalogue || catalogue.version !== version) {
+    const data = once('properties', loadPublished)();
+    const entry = { version, data };
+    catalogue = entry;
+    // A failed load is not kept: the next request tries again.
+    data.catch(() => {
+      if (catalogue === entry) catalogue = null;
+    });
+  }
+  return catalogue.data;
+});
 const cachedCorridors = guard(unstable_cache(once('corridors', () => getRepos().corridors.list()), ['corridors'], { tags: ['catalogue'], revalidate: REVALIDATE }));
 
 /** Corridors, with their admin-set regions registered for zoneOfCorridor(). */

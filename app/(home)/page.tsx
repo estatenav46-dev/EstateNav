@@ -3,6 +3,7 @@ import { HomeHero } from '@/components/home/HomeHero';
 import { MarketTicker } from '@/components/home/MarketTicker';
 import { RegionTiles } from '@/components/home/RegionTiles';
 import { NeedTiles } from '@/components/home/NeedTiles';
+import { TechParkTiles } from '@/components/home/TechParkTiles';
 import { PartnerWall } from '@/components/home/PartnerWall';
 import { ForYou } from '@/components/home/ForYou';
 import { SavedRail } from '@/components/home/SavedRail';
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
 };
 
-// Hero (auto-cycling segments) → market pulse → region → need → channel partners → your brief / picks → blog → advisory.
+// Hero (auto-cycling segments) → market pulse → region → need → tech parks → channel partners → your brief / picks → blog → advisory.
 export default async function HomePage() {
   const [properties, corridors, snapshots, settings, posts, developers] = await Promise.all([
     getListingCards(),
@@ -40,6 +41,7 @@ export default async function HomePage() {
       <SavedRail properties={properties} />
       <RegionTiles properties={properties} advisorName={settings.agent.name} whatsapp={settings.contact.whatsapp} />
       <NeedTiles properties={properties} />
+      <TechParkTiles properties={properties} whatsapp={settings.contact.whatsapp} />
       <PartnerWall developers={developers} properties={properties} />
       <ForYou properties={properties} settings={settings} />
       <FromTheBlog posts={posts} />

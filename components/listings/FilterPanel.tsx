@@ -5,6 +5,7 @@ import { APPROVAL_OPTIONS, BHK_CHOICES, POSSESSION_OPTIONS, STATUS_OPTIONS, type
 import { bhkLabel, LENS_LABEL, SEGMENT_LABEL } from '@/lib/property';
 import { BudgetRange } from '@/components/search/BudgetRange';
 import { PROPERTY_TYPE_LABEL } from '@/lib/listingMeta';
+import { DEFAULT_RADIUS, RADIUS_CHOICES, parksWithHomes } from '@/lib/techParks';
 
 type Props = {
   state: ListingState;
@@ -43,6 +44,7 @@ export function FilterPanel({ state, update, corridors, properties, idPrefix }: 
   const builders = Array.from(new Map(properties.map((p) => [p.developerId, p.developerName])).entries())
     .map(([id, name]) => [id, name, properties.filter((p) => p.developerId === id).length] as const)
     .sort((a, b) => a[1].localeCompare(b[1]));
+  const parks = parksWithHomes(properties, state.parkKm);
   const rent = state.seg === 'rent' || state.seg === 'commercial';
   const showBhk = state.seg === '' || state.seg === 'residential';
 
@@ -64,6 +66,29 @@ export function FilterPanel({ state, update, corridors, properties, idPrefix }: 
         {corridors.map((c) => (
           <Check key={c.id} checked={state.corridors.includes(c.id)} onChange={() => update({ corridors: toggle(state.corridors, c.id) })} label={c.name} hint={properties.filter((p) => p.corridorId === c.id).length} />
         ))}
+      </Section>
+
+      <Section title="Near a tech park">
+        <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Tech park">
+          <button type="button" role="radio" aria-checked={!state.park} className="chip" onClick={() => update({ park: '', parkKm: DEFAULT_RADIUS })}>
+            Any
+          </button>
+          {parks.map(({ park, count }) => (
+            <button key={park.id} type="button" role="radio" aria-checked={state.park === park.id} className="chip" title={park.area} onClick={() => update({ park: park.id })}>
+              {park.short} <span className="ml-1 font-mono text-2xs text-ink-muted">{count}</span>
+            </button>
+          ))}
+        </div>
+        {state.park && (
+          <div className="mt-3 flex flex-wrap items-center gap-1.5" role="radiogroup" aria-label="Distance from the tech park">
+            <span className="mr-1 text-xs text-ink-muted">Within</span>
+            {RADIUS_CHOICES.map((km) => (
+              <button key={km} type="button" role="radio" aria-checked={state.parkKm === km} className="chip" onClick={() => update({ parkKm: km })}>
+                {km} km
+              </button>
+            ))}
+          </div>
+        )}
       </Section>
 
       {showBhk && (

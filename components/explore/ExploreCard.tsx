@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowUpRight, BadgePercent, GitCompareArrows, Heart, Images, MapPin, Sparkles } from 'lucide-react';
+import { ArrowUpRight, BadgePercent, Briefcase, GitCompareArrows, Heart, Images, MapPin, Sparkles } from 'lucide-react';
 import type { Property } from '@/lib/data/types';
 import { formatINR, formatSqftRange } from '@/lib/price';
 import { activeOffer, bhkLabel, rateLabel, statusChip } from '@/lib/property';
@@ -51,7 +51,7 @@ const roundBtn =
 
 // The whole card opens the project page (in a new tab, so the list keeps its place). The
 // heart, compare and photo buttons sit above that link and keep their own actions.
-export function ExploreCard({ property, priority = false, reasons, sizes }: { property: Property; priority?: boolean; reasons?: string[]; sizes?: string }) {
+export function ExploreCard({ property, priority = false, reasons, sizes, commute }: { property: Property; priority?: boolean; reasons?: string[]; sizes?: string; /** Distance to the tech park searched for, shown on every card size. */ commute?: string }) {
   const saved = shortlistStore.useValue().includes(property.id);
   const compareItems = compareStore.useValue();
   const comparing = compareItems.some((c) => c.id === property.id);
@@ -138,6 +138,12 @@ export function ExploreCard({ property, priority = false, reasons, sizes }: { pr
             {property.locality && property.corridorName && <span className="cq-wide"> · {property.corridorName}</span>}
           </span>
         </p>
+        {commute && (
+          <p className="mt-1 flex min-w-0 items-center gap-1 text-[12.5px] font-semibold text-accent-ink">
+            <Briefcase className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+            <span className="truncate">{commute}</span>
+          </p>
+        )}
         {property.developerName && (
           <p className="cq-wide mt-0.5 truncate text-xs text-ink-muted">
             by <span className="font-medium text-ink">{property.developerName}</span>

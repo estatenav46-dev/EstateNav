@@ -20,7 +20,7 @@ export function NeedTiles({ properties }: { properties: Property[] }) {
   const ranked = sortListings(properties, 'relevance');
   const tiles = NEED_TILES.map((t) => {
     const list = ranked.filter(t.matches);
-    return { ...t, count: list.length, cover: list[0]?.media.cover, href: `/properties?${new URLSearchParams(t.query).toString()}` };
+    return { ...t, count: list.length, cover: list[0]?.media.cover, href: t.href ?? `/properties?${new URLSearchParams(t.query).toString()}` };
   }).filter((t) => t.count > 0);
   const types = tiles.filter((t) => TYPE_IDS.includes(t.id));
   const needs = tiles.filter((t) => !TYPE_IDS.includes(t.id));

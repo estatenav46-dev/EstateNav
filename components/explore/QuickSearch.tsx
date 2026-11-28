@@ -4,13 +4,25 @@ import { nameTokens, searchText } from '@/lib/listingFilters';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { ArrowUpRight, Building2, CornerDownLeft, MapPin, Navigation, Search, X } from 'lucide-react';
+import { ArrowUpRight, Briefcase, Building2, CornerDownLeft, MapPin, Navigation, Search, X } from 'lucide-react';
 import type { Corridor, Property } from '@/lib/data/types';
 import { liveZones, zoneOfCorridor } from '@/lib/regions';
+import { parksWithHomes } from '@/lib/techParks';
 
-type Suggestion = { key: string; group: 'Regions' | 'Areas' | 'Locations' | 'Projects'; label: string; hint: string; href: string; img?: string };
+type Suggestion = { key: string; group: 'Regions' | 'Areas' | 'Tech parks' | 'Locations' | 'Projects'; label: string; hint: string; href: string; img?: string; /** Extra words it answers to. */ terms?: string };
 
-const ICON = { Regions: Navigation, Areas: MapPin, Locations: MapPin, Projects: Building2 };
+const ICON = { Regions: Navigation, Areas: MapPin, 'Tech parks': Briefcase, Locations: MapPin, Projects: Building2 };
+
+// Other names buyers type for a park ("ITPB", "Embassy Tech Village"…).
+const PARK_TERMS: Record<string, string> = {
+  itpl: 'itpb international tech park epip whitefield tech park',
+  'bellandur-orr': 'rmz ecospace ecoworld embassy tech village etv bellandur orr outer ring road',
+  'marathahalli-orr': 'prestige tech park cessna marathahalli orr outer ring road kadubeesanahalli',
+  'sarjapur-wipro': 'wipro rga tech park sarjapur',
+  'electronic-city': 'ecity e city infosys biocon',
+  aerospace: 'aerospace park kiadb hardware park devanahalli airport',
+  golflinks: 'embassy golf links domlur',
+};
 
 function buildIndex(properties: Property[], corridors: Corridor[]): Suggestion[] {
   const out: Suggestion[] = [];
@@ -22,6 +34,9 @@ function buildIndex(properties: Property[], corridors: Corridor[]): Suggestion[]
     const n = properties.filter((p) => p.corridorId === c.id).length;
     if (!n) continue;
     out.push({ key: `c-${c.id}`, group: 'Areas', label: c.name, hint: `${n} ${n === 1 ? 'project' : 'projects'}`, href: `/properties?zone=${zoneOfCorridor(c.id)}&corridor=${c.id}` });
+  }
+  for (const { park, count } of parksWithHomes(properties)) {
+    out.push({ key: `t-${park.id}`, group: 'Tech parks', label: park.name, hint: `${count} ${count === 1 ? 'project' : 'projects'} nearby · ${park.area}`, href: `/properties?park=${park.id}`, terms: `tech park office ${park.short} ${PARK_TERMS[park.id] ?? ''}` });
   }
   const seen = new Set<string>();
   for (const p of properties) {
@@ -75,7 +90,7 @@ export function QuickSearch({ properties, corridors, id = 'quick-search', classN
     // Same word handling as the results ("2bhk", "flats in whitefield", accents, punctuation).
     const tokens = nameTokens(q);
     if (!tokens.length) return index.filter((s) => s.group === 'Regions');
-    const hits = index.filter((s) => tokens.every((t) => searchText(`${s.label} ${s.hint}`).includes(t)));
+    const hits = index.filter((s) => tokens.every((t) => searchText(`${s.label} ${s.hint} ${s.terms ?? ''}`).includes(t)));
     // Keep the list short: a few of each kind.
     const perGroup: Record<string, number> = {};
     return hits.filter((s) => (perGroup[s.group] = (perGroup[s.group] ?? 0) + 1) <= 4);

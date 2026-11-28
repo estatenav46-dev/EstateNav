@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { usePathname, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowDownRight, ArrowDownUp, ArrowLeft, ArrowUpRight, Calculator, ChevronRight, GitCompareArrows, IndianRupee, MessageCircle, Search, ShieldCheck, SlidersHorizontal, X } from 'lucide-react';
+import { ArrowDownRight, ArrowDownUp, ArrowLeft, ArrowUpRight, Building2, Calculator, ChevronRight, GitCompareArrows, IndianRupee, MessageCircle, Search, ShieldCheck, SlidersHorizontal, X } from 'lucide-react';
 import type { Corridor, Lens, MarketSnapshot, Property, SiteSettings } from '@/lib/data/types';
 import {
   APPROVAL_OPTIONS,
@@ -29,6 +29,7 @@ import { FilterPanel } from '@/components/listings/FilterPanel';
 import { ExploreCard } from '@/components/explore/ExploreCard';
 import { PlaceSnapshot } from '@/components/explore/PlaceSnapshot';
 import { placeGuide } from '@/lib/placeGuides';
+import { DEFAULT_RADIUS, RADIUS_CHOICES, TECH_PARKS, parkLabel, parkMatch, techParkById } from '@/lib/techParks';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { JsonLd } from '@/components/ui/JsonLd';
 import { LazySheet as Sheet } from '@/components/ui/LazySheet';
@@ -64,6 +65,8 @@ function extraChips(s: ListingState, builders: Map<string, string> = new Map()):
   s.lens.forEach((l) => chips.push({ key: `l-${l}`, label: LENS_LABEL[l], patch: { lens: s.lens.filter((x) => x !== l) } }));
   s.dev.forEach((d) => chips.push({ key: `d-${d}`, label: builders.get(d) ?? d, patch: { dev: s.dev.filter((x) => x !== d) } }));
   s.ptype.forEach((t) => chips.push({ key: `t-${t}`, label: PROPERTY_TYPE_LABEL[t], patch: { ptype: s.ptype.filter((x) => x !== t) } }));
+  const park = s.park ? techParkById(s.park) : undefined;
+  if (park) chips.push({ key: 'park', label: `Within ${s.parkKm} km of ${park.short}`, patch: { park: '', parkKm: DEFAULT_RADIUS } });
   return chips;
 }
 
@@ -282,8 +285,14 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
   const suggestions = results.length <= 2 ? relaxSuggestions(properties, state).filter((s) => s.count > results.length) : [];
 
   const [one, many] = state.seg ? SEGMENT_NOUN[state.seg] : ['project', 'projects'];
-  const title = state.loc || area?.name || zone?.name || 'All of Bengaluru';
-  const context = state.loc ? area?.name ?? zone?.name : area ? zone?.name : zone ? zone.areas : 'Pick a region to narrow it down';
+  // Tech park search: the page is about the park, results nearest first with their distance.
+  const park = state.park ? techParkById(state.park) : undefined;
+  const parkOptions = TECH_PARKS.map((p) => ({ park: p, count: countWith({ park: p.id }) })).filter((x) => x.count > 0 || x.park.id === state.park);
+  const place = state.loc || area?.name || zone?.name;
+  const title = park ? `Near ${park.name}` : place || 'All of Bengaluru';
+  const context = park
+    ? [park.area, place, state.sort === 'relevance' ? 'nearest first' : null].filter(Boolean).join(' · ')
+    : state.loc ? area?.name ?? zone?.name : area ? zone?.name : zone ? zone.areas : 'Pick a region to narrow it down';
 
   const crumbs = [
     { name: 'Home', path: '/' },
@@ -309,7 +318,11 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
     </div>
   );
 
-  const askText = `Hi EstateNav, I'm looking for ${state.seg ? SEGMENT_NOUN[state.seg][1] : 'property'} in ${title} on EstateNav and couldn't find a match. Do you have anything coming up there?`;
+  const cardReason = (p: Property) => {
+    const m = park ? parkMatch(p, park) : null;
+    return m && park ? parkLabel(m, park) : undefined;
+  };
+  const askText = `Hi EstateNav, I'm looking for ${state.seg ? SEGMENT_NOUN[state.seg][1] : 'property'} ${park ? `near ${park.name}` : `in ${title}`} on EstateNav and couldn't find a match. Do you have anything coming up there?`;
 
   return (
     <main id="main" className="mx-auto flex max-w-container">
@@ -436,6 +449,25 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
               />
             )}
             <Select
+              label="Near a tech park"
+              value={state.park}
+              options={[
+                { value: '', label: 'Any tech park', hint: 'Search near your office' },
+                ...parkOptions.map(({ park: p, count }) => ({ value: p.id, label: p.name, hint: p.area, count })),
+              ]}
+              onChange={(v) => update({ park: v, parkKm: v ? state.parkKm : DEFAULT_RADIUS }, true)}
+              hideChevron
+              align="end"
+              menuWidth={300}
+              display={
+                <span className="flex items-center justify-center gap-2">
+                  <Building2 className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+                  <span className="hidden sm:inline">{park ? park.short : 'Near tech park'}</span>
+                </span>
+              }
+              className={`h-12 w-12 shrink-0 justify-center rounded-full border text-sm font-semibold sm:h-10 sm:w-auto sm:px-4 ${park ? 'border-ink bg-ink text-bg' : 'border-line bg-surface text-ink hover:border-ink/40'}`}
+            />
+            <Select
               label="Sort by"
               value={state.sort}
               options={SORT_OPTIONS.map((o) => ({ value: o.value, label: o.value === 'relevance' ? 'Featured first' : o.label }))}
@@ -468,6 +500,18 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
             </label>
           </div>
         </div>
+
+        {park && (
+          <div className="no-scrollbar -mx-1 mt-3 flex items-center gap-2 overflow-x-auto px-1" role="group" aria-label={`Distance from ${park.name}`}>
+            <span className="shrink-0 text-2xs font-semibold uppercase tracking-[0.14em] text-ink-muted">Within</span>
+            {RADIUS_CHOICES.map((km) => (
+              <button key={km} type="button" aria-pressed={state.parkKm === km} onClick={() => update({ parkKm: km })} className="chip min-h-[48px] shrink-0 whitespace-nowrap px-3.5 text-sm sm:min-h-[40px]">
+                {km} km
+                <span className="text-xs text-ink-muted">{countWith({ parkKm: km })}</span>
+              </button>
+            ))}
+          </div>
+        )}
 
         {locChips.length > 1 && (
           <div className="no-scrollbar -mx-1 mt-3 flex gap-2 overflow-x-auto px-1" role="group" aria-label={`Locations in ${area!.name}`}>
@@ -551,7 +595,7 @@ export default function PropertyResults({ properties, corridors, snapshots, cost
             <ul data-testid="results" key={`${state.zone}|${state.corridors.join()}|${state.loc}|${state.seg}`} className="stagger grid grid-cols-2 gap-2.5 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
               {shown.map((p, i) => (
                 <li key={p.id} style={{ '--i': Math.min(i, 8) } as React.CSSProperties} className={results.length === 1 ? 'col-span-2 sm:col-span-1' : undefined}>
-                  <ExploreCard property={p} priority={i < 2} />
+                  <ExploreCard property={p} priority={i < 2} commute={park ? cardReason(p) : undefined} />
                 </li>
               ))}
               {results.length <= 2 && (

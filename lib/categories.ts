@@ -1,9 +1,10 @@
 import type { Property, SearchSegment } from './data/types';
 import { matchesSegment } from './property';
+import { isNearPark, TECH_PARKS } from './techParks';
 
 // Shortcuts on the home page ("What are you looking for?"). Each opens the explore page
 // with the matching filter already applied.
-export type NeedIcon = 'apartment' | 'plot' | 'ready' | 'launch' | 'budget' | 'family' | 'nri' | 'first-home' | 'office' | 'villa';
+export type NeedIcon = 'apartment' | 'plot' | 'ready' | 'launch' | 'budget' | 'family' | 'nri' | 'first-home' | 'office' | 'villa' | 'techpark';
 
 export interface NeedTile {
   id: string;
@@ -11,6 +12,8 @@ export interface NeedTile {
   icon: NeedIcon;
   query: Record<string, string>;
   matches: (p: Property) => boolean;
+  /** Where the tile goes, when it is not an explore-page filter. */
+  href?: string;
 }
 
 export const NEED_TILES: NeedTile[] = [
@@ -22,6 +25,8 @@ export const NEED_TILES: NeedTile[] = [
   { id: 'villas', label: 'Villas', icon: 'villa', query: { ptype: 'villa,row-house,villament' }, matches: (p) => ['villa', 'row-house', 'villament'].includes(p.propertyType) },
   { id: '3bhk', label: 'Upgrading', icon: 'family', query: { bhk: '3,3.5,4,4.5,5' }, matches: (p) => p.bhkOptions.some((b) => b >= 3) },
   { id: 'first-home', label: 'First home', icon: 'first-home', query: { lens: 'first-home' }, matches: (p) => p.lenses.includes('first-home') },
+  // Opens the home page's tech park section, where each park has its own link.
+  { id: 'tech-parks', label: 'Near tech parks', icon: 'techpark', query: {}, href: '#tech-parks', matches: (p) => TECH_PARKS.some((park) => isNearPark(p, park)) },
   { id: 'nri', label: 'NRI picks', icon: 'nri', query: { lens: 'nri' }, matches: (p) => p.lenses.includes('nri') },
   { id: 'offices', label: 'Offices', icon: 'office', query: { seg: 'commercial' }, matches: (p) => matchesSegment(p, 'commercial') },
 ];
