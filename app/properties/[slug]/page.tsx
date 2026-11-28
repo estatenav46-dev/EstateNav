@@ -8,9 +8,15 @@ import { similarProperties } from '@/lib/similar';
 
 export const revalidate = 3600;
 
+// Pages listed here are built ahead; any other slug renders on its first visit. If the database
+// can't be read during the build, build none ahead rather than failing the deploy.
 export async function generateStaticParams() {
-  const properties = await getPublishedProperties();
-  return properties.map((p) => ({ slug: p.slug }));
+  try {
+    const properties = await getPublishedProperties();
+    return properties.map((p) => ({ slug: p.slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {

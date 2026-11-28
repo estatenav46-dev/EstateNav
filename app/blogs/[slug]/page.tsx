@@ -17,9 +17,15 @@ import { absoluteUrl } from '@/lib/site';
 
 export const revalidate = 3600;
 
+// Pages listed here are built ahead; any other slug renders on its first visit. If the database
+// can't be read during the build, build none ahead rather than failing the deploy.
 export async function generateStaticParams() {
-  const posts = await getPublishedBlogs();
-  return posts.map((p) => ({ slug: p.slug }));
+  try {
+    const posts = await getPublishedBlogs();
+    return posts.map((p) => ({ slug: p.slug }));
+  } catch {
+    return [];
+  }
 }
 
 async function findPost(slug: string) {
