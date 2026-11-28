@@ -40,14 +40,17 @@ type Props = {
   onTogglePause: () => void;
 };
 
-// The hero spotlight as a card rail: several featured projects side by side (one and a peek on
-// phones, two on tablets and the two-column hero, three on wide screens). Every few seconds the
-// rail moves on by one project; cards slide in from the side they come from.
-export function HeroShowcase({ all, slides, index, dir, segLabel, duration, timerKey, running, animate, paused, onAdvance, onStep, onHold, onTogglePause }: Props) {
+const SIZES = '(min-width: 1024px) 50vw, 100vw';
+
+// The hero spotlight: one featured project at a time, full width, so the photo is never cut off.
+// Every few seconds it moves on to the next project; the card slides in from the side it comes from.
+// The next project's photo is fetched ahead so the change is never blank.
+export function HeroShowcase({ all, slides, index, dir, segLabel, duration, timerKey, running, animate, paused, preload, onAdvance, onStep, onHold, onTogglePause }: Props) {
   const swipe = useRef<{ x: number; y: number } | null>(null);
   if (!slides.length) return null;
-  const order = slides.map((_, k) => slides[(index + k) % slides.length]);
+  const order = [slides[index % slides.length]];
   const firstId = all[0]?.id;
+  const next = preload.map((id) => all.find((p) => p.id === id)).filter((p): p is Property => !!p && p.id !== order[0].id);
 
   return (
     <div
@@ -89,7 +92,7 @@ export function HeroShowcase({ all, slides, index, dir, segLabel, duration, time
                 key={`${timerKey}-${p.id}`}
                 aria-roledescription="slide"
                 aria-label={`${((index + k) % slides.length) + 1} of ${slides.length}: ${p.title}`}
-                className={`h-[18rem] shrink-0 grow sm:h-[20rem] lg:h-[23rem] xl:h-[24rem] ${slides.length === 1 ? 'basis-full' : slides.length === 2 ? 'basis-[84%] sm:basis-[calc((100%-0.75rem)/2)]' : 'basis-[84%] sm:basis-[calc((100%-0.75rem)/2)] md:basis-[calc((100%-1.5rem)/3)] lg:basis-[calc((100%-0.75rem)/2)]'} ${animate ? (dir === 1 ? 'card-in-next' : 'card-in-prev') : ''}`}
+                className={`h-[18rem] shrink-0 basis-full sm:h-[22rem] lg:h-[23rem] xl:h-[24rem] ${animate ? (dir === 1 ? 'card-in-next' : 'card-in-prev') : ''}`}
                 style={{ '--d': `${k * 70}ms` } as CSSProperties}
               >
                 <a
@@ -106,7 +109,7 @@ export function HeroShowcase({ all, slides, index, dir, segLabel, duration, time
                     quality={65}
                     placeholder={p.media.cover.blurDataURL ? 'blur' : 'empty'}
                     blurDataURL={p.media.cover.blurDataURL}
-                    sizes="(min-width: 1280px) 28vw, (min-width: 1024px) 29vw, (min-width: 768px) 31vw, (min-width: 640px) 47vw, 84vw"
+                    sizes={SIZES}
                     className="-z-10 object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                   />
                   <span aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(0_0_0/0.3)_0%,transparent_22%,transparent_45%,rgb(0_0_0/0.55)_70%,rgb(0_0_0/0.85)_100%)]" />
@@ -142,6 +145,11 @@ export function HeroShowcase({ all, slides, index, dir, segLabel, duration, time
             );
           })}
         </ul>
+        {next.map((p) => (
+          <span key={p.id} aria-hidden="true" className="pointer-events-none invisible absolute h-px w-px overflow-hidden">
+            <Image src={p.media.cover.url} alt="" fill loading="eager" quality={65} sizes={SIZES} />
+          </span>
+        ))}
       </section>
 
       <div className={`mt-4 flex items-center gap-3 ${slides.length < 2 ? 'hidden' : ''}`}>
