@@ -4,23 +4,41 @@ import { registerCorridorZones } from '@/lib/regions';
 import { toCardView, toPublicProperty } from './publicView';
 
 // Cached reads for public pages (ISR on Vercel). Admin publish actions call
-// revalidateTag('properties' | 'catalogue' | 'settings') to refresh them immediately.
-// Development keeps data for 30s (admin saves still refresh instantly by tag) instead of refetching
-// Firestore on every request.
-const REVALIDATE = process.env.NODE_ENV === 'development' ? 30 : 60;
+// revalidateTag('properties' | 'catalogue' | 'settings') through /api/revalidate, so admin changes
+// show at once; the timed refresh is only a safety net. It is kept long (1 hour) because every
+// refresh re-reads whole Firestore collections, and a short timer used up the free plan's daily
+// read quota. Development keeps data for 30s.
+const REVALIDATE = process.env.NODE_ENV === 'development' ? 30 : 3600;
+
+// During `next build` many pages render in parallel and each would read the same collections.
+// Share one read per collection per build worker instead.
+const isBuild = process.env.NEXT_PHASE === 'phase-production-build';
+const buildMemo = new Map<string, Promise<unknown>>();
+function once<T>(key: string, read: () => Promise<T>): () => Promise<T> {
+  return () => {
+    if (!isBuild) return read();
+    let hit = buildMemo.get(key) as Promise<T> | undefined;
+    if (!hit) {
+      hit = read();
+      buildMemo.set(key, hit);
+      hit.catch(() => buildMemo.delete(key));
+    }
+    return hit;
+  };
+}
 
 // Published listings that are not hidden and whose partner is not hidden (both set in the admin).
 const cachedProperties = unstable_cache(
-  async () => {
+  once('properties', async () => {
     const repos = getRepos();
     const [properties, developers] = await Promise.all([repos.properties.list({ status: 'published' }), repos.developers.list()]);
     const hiddenPartners = new Set(developers.filter((d) => d.hidden).map((d) => d.id));
     return properties.filter((p) => !p.hidden && !hiddenPartners.has(p.developerId)).map(toPublicProperty);
-  },
+  }),
   ['published-properties-v2'],
   { tags: ['properties', 'catalogue'], revalidate: REVALIDATE },
 );
-const cachedCorridors = unstable_cache(() => getRepos().corridors.list(), ['corridors'], { tags: ['catalogue'], revalidate: REVALIDATE });
+const cachedCorridors = unstable_cache(once('corridors', () => getRepos().corridors.list()), ['corridors'], { tags: ['catalogue'], revalidate: REVALIDATE });
 
 /** Corridors, with their admin-set regions registered for zoneOfCorridor(). */
 export async function getCorridors() {
@@ -46,8 +64,8 @@ export async function getPublishedProperty(slug: string) {
 }
 
 /** Partners shown on the website (hidden ones are left out). */
-export const getDevelopers = unstable_cache(async () => (await getRepos().developers.list()).filter((d) => !d.hidden), ['developers-visible'], { tags: ['catalogue'], revalidate: REVALIDATE });
-export const getOfficeHubs = unstable_cache(() => getRepos().corridors.listOfficeHubs(), ['office-hubs'], { tags: ['catalogue'], revalidate: REVALIDATE });
-export const getMarketSnapshots = unstable_cache(() => getRepos().corridors.listMarketSnapshots(), ['market-snapshots'], { tags: ['catalogue'], revalidate: REVALIDATE });
-export const getPublishedBlogs = unstable_cache(() => getRepos().blogs.listPublished(), ['published-blogs'], { tags: ['blogs'], revalidate: REVALIDATE });
-export const getSettings = unstable_cache(() => getRepos().settings.get(), ['site-settings'], { tags: ['settings'], revalidate: REVALIDATE });
+export const getDevelopers = unstable_cache(once('developers', async () => (await getRepos().developers.list()).filter((d) => !d.hidden)), ['developers-visible'], { tags: ['catalogue'], revalidate: REVALIDATE });
+export const getOfficeHubs = unstable_cache(once('office-hubs', () => getRepos().corridors.listOfficeHubs()), ['office-hubs'], { tags: ['catalogue'], revalidate: REVALIDATE });
+export const getMarketSnapshots = unstable_cache(once('market', () => getRepos().corridors.listMarketSnapshots()), ['market-snapshots'], { tags: ['catalogue'], revalidate: REVALIDATE });
+export const getPublishedBlogs = unstable_cache(once('blogs', () => getRepos().blogs.listPublished()), ['published-blogs'], { tags: ['blogs'], revalidate: REVALIDATE });
+export const getSettings = unstable_cache(once('settings', () => getRepos().settings.get()), ['site-settings'], { tags: ['settings'], revalidate: REVALIDATE });

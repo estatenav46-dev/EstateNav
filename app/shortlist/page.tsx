@@ -4,7 +4,7 @@ import { ShortlistView } from './ShortlistView';
 import { getListingCards, getSettings } from '@/lib/data/cached';
 
 export const metadata: Metadata = { title: 'Your wishlist', robots: { index: false } };
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export default async function ShortlistPage() {
   const [properties, settings] = await Promise.all([getListingCards(), getSettings()]);

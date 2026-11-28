@@ -5,7 +5,7 @@ import { getCorridors, getListingCards } from '@/lib/data/cached';
 import { allLandingPages, resolveLanding } from '@/lib/landing';
 import { landingMetadata } from '@/lib/landingMeta';
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 // A place plus a search: /bangalore/whitefield/2-bhk-flats. Exists only with at least two matches.
 async function load(place: string, filter: string) {

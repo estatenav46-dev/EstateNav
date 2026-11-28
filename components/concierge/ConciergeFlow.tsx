@@ -115,7 +115,9 @@ function Compass({ heading }: { heading: number | null }) {
   );
 }
 
-function Tile({ selected, onPick, index, children, className = '' }: { selected: boolean; onPick: () => void; index: number; children: React.ReactNode; className?: string }) {
+// `stack`: on phones the icon sits above the text and the tick moves to the corner, so two
+// tiles fit side by side; from the sm breakpoint up it is the usual row.
+function Tile({ selected, onPick, index, children, className = '', stack = false }: { selected: boolean; onPick: () => void; index: number; children: React.ReactNode; className?: string; stack?: boolean }) {
   return (
     <button
       type="button"
@@ -123,14 +125,14 @@ function Tile({ selected, onPick, index, children, className = '' }: { selected:
       aria-pressed={selected}
       data-ripple
       style={{ '--i': index } as CSSProperties}
-      className={`group relative flex w-full items-center gap-3 rounded-[14px] border p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-base ease-out active:scale-[0.97] sm:p-3.5 ${
+      className={`group relative flex w-full ${stack ? 'flex-col items-start gap-2 pr-9 sm:flex-row sm:items-center sm:gap-3 sm:pr-3.5' : 'items-center gap-3'} rounded-[14px] border p-3 text-left transition-[transform,border-color,background-color,box-shadow] duration-base ease-out active:scale-[0.97] sm:p-3.5 ${
         selected
           ? 'border-accent bg-accent-soft shadow-[0_16px_30px_-20px_rgb(var(--accent)/0.9)]'
           : 'border-line bg-surface hover:-translate-y-0.5 hover:border-line-strong hover:shadow-[0_16px_30px_-24px_rgb(var(--shadow)/0.6)]'
       } ${className}`}
     >
       {children}
-      <span className={`ml-auto inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-all duration-base ${selected ? 'scale-100 border-accent bg-accent text-accent-on' : 'scale-90 border-line-strong text-transparent group-hover:scale-100'}`}>
+      <span className={`${stack ? 'absolute right-2.5 top-2.5 sm:static sm:ml-auto' : 'ml-auto'} inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-all duration-base ${selected ? 'scale-100 border-accent bg-accent text-accent-on' : 'scale-90 border-line-strong text-transparent group-hover:scale-100'}`}>
         <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden="true" />
       </span>
     </button>
@@ -324,15 +326,15 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
             <>
               {heading(STEP_TITLE.goal)}
               <p className="mt-1.5 text-sm text-ink-muted">Pick one. About 20 seconds in all, no sign-up.</p>
-              <div className={`stagger grid gap-2 sm:grid-cols-2 ${inline ? 'mt-3 xl:grid-cols-3' : 'mt-5'}`}>
+              <div className={`stagger grid grid-cols-2 gap-2 ${inline ? 'mt-3 xl:grid-cols-3' : 'mt-5'}`}>
                 {GOALS.map((g, i) => (
-                  <Tile key={g.id} index={i} selected={answers.goal === g.id} onPick={() => pick('goal', g.id)} className={g.id === 'browsing' ? 'sm:col-span-2' : ''}>
-                    <span className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] transition-colors duration-base ${answers.goal === g.id ? 'bg-accent text-accent-on' : 'bg-accent-soft text-accent-ink group-hover:bg-accent group-hover:text-accent-on'}`}>
+                  <Tile key={g.id} index={i} selected={answers.goal === g.id} onPick={() => pick('goal', g.id)} stack={g.id !== 'browsing'} className={g.id === 'browsing' ? 'col-span-2' : ''}>
+                    <span className={`inline-flex h-9 w-9 shrink-0 sm:h-11 sm:w-11 items-center justify-center rounded-[12px] transition-colors duration-base ${answers.goal === g.id ? 'bg-accent text-accent-on' : 'bg-accent-soft text-accent-ink group-hover:bg-accent group-hover:text-accent-on'}`}>
                       <NeedIcon name={g.icon} className="h-[22px] w-[22px]" />
                     </span>
                     <span className="min-w-0">
-                      <span className="block text-sm font-semibold">{g.label}</span>
-                      <span className="block truncate text-xs text-ink-muted">{g.hint}</span>
+                      <span className="block text-sm font-semibold leading-tight">{g.label}</span>
+                      <span className="mt-0.5 block text-xs leading-snug text-ink-muted sm:truncate">{g.hint}</span>
                     </span>
                   </Tile>
                 ))}
@@ -367,11 +369,11 @@ export function ConciergeCard({ variant, consent, advisorName, catalogue, onClos
             <>
               {heading(STEP_TITLE.budget)}
               <p className="mt-1.5 text-sm text-ink-muted">Developer guide prices; your advisor confirms the final sheet.</p>
-              <div className="stagger mt-5 grid gap-2.5 sm:grid-cols-2">
+              <div className="stagger mt-5 grid grid-cols-2 gap-2.5">
                 {BUDGETS.map((b, i) => {
                   const n = matching(catalogue, { ...answers, budget: b.id }).length;
                   return (
-                    <Tile key={b.id} index={i} selected={answers.budget === b.id} onPick={() => pick('budget', b.id)} className={b.id === 'any' ? 'sm:col-span-2' : ''}>
+                    <Tile key={b.id} index={i} selected={answers.budget === b.id} onPick={() => pick('budget', b.id)} className={b.id === 'any' ? 'col-span-2' : ''}>
                       <span className="min-w-0">
                         <span className="block text-sm font-semibold">{b.label}</span>
                         <span className="block text-xs text-ink-muted">{n} {n === 1 ? 'match' : 'matches'}</span>

@@ -4,7 +4,7 @@ import { getCorridors, getListingCards } from '@/lib/data/cached';
 import { allLandingPages, CITY_PLACE, LANDING_ROOT, type LandingPage } from '@/lib/landing';
 import { landingMetadata } from '@/lib/landingMeta';
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 async function load() {
   const [properties, corridors] = await Promise.all([getListingCards(), getCorridors()]);

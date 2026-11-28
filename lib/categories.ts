@@ -3,7 +3,7 @@ import { matchesSegment } from './property';
 
 // Shortcuts on the home page ("What are you looking for?"). Each opens the explore page
 // with the matching filter already applied.
-export type NeedIcon = 'apartment' | 'plot' | 'ready' | 'launch' | 'budget' | 'family' | 'nri' | 'first-home' | 'office';
+export type NeedIcon = 'apartment' | 'plot' | 'ready' | 'launch' | 'budget' | 'family' | 'nri' | 'first-home' | 'office' | 'villa';
 
 export interface NeedTile {
   id: string;
@@ -19,7 +19,8 @@ export const NEED_TILES: NeedTile[] = [
   { id: 'ready', label: 'Ready to move', icon: 'ready', query: { pos: 'ready' }, matches: (p) => p.possession.status === 'ready' && p.transaction === 'sale' },
   { id: 'new-launch', label: 'New launches', icon: 'launch', query: { status: 'pre-launch,new-launch' }, matches: (p) => p.isNewLaunch || p.possession.status === 'pre-launch' },
   { id: 'under-1-5', label: 'Under ₹1.5 Cr', icon: 'budget', query: { max: '15000000' }, matches: (p) => p.transaction === 'sale' && p.priceMin <= 15_000_000 },
-  { id: '3bhk', label: '3 BHK & up', icon: 'family', query: { bhk: '3,3.5,4,4.5,5' }, matches: (p) => p.bhkOptions.some((b) => b >= 3) },
+  { id: 'villas', label: 'Villas', icon: 'villa', query: { ptype: 'villa,row-house,villament' }, matches: (p) => ['villa', 'row-house', 'villament'].includes(p.propertyType) },
+  { id: '3bhk', label: 'Upgrading', icon: 'family', query: { bhk: '3,3.5,4,4.5,5' }, matches: (p) => p.bhkOptions.some((b) => b >= 3) },
   { id: 'first-home', label: 'First home', icon: 'first-home', query: { lens: 'first-home' }, matches: (p) => p.lenses.includes('first-home') },
   { id: 'nri', label: 'NRI picks', icon: 'nri', query: { lens: 'nri' }, matches: (p) => p.lenses.includes('nri') },
   { id: 'offices', label: 'Offices', icon: 'office', query: { seg: 'commercial' }, matches: (p) => matchesSegment(p, 'commercial') },

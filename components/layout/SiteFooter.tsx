@@ -10,6 +10,7 @@ import { BackToTop, FooterCta } from './FooterBits';
 const TYPES = [
   { label: 'Apartments', page: '/bangalore/flats', href: '/properties?seg=residential' },
   { label: 'Plots', page: '/bangalore/plots', href: '/properties?seg=plot' },
+  { label: 'Villas', page: '/bangalore/villas', href: '/properties?ptype=villa,row-house,villament' },
   { label: 'Offices', page: '/bangalore/offices', href: '/properties?seg=commercial' },
   { label: 'New launches', page: '/bangalore/new-launch-projects', href: '/properties?status=pre-launch,new-launch' },
   { label: 'Ready to move', page: '/bangalore/ready-to-move-flats', href: '/properties?pos=ready' },
@@ -34,8 +35,8 @@ export function SiteFooter({ settings, corridors, pages = [], searches = [] }: {
       <div className="relative mx-auto max-w-container px-4 sm:px-6 lg:px-8">
         <FooterCta agentName={agent.name} whatsapp={contact.whatsapp} />
 
-        <div className="grid grid-cols-2 gap-x-6 gap-y-8 pt-10 lg:grid-cols-[minmax(0,1.5fr)_repeat(4,minmax(0,1fr))] lg:gap-8">
-          <div className="col-span-2 space-y-5 lg:col-span-1">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-8 pt-10 sm:grid-cols-3 lg:grid-cols-[minmax(0,1.6fr)_repeat(3,minmax(0,1fr))] lg:gap-8">
+          <div className="col-span-2 space-y-5 sm:col-span-3 lg:col-span-1">
             <p className="font-serif text-[1.75rem] leading-none">
               EstateNav
             </p>
@@ -82,17 +83,6 @@ export function SiteFooter({ settings, corridors, pages = [], searches = [] }: {
             </ul>
           </nav>
 
-          <nav aria-label="Corridors">
-            <p className={heading}>Corridors</p>
-            <ul className="mt-3 grid">
-              {corridors.map((c) => (
-                <li key={c.id}>
-                  <Link href={to(`/bangalore/${c.slug}`, `/properties?corridor=${c.id}`)} className={link}>{c.name}</Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
           <nav aria-label="Help">
             <p className={heading}>Help</p>
             <ul className="mt-3 grid">
@@ -117,6 +107,20 @@ export function SiteFooter({ settings, corridors, pages = [], searches = [] }: {
             </ul>
           </nav>
         </div>
+
+        {corridors.length > 0 && (
+          // Areas flow into several short columns instead of one long list.
+          <nav aria-label="Areas" className="mt-10">
+            <p className={heading}>Areas</p>
+            <ul className="mt-3 columns-2 gap-x-6 sm:columns-3 lg:columns-5 lg:gap-x-8">
+              {corridors.map((c) => (
+                <li key={c.id} className="break-inside-avoid">
+                  <Link href={to(`/bangalore/${c.slug}`, `/properties?corridor=${c.id}`)} className={`${link} py-1 leading-snug`}>{c.name}</Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
 
         {searches.length > 0 && (
           <nav aria-label="Popular searches" className="mt-10">

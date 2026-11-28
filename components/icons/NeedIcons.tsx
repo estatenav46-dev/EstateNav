@@ -2,7 +2,7 @@ import type { SVGProps } from 'react';
 
 // EstateNav's own icon set for property needs: one 24px grid, 1.6px rounded strokes and a
 // soft two-tone fill, drawn to read as architecture rather than generic UI glyphs.
-export type NeedIconName = 'apartment' | 'plot' | 'ready' | 'launch' | 'budget' | 'family' | 'first-home' | 'nri' | 'office';
+export type NeedIconName = 'apartment' | 'plot' | 'ready' | 'launch' | 'budget' | 'family' | 'first-home' | 'nri' | 'office' | 'villa';
 
 const tone = { fill: 'currentColor', opacity: 0.16, stroke: 'none' } as const;
 
@@ -67,6 +67,14 @@ const PATHS: Record<NeedIconName, JSX.Element> = {
       <circle cx="12" cy="12" r="8.5" />
       <path d="M3.5 12h17M12 3.5c-2.6 2.4-2.6 14.6 0 17M12 3.5c2.6 2.4 2.6 14.6 0 17" />
       <path d="M5.5 7.5c4 1.4 9 1.4 13 0M5.5 16.5c4-1.4 9-1.4 13 0" opacity="0.7" />
+    </>
+  ),
+  villa: (
+    <>
+      <path d="M3.5 11L9 6.5l5.5 4.5V20h-11z" {...tone} />
+      <path d="M2 12.2L9 6.5l7 5.7M3.5 11v9h11v-9" />
+      <path d="M14.5 13.5H21V20h-6.5M14.5 13.5l3.2-3 3.3 3" />
+      <path d="M7.5 20v-4h3v4M1.5 20h21" />
     </>
   ),
   office: (

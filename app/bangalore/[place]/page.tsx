@@ -5,7 +5,7 @@ import { getCorridors, getListingCards } from '@/lib/data/cached';
 import { allLandingPages, resolveLanding } from '@/lib/landing';
 import { landingMetadata } from '@/lib/landingMeta';
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 // One segment: a region or area (/bangalore/whitefield) or a city-wide search (/bangalore/2-bhk-flats).
 async function load(slug: string) {
