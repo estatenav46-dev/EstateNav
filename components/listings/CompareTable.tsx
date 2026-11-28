@@ -1,27 +1,48 @@
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import type { Property } from '@/lib/data/types';
-import { priceLabel, rateLabel, scaleFacts, sizeLabel, statusChip } from '@/lib/property';
+import { priceLabel, rateLabel, sizeLabel } from '@/lib/property';
 
 type Row = { label: string; values: string[] };
 
-const approvals = (p: Property) =>
-  [p.approvals.khata && `${p.approvals.khata}-Khata`, p.approvals.planAuthority && `${p.approvals.planAuthority} plan`, p.approvals.titleCheck === 'clear' && 'Title clear'].filter(Boolean).join(', ') || 'Ask advisor';
+// Main home types only: "Studio, 1, 2, 3 BHK" rather than every unit variant and size
+// (2.5 BHK counts as 2 BHK, 4.5 as 4).
+function homeTypes(p: Property): string {
+  const studio = p.configurations.some((c) => c.unitKind === 'studio');
+  const bhks = Array.from(new Set(p.bhkOptions.filter((b) => b >= 1).map((b) => Math.min(5, Math.floor(b))))).sort((a, b) => a - b);
+  const parts = [...(studio ? ['Studio'] : []), ...bhks.map((b) => (b >= 5 ? '5+' : String(b)))];
+  if (!bhks.length) return parts.join(', ') || 'Ask advisor';
+  return `${parts.join(', ')} BHK`;
+}
 
+const NEARBY_ROWS = [
+  { label: 'Transit', categories: ['metro', 'railway', 'bus'] },
+  { label: 'Education', categories: ['school', 'college'] },
+  { label: 'Healthcare', categories: ['hospital'] },
+] as const;
+
+// The closest listed place of these kinds, e.g. "Whitefield Metro · 1.2 km".
+function nearest(p: Property, categories: readonly string[]): string {
+  const places = p.nearby.filter((n) => categories.includes(n.category));
+  if (!places.length) return 'Ask advisor';
+  const far = (n: (typeof places)[number]) => n.distanceKm ?? (n.travelMins != null ? n.travelMins / 2 : Infinity);
+  const best = [...places].sort((a, b) => far(a) - far(b))[0];
+  const how = best.distanceKm != null ? `${Number(best.distanceKm.toFixed(1))} km` : best.travelMins != null ? `${best.travelMins} min` : null;
+  return how ? `${best.name} · ${how}` : best.name;
+}
+
+// Seven rows, the ones buyers weigh first: price, rate, home types, possession and what is close by.
+// Full specifications, approvals and amenities stay on each project's own page.
 export function compareRows(properties: Property[]): Row[] {
+  const homes = properties.every((p) => p.segment === 'residential');
   return [
     { label: 'Price', values: properties.map(priceLabel) },
     { label: '₹ / sq.ft', values: properties.map((p) => rateLabel(p) ?? '—') },
-    { label: 'Sizes', values: properties.map((p) => sizeLabel(p) ?? 'Ask advisor') },
-    { label: 'Configurations', values: properties.map((p) => p.configurations.map((c) => c.label).join(', ')) },
-    { label: 'Project size', values: properties.map((p) => scaleFacts(p).join(' · ') || '—') },
+    homes
+      ? { label: 'Home types', values: properties.map(homeTypes) }
+      : { label: 'Sizes', values: properties.map((p) => sizeLabel(p) ?? 'Ask advisor') },
     { label: 'Possession', values: properties.map((p) => p.possession.label) },
-    { label: 'Status', values: properties.map(statusChip) },
-    { label: 'Approvals', values: properties.map(approvals) },
-    { label: 'Bank approvals', values: properties.map((p) => p.bankApprovals.join(', ') || 'Ask advisor') },
-    { label: 'K-RERA', values: properties.map((p) => p.rera.number ?? 'RERA details on request') },
-    { label: 'Amenities', values: properties.map((p) => p.amenities.join(', ') || 'Ask advisor') },
-    { label: 'Corridor', values: properties.map((p) => `${p.locality} · ${p.corridorName}`) },
+    ...NEARBY_ROWS.map((r) => ({ label: r.label, values: properties.map((p) => nearest(p, r.categories)) })),
   ];
 }
 
@@ -60,7 +81,7 @@ export function CompareTable({ properties }: { properties: Property[] }) {
                   </span>
                 </th>
                 {row.values.map((value, i) => (
-                  <td key={i} className={`border-b border-line px-3 py-3 align-top ${differs ? 'bg-accent-soft/40' : ''} ${row.label === 'K-RERA' ? 'break-all font-mono text-2xs' : ''}`}>
+                  <td key={i} className={`border-b border-line px-3 py-3 align-top ${differs ? 'bg-accent-soft/40' : ''}`}>
                     {value}
                   </td>
                 ))}

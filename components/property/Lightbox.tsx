@@ -3,14 +3,19 @@
 import Image from 'next/image';
 import useEmblaCarousel from 'embla-carousel-react';
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import type { ImageRef } from '@/lib/data/types';
 
 type Zoom = { scale: number; x: number; y: number };
 const NONE: Zoom = { scale: 1, x: 0, y: 0 };
+let pendingBack: ReturnType<typeof setTimeout> | null = null;
 
 // Full-screen photo viewer: swipe between photos, pinch or double-tap to zoom, drag to pan.
-export default function Lightbox({ images, start, title, onClose }: { images: ImageRef[]; start: number; title: string; onClose: () => void }) {
+// It renders straight into <body> so no header or card can sit on top of it, and it adds a history
+// entry while open, so the phone's back button or back swipe (Android, iPhone, iPad) closes the
+// photos instead of leaving the page.
+export default function Lightbox({ images, start, title, onClose: close }: { images: ImageRef[]; start: number; title: string; onClose: () => void }) {
   const [viewport, embla] = useEmblaCarousel({ startIndex: start, loop: images.length > 1 });
   const [index, setIndex] = useState(start);
   const [zoom, setZoom] = useState<Zoom>(NONE);
@@ -18,6 +23,38 @@ export default function Lightbox({ images, start, title, onClose }: { images: Im
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const pinch = useRef<{ dist: number; scale: number } | null>(null);
   const pan = useRef<{ x: number; y: number; zx: number; zy: number } | null>(null);
+
+  // Back closes the viewer: push an entry on open; going back (gesture or button) pops it and closes.
+  // Closing any other way (✕, Escape) steps back over that entry so the history stays as it was.
+  // The router's own state is copied into the entry so Next.js treats it as the same page. The step
+  // back waits a tick so a quick unmount-and-remount (React's development double run) reuses the
+  // entry instead of popping it.
+  const closeRef = useRef(close);
+  closeRef.current = close;
+  useEffect(() => {
+    if (pendingBack) {
+      clearTimeout(pendingBack);
+      pendingBack = null;
+    } else {
+      window.history.pushState({ ...(window.history.state ?? {}), lightbox: true }, '');
+    }
+    let popped = false;
+    const onPop = () => {
+      if (window.history.state?.lightbox) return; // still on a viewer entry
+      popped = true;
+      closeRef.current();
+    };
+    window.addEventListener('popstate', onPop);
+    return () => {
+      window.removeEventListener('popstate', onPop);
+      if (popped) return;
+      pendingBack = setTimeout(() => {
+        pendingBack = null;
+        if (window.history.state?.lightbox) window.history.back();
+      }, 0);
+    };
+  }, []);
+  const onClose = () => close();
 
   useEffect(() => {
     if (!embla) return;
@@ -63,7 +100,8 @@ export default function Lightbox({ images, start, title, onClose }: { images: Im
       document.removeEventListener('keydown', onKey);
       previous?.focus();
     };
-  }, [embla, onClose]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [embla]);
 
   const onPointerDown = (e: React.PointerEvent) => {
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -91,13 +129,14 @@ export default function Lightbox({ images, start, title, onClose }: { images: Im
     if (pointers.current.size === 0) pan.current = null;
   };
 
-  return (
-    <div ref={dialog} role="dialog" aria-modal="true" aria-label={`${title} photos`} className="fixed inset-0 z-[95] flex flex-col bg-scrim/95 text-white">
+  if (typeof document === 'undefined') return null;
+  return createPortal(
+    <div ref={dialog} role="dialog" aria-modal="true" aria-label={`${title} photos`} className="fixed inset-0 z-[200] flex flex-col bg-scrim/95 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] text-white">
       <div className="flex items-center justify-between px-3 py-2">
         <p className="font-mono text-sm" aria-live="polite">
           {index + 1} / {images.length}
         </p>
-        <button data-close type="button" onClick={onClose} className="inline-flex h-12 w-12 items-center justify-center rounded-full hover:bg-white/10" aria-label="Close photos">
+        <button data-close type="button" onClick={onClose} className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/25 hover:bg-white/20" aria-label="Close photos">
           <X className="h-6 w-6" aria-hidden="true" />
         </button>
       </div>
@@ -131,6 +170,7 @@ export default function Lightbox({ images, start, title, onClose }: { images: Im
           </button>
         </div>
       )}
-    </div>
+    </div>,
+    document.body,
   );
 }

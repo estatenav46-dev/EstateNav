@@ -31,12 +31,19 @@ export function CompareTray() {
 
   return (
     <>
+      {/* Hidden, the tray slides down onto the phone's bottom action bar, so it must also stop taking
+          taps (pointer-events) and leave the page (visibility, after the slide) or it blocks those buttons. */}
       <div
         className="pointer-events-none fixed inset-x-0 bottom-[84px] z-40 flex justify-center px-3 md:bottom-5"
-        style={{ transform: show ? 'none' : 'translateY(140%)', opacity: show ? 1 : 0, transition: 'transform var(--dur-slow) var(--ease), opacity var(--dur-base) var(--ease)' }}
+        style={{
+          transform: show ? 'none' : 'translateY(140%)',
+          opacity: show ? 1 : 0,
+          visibility: show ? 'visible' : 'hidden',
+          transition: `transform var(--dur-slow) var(--ease), opacity var(--dur-base) var(--ease), visibility 0s linear ${show ? '0s' : 'var(--dur-slow)'}`,
+        }}
         aria-hidden={!show}
       >
-        <div className="pointer-events-auto flex w-full max-w-3xl items-center gap-3 rounded-card border border-line bg-surface p-2 pl-4 shadow-[0_18px_40px_-18px_rgb(var(--shadow)/0.45)]">
+        <div className={`${show ? 'pointer-events-auto' : 'pointer-events-none'} flex w-full max-w-3xl items-center gap-3 rounded-card border border-line bg-surface p-2 pl-4 shadow-[0_18px_40px_-18px_rgb(var(--shadow)/0.45)]`}>
           <p className="shrink-0 text-sm">
             Compare <span className="font-mono text-ink-muted">{items.length}/{MAX_COMPARE}</span>
           </p>

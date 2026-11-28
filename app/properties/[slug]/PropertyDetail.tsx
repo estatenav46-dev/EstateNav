@@ -135,6 +135,9 @@ export default function PropertyDetail({ property, developer, corridors, hubs, s
   ].filter((x): x is [string, string] => Boolean(x[1])).slice(0, 6);
   const inStrip = new Set(keyFacts.map(([label]) => label));
   const moreFacts = facts.filter(([label]) => !inStrip.has(label));
+  // The comparison table only appears when a similar listing is in the same segment and deal type.
+  const comparePool = allProperties.filter((p) => p.segment === property.segment && p.transaction === property.transaction);
+  const canCompare = similar.some((m) => comparePool.some((p) => p.id === m.property.id));
   const plans = [...(property.media.masterPlan ? [property.media.masterPlan] : []), ...property.media.floorPlans];
   const photos = property.media.gallery.length ? property.media.gallery : [property.media.cover];
   const rate = rateLabel(property);
@@ -200,11 +203,14 @@ export default function PropertyDetail({ property, developer, corridors, hubs, s
       </div>
       </div>
 
-      <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-4 border-y border-line py-4 sm:grid-cols-3 lg:grid-flow-col lg:grid-cols-none lg:auto-cols-fr">
+      {/* Desktop: one row where each column is as wide as its value (short facts like Rate and Units
+          stay narrow, Configurations and Size get the room); a value that still doesn't fit wraps to a
+          second line. Smaller screens: a 2- or 3-column grid. */}
+      <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-4 border-y border-line py-4 sm:grid-cols-3 lg:flex lg:gap-x-0">
         {keyFacts.map(([label, value]) => (
-          <div key={label} className="min-w-0 lg:border-l lg:border-line lg:pl-5 lg:first:border-l-0 lg:first:pl-0">
-            <dt className="text-2xs font-semibold uppercase tracking-[0.12em] text-ink-muted">{label}</dt>
-            <dd className="mt-1 truncate text-[0.95rem] font-semibold" title={value}>
+          <div key={label} className="min-w-0 lg:flex-auto lg:border-l lg:border-line lg:px-5 lg:first:border-l-0 lg:first:pl-0 lg:last:pr-0">
+            <dt className="whitespace-nowrap text-2xs font-semibold uppercase tracking-[0.12em] text-ink-muted">{label}</dt>
+            <dd className="mt-1 line-clamp-2 break-words text-[0.95rem] font-semibold leading-snug" title={value}>
               {value}
             </dd>
           </div>
@@ -429,7 +435,7 @@ export default function PropertyDetail({ property, developer, corridors, hubs, s
           <DetailsOnRequest property={property} settings={settings} />
         </div>
 
-        <PropertyActions property={property} settings={settings} />
+        <PropertyActions property={property} settings={settings} canCompare={canCompare} />
       </div>
 
       {similar.length > 0 && (
@@ -459,11 +465,7 @@ export default function PropertyDetail({ property, developer, corridors, hubs, s
         </section>
       )}
 
-      <AutoCompare
-        base={property}
-        suggested={similar.map((m) => m.property)}
-        pool={allProperties.filter((p) => p.segment === property.segment && p.transaction === property.transaction)}
-      />
+      <AutoCompare base={property} suggested={similar.map((m) => m.property)} pool={comparePool} />
     </main>
   );
 }

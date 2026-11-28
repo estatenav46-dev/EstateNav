@@ -1,6 +1,6 @@
 'use client';
 
-import { CalendarDays, FileText } from 'lucide-react';
+import { ArrowLeftRight, CalendarDays, FileText } from 'lucide-react';
 import type { Property, SiteSettings } from '@/lib/data/types';
 import dynamic from 'next/dynamic';
 import { LazySheet as Sheet } from '@/components/ui/LazySheet';
@@ -13,10 +13,10 @@ import { leadSheetStore, openLeadSheet } from '@/lib/ui/stores';
 
 const LeadForm = dynamic(() => import('@/components/forms/LeadForm').then((m) => m.LeadForm), { ssr: false, loading: () => <div className="skeleton h-72 rounded-xl" /> });
 
-type Props = { property: Property; settings: SiteSettings; advisorCard?: React.ReactNode; /** 'dock': a compact button row (used under the media panel) instead of the sticky price column. */ layout?: 'sidebar' | 'dock' };
+type Props = { property: Property; settings: SiteSettings; advisorCard?: React.ReactNode; /** Shows "Compare similar properties", which scrolls to the #compare section. */ canCompare?: boolean; /** 'dock': a compact button row (used under the media panel) instead of the sticky price column. */ layout?: 'sidebar' | 'dock' };
 
 // Desktop: sticky price-and-actions column. Phones: a sticky bottom bar (the dock steps aside).
-export function PropertyActions({ property, settings, advisorCard, layout = 'sidebar' }: Props) {
+export function PropertyActions({ property, settings, advisorCard, canCompare = false, layout = 'sidebar' }: Props) {
   const lead = leadSheetStore.useValue();
   const desktop = useMediaQuery('(min-width: 1024px)');
   const consent = { text: settings.consentText, version: settings.consentVersion, privacyNote: settings.privacyNote };
@@ -66,6 +66,24 @@ export function PropertyActions({ property, settings, advisorCard, layout = 'sid
               <button type="button" onClick={() => openLeadSheet('price-sheet')} className="btn-ghost min-h-[42px] w-full text-sm">
                 <FileText className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Get the price sheet
               </button>
+              {canCompare && (
+                <a
+                  href="#compare"
+                  data-track="cta"
+                  data-track-kind="compare-similar"
+                  onClick={(e) => {
+                    const target = document.getElementById('compare');
+                    if (!target) return;
+                    e.preventDefault();
+                    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                    target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+                    history.replaceState(null, '', '#compare');
+                  }}
+                  className="btn-ghost min-h-[42px] w-full text-sm"
+                >
+                  <ArrowLeftRight className="h-4 w-4 text-accent-ink" aria-hidden="true" /> Compare similar properties
+                </a>
+              )}
             </div>
             <p className="mt-4 border-t border-line pt-4 text-xs leading-relaxed text-ink-muted">
               {property.priceOnRequest ? 'Prices on request. ' : '*Approximate developer guide price; T&C apply. '}Zero buyer brokerage · K-RERA registered agent.

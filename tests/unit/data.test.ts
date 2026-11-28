@@ -72,4 +72,16 @@ describe('similar homes', () => {
   it('copes with a catalogue of one', () => {
     expect(similarProperties(properties[0], [properties[0]])).toEqual([]);
   });
+
+  it('ranks listings by how close their price is before area or BHK', () => {
+    const base = properties.find((p) => !p.priceOnRequest && p.priceMin > 0)!;
+    const kin = { segment: base.segment, transaction: base.transaction, priceOnRequest: false, featured: false };
+    // Same area and BHK, but three times the price.
+    const pricey = { ...base, ...kin, id: 'pricey', slug: 'pricey', priceMin: base.priceMin * 3, priceMax: null };
+    // Another area and other BHK, but within 10% of the price.
+    const close = { ...base, ...kin, id: 'close', slug: 'close', corridorId: 'elsewhere-area', bhkOptions: [9], priceMin: Math.round(base.priceMin * 1.1), priceMax: null };
+    const order = similarProperties(base, [base, pricey, close]).map((m) => m.property.id);
+    expect(order[0]).toBe('close');
+    expect(similarProperties(base, [base, close])[0].reasons[0]).toBe('Similar price');
+  });
 });

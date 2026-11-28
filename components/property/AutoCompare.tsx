@@ -34,7 +34,7 @@ export function AutoCompare({ base, suggested, pool }: { base: Property; suggest
   if (!others.length) return null;
 
   return (
-    <section aria-labelledby="auto-compare-title" className="mt-12 border-t border-line pt-10 sm:mt-14 sm:pt-12">
+    <section id="compare" aria-labelledby="auto-compare-title" className="mt-12 scroll-mt-24 border-t border-line pt-10 sm:mt-14 sm:pt-12">
       <p className="text-sm font-medium text-ink-muted">
         Compared for you
       </p>
@@ -91,7 +91,6 @@ export function AutoCompare({ base, suggested, pool }: { base: Property; suggest
           </thead>
           <tbody>
             {rows
-              .filter((row) => row.label !== 'K-RERA')
               .map((row) => {
                 const differs = new Set(row.values).size > 1;
                 return (
